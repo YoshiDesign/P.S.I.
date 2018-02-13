@@ -1,0 +1,9 @@
+import pygame
+from pygame.sprite import Sprite
+class Bullet(Sprite):
+	
+	def __init__(self, screen, g_settings, w_projectile):
+		super(Bullet, self).__init__()
+		
+		self.screen = screen
+		
