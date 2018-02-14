@@ -25,6 +25,10 @@ class Settings():
 		self.bullet_height = 2
 		self.bullet_width = 2
 		
+		# Ship settings
+		self.ship_speed_right = 5.0
+		self.ship_speed_left = 5.0
+		
 		
 
 	def init_dynamic_settings(self):
@@ -37,5 +41,13 @@ class Settings():
 		self.bomb_dmg = 2
 		self.lazer_dmg = 1
 		self.bullet_dmg = 1
+		
+	def change_reticle(self, reticle):
+		
+		pass 
+		
+	def load_background(self, screen):
+		screen.blit(self.background, self.background_rect)
+
 
 		
