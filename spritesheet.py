@@ -20,12 +20,12 @@ class Spritesheet:
 		h = self.cellHeight = self.rect.height / rows
 		# Half the width and half the height of each CELL
 		hw, hh = self.cellCenter = (w/2, h/2)
-		print(w, h)
+		#print(w, h)
 		
 		# A list of cells (a list of rectangles repr. each cell in the spritesheet)
 		self.cells = list([(i % cols * w, index / cols * h, w, h) for i in range(self.totalCells)])
 		# Offsets
-		print(self.cells)
+		#print(self.cells)
 		self.handle = list([
 		(0,0), (-hw,0), (-w,0),
 		(0, -hh), (-hw, -hh), (-w, -hh),

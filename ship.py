@@ -49,7 +49,7 @@ class Ship():
 			self.ship_x -= self.settings.ship_speed_left
 		if self.move_up and self.ship_y > self.screen_rect.centery:
 			# Uses same speed for UP as it does for RIGHT
-			self.ship_y -= self.settings.ship_speed_right
+			self.ship_y -= self.settings.ship_speed_up
 		if self.move_down and self.ship_y < self.screen_rect.bottom:
 			# Enumeration == mootsauce
 			self.ship_y += self.settings.ship_speed_left
@@ -64,8 +64,8 @@ class Ship():
 			
 			
 		
-	#~ def center_ship(self):
-		#~ self.center = self.screen_rect.centerx
+	def center_ship(self):
+		self.center = self.screen_rect.centerx
 	
 		
 		
