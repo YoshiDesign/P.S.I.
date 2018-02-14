@@ -1,11 +1,10 @@
 import pygame
-import sys
+import urllib
+import sys, socket
 from time import sleep
-
+from networking import MySocket
 from bullets import Bullet
 from alien import Alien
-
-
 	
 def check_events(g_settings, screen, ship, stats):
 
@@ -59,9 +58,31 @@ def check_player_clicks(event, g_settings, screen, ship):
 	pass
 	
 	
-def send_data():
-	pass
-	
+def send_data_TEST(name, fail=0):
+
+	socket.setdefaulttimeout = 0.50
+	url = "localhost"
+	url = urllib.parse.urlparse(url)
+	req_pre_format = "GET /invade?h=" + name + " HTTP/1.1\r\n\r\n"
+	REQ = req_pre_format.encode('utf-8')
+	HOST = url.netloc
+	PORT = 5000
+
+	print("HOST == {}\nPORT == {}\nREQ == {}".format(HOST, PORT, REQ))
+
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	#s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	#s.settimeout(0.30)
+
+	MS = MySocket(s)
+	MS.connect(HOST, PORT)
+	MS.mysend(REQ)
+	DD = MS.myreceive()
+	print("DD == {}".format(DD))
+
+	s.close()
+	#print("Received ", repr(data))
+
 def update_screen(g_settings, screen, ship, aliens, ret, stats):
 	# Mouse
 	mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -77,17 +98,23 @@ def update_screen(g_settings, screen, ship, aliens, ret, stats):
 def get_infoz(g_settings, screen, ship, stats, textbox):
 	""" Bring textbox to screen and monitor input """
 	events = pygame.event.get()
+	# Continue to monitor since we are not multiprocessing yet
 	for event in events:
 		if event.type == pygame.QUIT:
 			sys.exit()
 	if textbox.update(events):
 		# handle = User Input
 		handle = textbox.get_text()
-		print("HANDLE {}".format(len(handle)))
+		print("HANDLE {}".format(str(handle)))
 		start_game(g_settings, screen, ship, stats)
+
+		# INSERT TWITTER GETTER HERE
+
+		return False
 	
 	else:
 		screen.blit(textbox.get_surface(), (g_settings.screen_width / 2, 10))
+		return False
 
 
 def start_game(g_settings, screen, ship, stats):
@@ -96,8 +123,9 @@ def start_game(g_settings, screen, ship, stats):
 	stats.reset_stats()
 	stats.game_active = True
 	pygame.mouse.set_visible(False)
-	#ship.center_ship()
-	#g_settings.change_reticle()
+	# Reset Ship
+	# Reset Reticle
+
 	
 	
 	

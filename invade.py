@@ -23,19 +23,20 @@ def Main():
 	
 	pygame.init()
 	pygame.display.set_caption("Personal Space")
-
+	# name will be the result of get_info for twitter. Obviously relocated
+	name = "YoshiYoshums"
 	g_settings = Settings()
 	screen = pygame.display.set_mode((g_settings.screen_width, g_settings.screen_height))
-	
+
 	g_settings.load_background(screen)
 	stats = Stats(g_settings)
 	ship = Ship(screen, g_settings)
 	ret = Reticle(g_settings, screen)
 	textbox = TextInput()
 	aliens = Alien(screen, g_settings)
-	#bullets = Group()
+
+	gf.send_data_TEST(name)
 	
-	print(stats.game_active)	
 	while True:
 
 		gf.update_screen(g_settings, screen, ship, aliens, ret, stats)
@@ -46,14 +47,11 @@ def Main():
 			gf.start_game(g_settings, screen, ship, stats)
 			gf.check_events(g_settings, screen, ship, stats)
 
-		else:
-
-			
-				
+		else:	
 		### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
 			# Gather Textbox resources & set to screen
-			gf.get_infoz(g_settings, screen, ship, stats, textbox)
-				
+			x = gf.get_infoz(g_settings, screen, ship, stats, textbox)
+			
 			
 
 		### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
