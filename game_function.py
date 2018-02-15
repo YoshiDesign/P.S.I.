@@ -1,15 +1,16 @@
 import pygame
-import urllib
-import sys, socket
+import sys
+import multiprocessing
 from time import sleep
-from networking import MySocket
+import requests
 from bullets import Bullet
 from alien import Alien
 	
-def check_events(g_settings, screen, ship, stats):
+def check_events(g_settings, screen, ship, aliens, stats, textbox, play_twit_btn, play_reg_btn):
 
 	events = pygame.event.get()
 
+	# Events
 	for event in events:
 		print(event)
 
@@ -17,27 +18,37 @@ def check_events(g_settings, screen, ship, stats):
 			sys.exit()
 		# If textinput.update() == True, user pressed Return
 		elif event.type == pygame.MOUSEBUTTONDOWN:
+
 			mousex, mousey = pygame.mouse.get_pos()
-			check_player_clicks(event, g_settings, screen, ship)
-			
+			print("oy")
+			if not stats.game_active:
+				print("oy")
+				check_play_buttons(events, g_settings, screen, ship, stats, textbox, play_reg_btn, \
+					play_twit_btn, aliens, mousex, mousey)
+			else:
+				# Check Clicks during Gameplay
+				check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 		elif event.type == pygame.KEYDOWN:
 			keydown_event(event, g_settings, screen, ship, stats)
 		elif event.type == pygame.KEYUP:
-			keyup_event(event, ship)
+			keyup_event(event, ship, stats)
 			
-def keyup_event(event, ship):
+def keyup_event(event, ship, stats):
 	""" Keyups """
-	if event.key == pygame.K_d:
-		ship.move_right = False
-	elif event.key == pygame.K_a:
-		ship.move_left = False
-	elif event.key == pygame.K_s:
-		ship.move_down = False
-	elif event.key == pygame.K_w:
-		ship.move_up = False
+	# More events
+	if stats.game_active:
+		if event.key == pygame.K_d:
+			ship.move_right = False
+		elif event.key == pygame.K_a:
+			ship.move_left = False
+		elif event.key == pygame.K_s:
+			ship.move_down = False
+		elif event.key == pygame.K_w:
+			ship.move_up = False
 
 def keydown_event(event, g_settings, screen, ship, stats):
 	""" Keydowns """
+	# Aka more events
 	if stats.game_active:
 		if event.key == pygame.K_d:
 			ship.move_right = True
@@ -49,50 +60,68 @@ def keydown_event(event, g_settings, screen, ship, stats):
 			ship.move_up = True
 		elif event.key == pygame.K_SPACE:
 			pass
-		elif event.key == pygame.K_b:
-			start_game(g_settings, screen, stats, ship)
-		
+
+def check_play_buttons(events, g_settings, screen, ship, stats, textbox, play_reg_btn, \
+					play_twit_btn, aliens, mousex, mousey):
+	""" 
+		Check specifically for button presses 
+		Only Callable while game_active = 0
+	"""
+
+	# Check which game mode was selected
+	btn_reg_clicked = play_reg_btn.rect.collidepoint(mousex, mousey)
+	btn_twit_clicked = play_twit_btn.rect.collidepoint(mousex, mousey)
+
+	if (btn_reg_clicked or btn_twit_clicked) and not stats.game_active:
+		stats.reset_all()
+		check = textbox.update(events)
+		if btn_reg_clicked and not stats._current_game:
+			print("REGULAR")
+			# Start reg
+			stats.start_game()
+			
+			
+		elif btn_twit_clicked or check:
+			print("YUP")
+			# Start twitter
+
+			stats.start_game(game="tw")
+			start_twit_game(g_settings, screen, ship, aliens, stats)
+
+
+		elif btn_twit_clicked and not textbox.update(events):
+			print("NOPE")
+		else:
+			print("NUTHIN BUT DEBUGGIN")
+
+		# reset ship
+		# reset reticle
+
+def start_twit_game(g_settings, screen, ship, aliens, stats):
 	
-def check_player_clicks(event, g_settings, screen, ship):
+	ship.switch_game()
+	print("SHIP {}".format(ship._current_game))
+	aliens.switch_game()
+	#bullets.switch_game()
+
+	
+
+
+
+def set_Classes():
+	pass
+	
+def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey):
 	""" Click """
 	pass
 	
 	
 def send_data_TEST(name, fail=0):
-
-	socket.setdefaulttimeout = 0.50
-	url = "localhost"
-	url = urllib.parse.urlparse(url)
-	req_pre_format = "GET /invade?h=" + name + " HTTP/1.1\r\n\r\n"
-	REQ = req_pre_format.encode('utf-8')
-	HOST = url.netloc
-	PORT = 5000
-
-	print("HOST == {}\nPORT == {}\nREQ == {}".format(HOST, PORT, REQ))
-
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	#s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	#s.settimeout(0.30)
-
-	MS = MySocket(s)
-	MS.connect(HOST, PORT)
-	MS.mysend(REQ)
-	DD = MS.myreceive()
-	print("DD == {}".format(DD))
-
-	s.close()
-	#print("Received ", repr(data))
-
-def update_screen(g_settings, screen, ship, aliens, ret, stats):
-	# Mouse
-	mouse_x, mouse_y = pygame.mouse.get_pos()
-	# Load background so we dont leave ship footprints everywhere
-	g_settings.load_background(screen)
+	resp = []
+	url = "https://sleepy-river-27272.herokuapp.com/twit?h=" + name
+	resp = requests.get(url)
 	
-	if stats.game_active:
-		ship.update()
-		ret.blitme(mouse_x, mouse_y)
-		aliens.blitmeh()
+	return resp.json()
 
 	
 def get_infoz(g_settings, screen, ship, stats, textbox):
@@ -103,28 +132,52 @@ def get_infoz(g_settings, screen, ship, stats, textbox):
 		if event.type == pygame.QUIT:
 			sys.exit()
 	if textbox.update(events):
+
 		# handle = User Input
 		handle = textbox.get_text()
-		print("HANDLE {}".format(str(handle)))
-		start_game(g_settings, screen, ship, stats)
 
-		# INSERT TWITTER GETTER HERE
+		#start_twit_game(g_settings, screen, ship, stats)
+
+		# Get Twitter timeline, needs multiprocess capability
+		x = send_data_TEST(handle)
+		print(x)
+		### ### ### ### ### ### ### ### ### ###
+
+					# ANALYZER
+
+
+		### ### ### ### ### ### ### ### ### ###
+		stats.game_active = True
+		stats.game_twit_active = True
 
 		return False
-	
 	else:
-		screen.blit(textbox.get_surface(), (g_settings.screen_width / 2, 10))
+		x, y = g_settings.screen_width // 4, g_settings.screen_height // 4
+		screen.blit(textbox.get_surface(), (x*3-100, y*3-80))
 		return False
 
 
-def start_game(g_settings, screen, ship, stats):
+def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
+						 stats, play_reg_btn, play_twit_btn):
+	# Mouse
+	mouse_x, mouse_y = pygame.mouse.get_pos()
+	# Load background so we dont leave ship footprints everywhere
+	g_settings.load_background(screen)
 	
-	# Reset score / lvl / lives
-	stats.reset_stats()
-	stats.game_active = True
-	pygame.mouse.set_visible(False)
-	# Reset Ship
-	# Reset Reticle
+	if stats.game_active:
+		ship.update()
+		reticle.blitme(mouse_x, mouse_y)
+		aliens.blitmeh()
+	else:
+		play_reg_btn.create_button()
+		play_twit_btn.create_button()
+		# If everything breaks
+		
+
+
+
+
+
 
 	
 	

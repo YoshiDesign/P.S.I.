@@ -1,6 +1,9 @@
 import pygame, os
 
 class Settings():
+
+	# 0 = reg || 1 = twitter
+	_current_game = 0
 	
 	def __init__(self):
 		
@@ -29,7 +32,11 @@ class Settings():
 		
 		# Reticles
 		#self.Lazer_ret = 
-		
+
+
+		@staticmethod
+		def switch_game():
+			Settings._current_game = 1
 		
 		#
 		self.init_dynamic_settings()
