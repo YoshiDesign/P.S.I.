@@ -33,19 +33,15 @@ def Main():
 	reticle = Reticle(g_settings, screen)
 	textbox = TextInput()
 	aliens = Alien(screen, g_settings)
-	play_twit_btn = Button(g_settings, screen, text="Tweets", off_x=(g_settings.screen_width // 4), \
-															  off_y=(g_settings.screen_height // 4))
+	play_twit_btn = Button(g_settings, screen, text="Tweets", off_x=(g_settings.screen_width // 4))
 	play_reg_btn = Button(g_settings, screen, text="PLAY", off_x=(g_settings.screen_width // 4) * -1, \
-														   off_y=(g_settings.screen_height // 4) * -1 )
+														   off_y=(g_settings.screen_height // 8) * -1 )
 
 	
 	while True:
 		
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 								stats, play_reg_btn, play_twit_btn)
-
-		# Separation of gamestates
-		
 		
 		gf.check_events(g_settings, screen, ship, aliens, stats, textbox, play_twit_btn, play_reg_btn)
 		

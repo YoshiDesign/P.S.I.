@@ -42,9 +42,6 @@ class Stats():
 		else:
 			pass
 
-		
-
-
 
 	def reset_all(self):
 		""" Revert stats to initial state """

@@ -23,12 +23,17 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, play_twit_btn
 			mousex, mousey = pygame.mouse.get_pos()
 			print("oy")
 			if not stats.game_active:
+
+				# OP : check_play_buttons and check_player_clicks could be 1 functions
+				# as the conditions for check_play_buttons, arent entirely verbose
+
 				print("oyo")
 				check_play_buttons(events, g_settings, screen, ship, stats, textbox, play_reg_btn, \
 					play_twit_btn, aliens, mousex, mousey)
+
 			else:
-				# Check Clicks during Gameplay
 				check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
+
 		elif event.type == pygame.KEYDOWN:
 			keydown_event(event, g_settings, screen, ship, stats)
 		elif event.type == pygame.KEYUP:
@@ -134,15 +139,18 @@ def get_infoz(events, g_settings, screen, ship, stats, textbox):
 		if event.type == pygame.QUIT:
 			sys.exit()
 	if textbox.update(events):
+		print("YAAAA")
 
-		# handle = User Input
+		# handle is the user's input
 		handle = textbox.get_text()
 
 		#start_twit_game(g_settings, screen, ship, stats)
 
 		# Get Twitter timeline, needs multiprocess capability
-		x = send_data_TEST(handle)
-		print(x)
+		tweets = send_data_TEST(handle)
+		if tweets:
+			print("{} SAYS : ".format(handle))
+			print(tweets)
 		### ### ### ### ### ### ### ### ### ###
 
 					# ANALYZER
@@ -154,7 +162,7 @@ def get_infoz(events, g_settings, screen, ship, stats, textbox):
 
 		return False
 	else:
-		x, y = g_settings.screen_width // 4, g_settings.screen_height // 4
+		x, y = g_settings.screen_width // 4, g_settings.screen_height // 6
 		screen.blit(textbox.get_surface(), (x*3-100, y*3-80))
 		return False
 
