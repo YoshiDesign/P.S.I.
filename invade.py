@@ -46,10 +46,10 @@ def Main():
 
 		# Separation of gamestates
 		
-		if stats.game_active:
-				gf.check_events(g_settings, screen, ship, aliens, stats, textbox, play_twit_btn, play_reg_btn)
-		else:
-			gf.get_infoz(g_settings, screen, ship, stats, textbox)
+		
+		gf.check_events(g_settings, screen, ship, aliens, stats, textbox, play_twit_btn, play_reg_btn)
+		
+			
 
 		
 			

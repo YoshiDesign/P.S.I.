@@ -9,12 +9,12 @@ class Alien(Sprite):
 	
 	def __init__(self, screen, g_settings):
 		super(Alien, self).__init__()
-		self.fp = os.fsencode("sprites/alien/")
+		self.fp = os.fsencode("sprites/")
 		self.screen = screen
 		self.screen_rect = screen.get_rect()
 		self.g_settings = g_settings
 		
-		self.image = pygame.image.load(os.fsdecode(self.fp) + "a1_Alien.png")
+		self.image = pygame.image.load(os.fsdecode(self.fp) + "let_C20.png")
 		self.rect = self.image.get_rect()
 		self.rect.x = self.rect.width 
 		self.rect.y = self.rect.height

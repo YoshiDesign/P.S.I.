@@ -9,7 +9,8 @@ from alien import Alien
 def check_events(g_settings, screen, ship, aliens, stats, textbox, play_twit_btn, play_reg_btn):
 
 	events = pygame.event.get()
-
+	if not stats.game_active:
+		get_infoz(events, g_settings, screen, ship, stats, textbox)
 	# Events
 	for event in events:
 		print(event)
@@ -22,7 +23,7 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, play_twit_btn
 			mousex, mousey = pygame.mouse.get_pos()
 			print("oy")
 			if not stats.game_active:
-				print("oy")
+				print("oyo")
 				check_play_buttons(events, g_settings, screen, ship, stats, textbox, play_reg_btn, \
 					play_twit_btn, aliens, mousex, mousey)
 			else:
@@ -124,9 +125,10 @@ def send_data_TEST(name, fail=0):
 	return resp.json()
 
 	
-def get_infoz(g_settings, screen, ship, stats, textbox):
+def get_infoz(events, g_settings, screen, ship, stats, textbox):
 	""" Bring textbox to screen and monitor input """
-	events = pygame.event.get()
+	##
+	# events = pygame.event.get()
 	# Continue to monitor since we are not multiprocessing yet
 	for event in events:
 		if event.type == pygame.QUIT:

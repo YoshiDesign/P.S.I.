@@ -51,9 +51,9 @@ class Ship():
 												self.ship_x, self.ship_y)
 		
 		# Movement Sensors
-		if self.move_right and self.ship_x < self.screen_rect.right:
+		if self.move_right and self.ship_x < self.screen_rect.right + 40:
 			self.ship_x += self.settings.ship_speed_right
-		if self.move_left and self.ship_x > self.screen_rect.left:
+		if self.move_left and self.ship_x > self.screen_rect.left - 40:
 			self.ship_x -= self.settings.ship_speed_left
 		# Twiter Mode upper allowance
 		if self.move_up and self.ship_y > self.screen_rect.centery - 250 \
