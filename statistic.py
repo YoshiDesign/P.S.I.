@@ -21,26 +21,26 @@ class Stats():
 	def switch_game():
 		""" if its 0, change it to 1, otherwise it is zero """
 		# OVER ENGINEERING
+		
 		if Stats._current_game == 0:
 			Stats._current_game = 1
 		else:
 			Stats._current_game = 0
+		print("Game state is {}".format(Stats._current_game))
 		
 
 	def start_game(self, game=""):
 
 		self.game_active = True
-		pygame.mouse.set_visible(False)
+		
 		self.g_settings.init_dynamic_settings()
 
+		pygame.mouse.set_visible(False)
 
 		if game == "tw":
 			# Change to a twitter game
+			print("ENGAGE TWITTER")
 			Stats.switch_game()
-		elif game == "nt":
-			pass
-		else:
-			pass
 
 
 	def reset_all(self):

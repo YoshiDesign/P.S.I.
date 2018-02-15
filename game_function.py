@@ -80,19 +80,19 @@ def check_play_buttons(events, g_settings, screen, ship, stats, textbox, play_re
 
 	if (btn_reg_clicked or btn_twit_clicked) and not stats.game_active:
 		stats.reset_all()
-		check = textbox.update(events)
-		if btn_reg_clicked and not stats._current_game:
-			print("REGULAR")
+		
+		if btn_reg_clicked:
+			print("REGULAR MODE")
 			# Start reg
 			stats.start_game()
 			
 			
-		elif btn_twit_clicked or check:
-			print("YUP")
+		elif (btn_twit_clicked and textbox.get_text()) or textbox.get_text():
+			print("TWITTER MODE")
 			# Start twitter
 
 			stats.start_game(game="tw")
-			start_twit_game(g_settings, screen, ship, aliens, stats)
+			
 
 
 		elif btn_twit_clicked and not textbox.update(events):
@@ -126,7 +126,6 @@ def send_data_TEST(name, fail=0):
 	resp = []
 	url = "https://sleepy-river-27272.herokuapp.com/twit?h=" + name
 	resp = requests.get(url)
-	
 	return resp.json()
 
 	
@@ -138,13 +137,12 @@ def get_infoz(events, g_settings, screen, ship, stats, textbox):
 	for event in events:
 		if event.type == pygame.QUIT:
 			sys.exit()
+	
 	if textbox.update(events):
-		print("YAAAA")
-
+		
 		# handle is the user's input
 		handle = textbox.get_text()
-
-		#start_twit_game(g_settings, screen, ship, stats)
+		print("Getting tweets from @{}".format(handle))
 
 		# Get Twitter timeline, needs multiprocess capability
 		tweets = send_data_TEST(handle)
@@ -157,8 +155,8 @@ def get_infoz(events, g_settings, screen, ship, stats, textbox):
 
 
 		### ### ### ### ### ### ### ### ### ###
+		stats.switch_game()
 		stats.game_active = True
-		stats.game_twit_active = True
 
 		return False
 	else:
@@ -175,9 +173,12 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 	g_settings.load_background(screen)
 	
 	if stats.game_active:
-		ship.update()
-		reticle.blitme(mouse_x, mouse_y)
-		aliens.blitmeh()
+		if stats._current_game:
+			print("meh")
+		else:
+			ship.update()
+			reticle.blitme(mouse_x, mouse_y)
+			aliens.blitmeh()
 	else:
 		play_reg_btn.create_button()
 		play_twit_btn.create_button()
