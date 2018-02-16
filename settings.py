@@ -1,5 +1,6 @@
 import pygame, os
 
+
 class Settings():
 
 	# 0 = reg || 1 = twitter

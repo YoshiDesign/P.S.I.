@@ -39,7 +39,7 @@ class Ship():
 	def switch_game():
 		Ship._current_game = 1
 
-	def update(self):
+	def update(self, game_type=0):
 		
 		if self.index < 100:
 			self.index += 1
@@ -56,8 +56,8 @@ class Ship():
 		if self.move_left and self.ship_x > self.screen_rect.left - 40:
 			self.ship_x -= self.settings.ship_speed_left
 		# Twiter Mode upper allowance
-		if self.move_up and self.ship_y > self.screen_rect.centery - 250 \
-					and self.stats._current_game:
+		if self.move_up and self.ship_y > self.screen_rect.centery + 250 \
+					and game_type:
 			self.ship_y -= self.settings.ship_speed_up
 		# Reg Mode upper allowance
 		elif self.move_up and self.ship_y > self.screen_rect.top \

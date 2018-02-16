@@ -5,9 +5,12 @@ class Button():
 	# 0 = reg || 1 = twitter
 	_current_game = 0
 	
-	def __init__(self, g_settings, screen, text="", width=200, \
-				 height=50, color=(0,255,200), text_color=(0,0,0), \
-				 font_size=32, off_x=0, off_y=0):
+	def __init__(self, g_settings, screen, \
+						text="", width=200, \
+				 		height=50, color=(0,255,200), \
+				 		text_color=(0,0,0), \
+				 		font_size=32, \
+				 		off_x=0, off_y=0):
 		
 		self.g_settings = g_settings
 		self.screen = screen

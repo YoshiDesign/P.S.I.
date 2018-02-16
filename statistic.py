@@ -1,4 +1,5 @@
 import pygame
+from analyze import Analyzer
 
 class Stats():
 	
@@ -19,14 +20,18 @@ class Stats():
 		
 	@staticmethod
 	def switch_game():
-		""" if its 0, change it to 1, otherwise it is zero """
-		# OVER ENGINEERING
-		
+		""" 
+			if its 0, change it to 1, otherwise it is zero
+			THIS IS THE ENDPOINT for post analysis checks before game starts
+			@staticmethod required
+		"""
+
 		if Stats._current_game == 0:
 			Stats._current_game = 1
 		else:
 			Stats._current_game = 0
-		print("Game state is {}".format(Stats._current_game))
+	
+		
 		
 
 	def start_game(self, game=""):
@@ -41,7 +46,6 @@ class Stats():
 			# Change to a twitter game
 			print("ENGAGE TWITTER")
 			Stats.switch_game()
-
 
 	def reset_all(self):
 		""" Revert stats to initial state """

@@ -1,8 +1,9 @@
 import pygame
-import sys
+import sys, os
 import multiprocessing
 from time import sleep
 import requests
+from analyze import Analyzer
 from bullets import Bullet
 from alien import Alien
 	
@@ -123,6 +124,7 @@ def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 	
 	
 def send_data_TEST(name, fail=0):
+	""" Activate the web server's view function to access the Twitter API """
 	resp = []
 	url = "https://sleepy-river-27272.herokuapp.com/twit?h=" + name
 	resp = requests.get(url)
@@ -144,21 +146,40 @@ def get_infoz(events, g_settings, screen, ship, stats, textbox):
 		handle = textbox.get_text()
 		print("Getting tweets from @{}".format(handle))
 
-		# Get Twitter timeline, needs multiprocess capability
-		tweets = send_data_TEST(handle)
+		# No interruptions but still traceback to stderr
+		try:
+			tweets = send_data_TEST(handle)
+		except:
+			print("Something went wrong : {}".\
+				format(sys.exc_info()[:-1]))
+			
+
 		if tweets:
-			print("{} SAYS : ".format(handle))
-			print(tweets)
-		### ### ### ### ### ### ### ### ### ###
+			# If Twitter API responds
+			tokenized_tweets = []
+			# Get (probably) POSIX paths to txt files
+			positive = os.path.join(sys.path[0], \
+					"sentiments/positive-words.txt")
+			negative = os.path.join(sys.path[0], \
+					"sentiments/negative-words.txt")
+			analyzer = Analyzer(positive, negative, stats)
 
-					# ANALYZER
+			for i, tweet in enumerate(tweets):
+				"""
+					Tweets are stored in a list as the analysis occurs.
+								List looks like:
+					[["This", "is", "tweet", "one", "!"],["and", "two"]...etc]
+				"""
+				tokenized_tweets.append(analyzer.analyze(tweet))
 
+			print(tokenized_tweets)
 
-		### ### ### ### ### ### ### ### ### ###
-		stats.switch_game()
-		stats.game_active = True
-
-		return False
+			stats.switch_game()
+			stats.game_active = True
+			return True
+		else:
+			print("Could not receive tweets from server")
+			return False
 	else:
 		x, y = g_settings.screen_width // 4, g_settings.screen_height // 6
 		screen.blit(textbox.get_surface(), (x*3-100, y*3-80))
@@ -174,7 +195,8 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 	
 	if stats.game_active:
 		if stats._current_game:
-			print("meh")
+			# A twitter-mode only update loop
+			ship.update(game_type=1)
 		else:
 			ship.update()
 			reticle.blitme(mouse_x, mouse_y)
