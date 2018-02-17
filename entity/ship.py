@@ -1,6 +1,6 @@
 import pygame
 import sys, os
-from spritesheet import Spritesheet
+from tools.spritesheet import Spritesheet
 
 class Ship():
 
