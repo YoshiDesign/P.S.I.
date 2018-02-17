@@ -6,6 +6,7 @@ import requests
 from analyze import Analyzer
 from entity.bullets import Bullet
 from entity.alien import Alien
+from entity.tweeter import Tweeter
 	
 def check_events(g_settings, screen, ship, aliens, stats, textbox, play_twit_btn, play_reg_btn):
 	""" Displays text input box as well as monitors player events """
@@ -70,8 +71,9 @@ def keydown_event(event, g_settings, screen, ship, stats):
 		elif event.key == pygame.K_SPACE:
 			pass
 
-def check_play_buttons(events, g_settings, screen, ship, stats, textbox, play_reg_btn, \
-					play_twit_btn, aliens, mousex, mousey):
+def check_play_buttons(events, g_settings, screen, ship, \
+							stats, textbox, play_reg_btn, \
+							play_twit_btn, aliens, mousex, mousey):
 	""" 
 		Check specifically for button presses 
 		Only Callable while game_active = 0
@@ -116,18 +118,26 @@ def start_twit_game(g_settings, screen, ship, aliens, stats):
 	#bullets.switch_game()
 
 
-def create_army(g_settings, screen, ship, tweet_bot):
-	""" Create our Twitter Foes""" 
+def create_army(g_settings, screen, ship, tokenized, neg_words, pos_words):
+	""" Create our Twitter Foes"""
+	for tweet in tokenized:
+		Tweeter.construct_tweet_army(g_settings, screen, ship, tokenized, neg_words, pos_words)
+	return True
 
+def get_align_x(g_settings, entity):
+	pass
 
+def get_align_y(g_settings, entity):
+	pass
 
 def update_army():
 	pass
 
-def set_Classes():
+def align_army():
+	enemy = Tweeter(g_settings, screen)
 	pass
 	
-def check_player_clicks(g_settings, screen, ship, stats, mousex, mousey):
+def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey):
 	""" Click """
 	pass
 	
@@ -180,14 +190,14 @@ def get_infoz(events, g_settings, screen, ship, stats, textbox):
 			for i, tweet in enumerate(tweet_bot):
 				"""
 					Tweets are stored in a list as the analysis occurs.
-								List looks like:
+							tokenized looks like:
 					[["This", "is", "tweet", "one", "!"],["and", "two"]...etc]
 				"""
 				tokenized_tweets.append(analyzer.analyze(tweet))
 
-			print(tokenized_tweets)
-			print(analyzer._pos_words)
-			create_army(g_settings, screen, ship, tweet_bot)
+			# Safe to use direct call to analyzer_words here ...fully endorsed
+			create_army(g_settings, screen, ship, tokenized_tweets, \
+							analyzer._neg_words, analyzer._pos_words)
 			stats.switch_game()
 			stats.game_active = True
 			return True

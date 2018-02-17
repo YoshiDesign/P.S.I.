@@ -12,7 +12,11 @@ class Settings():
 		self.screen_height = 800
 		# Load Image / sprites
 		self.fp = os.fsencode("media/Back.jpg")
+					#########
+		self.f2 = os.fsencode("media/Back.jpg")
 		self.background = pygame.image.load(os.fsdecode(self.fp))
+		self.background2 = pygame.image.load(os.fsdecode(self.fp))
+		# Essentially same as the screen object rect?
 		self.background_rect = self.background.get_rect()
 		
 		# Lives
@@ -34,7 +38,9 @@ class Settings():
 		# Reticles
 		#self.Lazer_ret = 
 
-
+		# Twitter stuff. Twit = A single letter of a tweet
+		self.twit_speed_v = 4
+		self.twit_direction = 1
 		@staticmethod
 		def switch_game():
 			Settings._current_game = 1
@@ -63,7 +69,6 @@ class Settings():
 
 
 	def change_reticle(self, reticle):
-		
 		pass 
 		
 	def load_background(self, screen):
@@ -71,6 +76,9 @@ class Settings():
 		screen.blit(self.background, self.background_rect)
 
 		#self.reticle.blit(self.background)
+
+	def switch_background(self, screen):
+		pass
 
 
 		

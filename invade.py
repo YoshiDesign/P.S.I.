@@ -11,6 +11,7 @@ from entity.buttons import Button
 from entity.reticle import Reticle
 from entity.alien import Alien
 from entity.ship import Ship
+from entity.tweeter import Tweeter
 
 """
 	pygame.display.toggle_fullscreen
@@ -28,6 +29,7 @@ def Main():
 	screen = pygame.display.set_mode((g_settings.screen_width, \
 										g_settings.screen_height))
 
+	# Load the background image
 	g_settings.load_background(screen)
 	stats = Stats(g_settings)
 	ship = Ship(screen, g_settings, stats)
