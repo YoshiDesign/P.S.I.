@@ -16,13 +16,22 @@ class Tweeter(Sprite):
 		Tweeter._total_twits += 1
 		super(Sprite, self).__init__
 
-		if sentiment:
-			self.
-		else:
-			pass
+		
+		self.letter = text_data["letter"]
+		self.sentiment = text_data["sentiment"]
 
-		self.filepath = os.fsencode(str("sprites/characters/" + \
-								str(sentiment) + str(letter) + ".bmp"))
+		if isdigit(self.text_data["letter"]):
+			self.filepath = os.fsencode(str("sprites/characters/" + \
+								"good" + str(self.letter) + ".png"))
+
+		elif self.text_data["sentiment"]:
+			self.filepath = os.fsencode(str("sprites/characters/" + \
+								"good" + str(self.letter.upper()) + ".png"))
+		else:
+			self.filepath = os.fsencode(str("sprites/characters/" + \
+								"bad" + str(self.letter.upper()) + ".png"))
+
+		
 		
 		self.g_settings = g_settings
 		self.sentiment = sentiment
@@ -63,6 +72,7 @@ class Tweeter(Sprite):
 		for tweet in tokenized[:3]:
 
 			for word in tweet:
+
 				# Eject links & other fragments
 				if re.search(re_alphaNum, word):
 
@@ -71,12 +81,24 @@ class Tweeter(Sprite):
 					else:
 						sentiment = 1
 
-					for letter in word:
+					for n, letter in enumerate(word):
+
+						# Catch the last char in each word
+						try:
+							if not letter[n+1]:
+								end_char = 1
+						except IndexError:
+							end_char = 1
+							pass
 
 						letter = letter.lower()
-						text_data{let_num : letter}
+
+						# DOES LET_NUM NEED TO BE A DIGIT FOR ITERATION? I THNK SO... 
+
+						text_data{"letter" : letter}
 						text_data{"sentiment" : sentiment}
 						text_data{"end_char" : end_char}
+						text_data{"index no." : let_num}
 
 						# if endchar, increase width for space
 
