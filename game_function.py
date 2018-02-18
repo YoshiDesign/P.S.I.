@@ -120,8 +120,8 @@ def start_twit_game(g_settings, screen, ship, aliens, stats):
 
 def create_army(g_settings, screen, ship, tokenized, neg_words, pos_words):
 	""" Create our Twitter Foes"""
-	for tweet in tokenized:
-		Tweeter.construct_tweet_army(g_settings, screen, ship, tokenized, neg_words, pos_words)
+	
+	Tweeter.construct_tweet_army(g_settings, screen, ship, tokenized, neg_words, pos_words)
 	return True
 
 def get_align_x(g_settings, entity):

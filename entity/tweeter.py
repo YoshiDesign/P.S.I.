@@ -10,6 +10,7 @@ class Tweeter(Sprite):
 	_total_twits = 0
 	# (... sentiment=1...) infers positive by default
 	def __init__(self, g_settings, screen, x, y, sentiment=1, cur_letter=""):
+		Tweeter._total_twits += 1
 		""" 
 			Construct a letter sprite
 			Must adhere to naming convention 
@@ -19,7 +20,7 @@ class Tweeter(Sprite):
 
 		self.filepath = os.fsencode(str("sprites/characters/" + \
 							str(sentiment) + str(letter) + ".bmp"))
-		Tweeter._total_twits += 1
+		
 		self.g_settings = g_settings
 		self.sentiment = sentiment
 		self.screen = screen
@@ -49,24 +50,28 @@ class Tweeter(Sprite):
 		# tweet = ["I", "am", "tweet!"]
 		for tweet in tokenized:
 			for word in tweet:
-				if word in Analyzer._neg_words:
-					sentiment = 0
-				word = str(word) + " "
-				# Skip most links
+				# Eject links
 				if re.search("://", word):
 					continue
+				if word in Analyzer._neg_words:
+					sentiment = 0
+				# Spaces between words
+				word = str(word) + " "
+				
 				for letter in word:
-					return cls(g_settings, screen, x, y, sentiment=sentiment, cur_letter=letter)
+					letter = cls(g_settings, screen, x, y, sentiment=sentiment, cur_letter=letter)
 					#print(letter, end="")
 
 
 
-	def get_col(self, g_settings, ship):
+	def get_col(self, g_settings):
 		""" determine n(letters) in a row """
-		# Determine how many aliens can fit in a row
+		
+		# Acquire columns. Could come in handy
 		self.cols = g_settings.screen_width / self.image_rect.width
-		# subtract 8 letter widths, for space to move
 		self.avail_space = self.cols - (8 * self.image_rect.width)
+		return avail_space
+
 
 
 	def get_row(self, g_settings):
