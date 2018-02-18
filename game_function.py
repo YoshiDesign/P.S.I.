@@ -8,13 +8,13 @@ from entity.bullets import Bullet
 from entity.alien import Alien
 from entity.tweeter import Tweeter
 	
-def check_events(g_settings, screen, ship, aliens, stats, textbox, play_twit_btn, play_reg_btn):
+def check_events(g_settings, screen, ship, aliens, stats, textbox, twits, play_twit_btn, play_reg_btn):
 	""" Displays text input box as well as monitors player events """
 
 	events = pygame.event.get()
 	if not stats.game_active:
 		# Activates text box
-		get_infoz(events, g_settings, screen, ship, stats, textbox)
+		get_infoz(events, g_settings, screen, ship, twits, stats, textbox)
 	# Events
 	for event in events:
 		print(event)
@@ -112,7 +112,6 @@ def start_twit_game(g_settings, screen, ship, aliens, stats):
 	
 	# Switch_game sets class property
 	ship.switch_game()
-	aliens.switch_game()
 
 	print("SHIP {}".format(ship._current_game))
 	#bullets.switch_game()
@@ -150,7 +149,7 @@ def send_data_TEST(name, fail=0):
 	return resp.json()
 
 	
-def get_infoz(events, g_settings, screen, ship, stats, textbox):
+def get_infoz(events, g_settings, screen, ship, twits, stats, textbox):
 	""" 
 		This function's modularity is in its order 
 		of operations as opposed to ad-hoc functions
@@ -190,14 +189,15 @@ def get_infoz(events, g_settings, screen, ship, stats, textbox):
 			for i, tweet in enumerate(tweet_bot):
 				"""
 					Tweets are stored in a list as the analysis occurs.
-							tokenized looks like:
+							tokenized_tweets looks like:
 					[["This", "is", "tweet", "one", "!"],["and", "two"]...etc]
 				"""
 				tokenized_tweets.append(analyzer.analyze(tweet))
 
 			# Safe to use direct call to analyzer_words here ...fully endorsed
-			create_army(g_settings, screen, ship, tokenized_tweets, \
-							analyzer._neg_words, analyzer._pos_words)
+			create_army(twits, tokenized_tweets, \
+							analyzer._neg_words, \
+							analyzer._pos_words)
 			stats.switch_game()
 			stats.game_active = True
 			return True

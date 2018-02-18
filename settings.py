@@ -39,12 +39,13 @@ class Settings():
 		#self.Lazer_ret = 
 
 		# Twitter stuff. Twit = A single letter of a tweet
-		self.twit_speed_v = 4
 		self.twit_direction = 1
+		self.char_spacing = 4
+		self.twit_speed = 2
+
 		@staticmethod
 		def switch_game():
 			Settings._current_game = 1
-		
 		#
 		self.init_dynamic_settings()
 

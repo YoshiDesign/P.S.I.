@@ -36,6 +36,7 @@ def Main():
 	reticle = Reticle(g_settings, screen)
 	textbox = TextInput()
 	aliens = Alien(screen, g_settings)
+	twits = Group()
 
 	play_twit_btn = Button(g_settings, screen, text="Tweets", \
 						 off_x=(g_settings.screen_width // 4))
@@ -48,10 +49,10 @@ def Main():
 	while True:
 		
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-											stats, play_reg_btn, play_twit_btn)
+										twits, stats, play_reg_btn, play_twit_btn)
 				
 		gf.check_events(g_settings, screen, ship, aliens, stats, textbox, \
-												play_twit_btn, play_reg_btn)
+										twits, play_twit_btn, play_reg_btn)
 
 		pygame.display.flip()
 
