@@ -40,8 +40,11 @@ class Settings():
 
 		# Twitter stuff. Twit = A single letter of a tweet
 		self.twit_direction = 1
-		self.char_spacing = 4
-		self.twit_speed = 2
+		# Map to char .png dimensions
+		self.char_width = 20
+		self.char_height = 24
+		self.char_spacing = 1
+		self.twit_speed = 1
 
 		@staticmethod
 		def switch_game():

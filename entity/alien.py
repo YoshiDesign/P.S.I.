@@ -14,7 +14,7 @@ class Alien(Sprite):
 		self.screen_rect = screen.get_rect()
 		self.g_settings = g_settings
 		
-		self.image = pygame.image.load(os.fsdecode(self.fp) + "let_C20.png")
+		self.image = pygame.image.load(os.fsdecode(self.fp) + "/alien/a1_Alien.png")
 		self.rect = self.image.get_rect()
 		self.rect.x = self.rect.width 
 		self.rect.y = self.rect.height

@@ -12,8 +12,8 @@ class Stats():
 		self.reset_all()
 		# Game States
 		self.game_active = False
-		self.game_reg_active = False
-		self.game_twit_active = False
+		self.play_active = False
+		self.twit_active = False
 		# Statistics
 		self.score = 0
 		self.high_score = 0

@@ -2625,7 +2625,6 @@ itchy
 jabber
 jaded
 jagged
-jam
 jarring
 jaundiced
 jealous
@@ -2801,7 +2800,6 @@ lowly
 ludicrous
 ludicrously
 lugubrious
-lukewarm
 lull
 lumpy
 lunatic
@@ -2888,7 +2886,6 @@ messed
 messes
 messing
 messy
-midget
 miff
 militancy
 mindless
@@ -2948,11 +2945,8 @@ misread
 misreading
 misrepresent
 misrepresentation
-miss
 missed
-misses
 misstatement
-mist
 mistake
 mistaken
 mistakenly
@@ -2962,7 +2956,6 @@ mistress
 mistrust
 mistrustful
 mistrustfully
-mists
 misunderstand
 misunderstanding
 misunderstandings
