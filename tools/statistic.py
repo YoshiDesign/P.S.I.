@@ -21,11 +21,9 @@ class Stats():
 	@staticmethod
 	def switch_game():
 		""" 
-			if its 0, change it to 1, otherwise it is zero
-			THIS IS THE ENDPOINT for post analysis checks before game starts
+			THIS IS AN ENDPOINT for post sentiment analysis checks
 			@staticmethod required
 		"""
-
 		if Stats._current_game == 0:
 			Stats._current_game = 1
 		else:

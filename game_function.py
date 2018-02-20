@@ -139,35 +139,44 @@ def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 
 
 def create_army(g_settings, screen, twits, tokenized, \
-							neg_words, pos_words, start=0,act=2):
+							neg_words, pos_words, start=0,act=3):
 
 	import re
-	dots = 0
-	end_char = 0
-	text_data = {}
+	re_alphaNum = r"^[a-zA-Z0-9 ]+$"
+	# Idk what 'wild' is, hopefully it doesn't cause portability errors
+	wild 		= '…'
+	wild2		= '...'
+	dots 		= 0
+	end_char 	= 0
 	available_x = int(get_cols(g_settings))
 	available_y = int(get_rows(g_settings))
-	re_alphaNum = r"^[a-zA-Z0-9 ]+$"
-	# I should add !  ? and *
-
-	# [start:act] control how many & which tweets are made
-
-	position_x = make_space(available_x)
-	position_y = make_space(available_y)
-	y = next(position_y)
-
+	generate_x 	= make_space(available_x)
+	generate_y 	= make_space(available_y)
+	row = next(generate_y)
+	# ROW is assigned because unlike X, it is not reset, it has a stable vector throughout.
+	# ROW is now 0
 	for tweet in tokenized[start:act]:
-		print(tweet)
+		# Get rid of the confusing bits
+		if wild2 in tweet:
+			tweet.remove(wild2)
+		if wild in tweet:
+			tweet.remove(wild)
 
+		# Add our own delimiter
+		tweet.append("...")
+
+		print("TWEET {}".format(tweet))
 		for word in tweet:
-			# FLAG : if tweet cut off
-			if word == "...":
-				dots = 1
-				break
 
 			word = word.lower()
-
-			if re.search(re_alphaNum, word):
+			# FLAG : if tweet cut off
+			if word == "...":
+				word = "."
+				print("DOTS {}".format(word))
+				dots = 1
+				
+		
+			if re.search(re_alphaNum, word) or dots:
 
 				if word in Analyzer._neg_words:
 		 			# FLAG : determine sentiment
@@ -180,59 +189,76 @@ def create_army(g_settings, screen, twits, tokenized, \
 					if n == len(word) - 1:
 						end_char = 1
 					else:
-						end_char = 0
-					"""
-						Create our twit army
-					"""
-					# create_twit(end_char, letter, sentiment, available_x, available_y)
-					# Instantiate generators
-					text_data["end_char"] = int(end_char)
-					text_data["letter"] = str(letter.lower())
-					text_data["sentiment"] = sentiment
-					
-
-					character = Tweeter(g_settings, screen, text_data=text_data)
-
+						end_char = 0					
 					try:
-						# Using our generators we can assign a specific location to each letter
-						width = character.rect.width
-						character.x = width * next(position_x)
-						character.rect.x = character.x
-						character.rect.y = character.rect.height + (2 * (character.rect.height * y))
-						twits.add(character)
-
-						# If we are towards to right edge and at the end of a word
-						if next(position_x) >= 40 and text_data["end_char"] == 1:
-							y = next(position_y)
-							position_x = make_space(available_x)
+						print("MAKING dots = {}\nletter = {}".format(dots, letter))
+						make = assign_twit(g_settings, screen, twits, letter, sentiment, end_char, generate_x, row, dots=dots)
 
 
-						if text_data["end_char"] == 1:
+						# True == (Last char and >= 40)
+						if make or dots:
+							# Carriage return + newline
+							generate_x = make_space(available_x)
+							row = next(generate_y)
+							dots = 0
 
-							text_data["letter"] = "space"
-							character = Tweeter(g_settings, screen, text_data=text_data)
-							width = character.rect.width
-							# Using our generators we can assign a specific location to each letter
-							character.x = width * next(position_x)
-							character.rect.x = character.x
-							character.rect.y = character.rect.height + (2 * (character.rect.height * y))
-							twits.add(character)
-						
-					# When we run out of X positions to assign in a row
 					except StopIteration:
-						# We move to the next row down, and start from position 0
-						y = next(position_y)
+						""" This more than likely wont incur from the above algo"""
+						row = next(generate_y)
 						position_x = make_space(available_x)
-		if dots:
 
-		y = next(position_y)
+	row = next(generate_y)
 
-	# Clean up
+
+
+def assign_twit(g_settings, screen, twits, letter, sentiment, end_char, generate_x, row, dots=0):
+
 	text_data = {}
+	text_data["end_char"] = int(end_char)
+	text_data["letter"] = str(letter.lower())
+	text_data["sentiment"] = sentiment
+	x_pos = next(generate_x)
+
+	# Using our generators we can assign a specific location to each letter
+	if not dots:
+		character = Tweeter(g_settings, screen, text_data=text_data)
+		give_twit_dimension(character, x_pos, row)
+		twits.add(character)
+
+	# If we are at right edge (limit) and at the end of a word
+	if x_pos + 1 >= 40 and text_data["end_char"] == 1:
+		# We dont need a space -> return
+		return True
+
+	elif text_data["end_char"] == 1 or dots:
+		# We Require A space between words
+		text_data["letter"] = "space"
+		text_data["space"] = 1
+		if dots:
+			text_data["letter"] = "dots"
+		x_pos = next(generate_x)
+		# Make a space char
+		character = Tweeter(g_settings, screen, text_data=text_data)
+		give_twit_dimension(character, x_pos, row)
+		twits.add(character)
+		return False
+
+	else:
+
+		return False
+
+	
 
 
+	# Garbage Collection
+	del(text_data)
 
-def assign_create(sentiment, end_char, available_x, available_y)
+def give_twit_dimension(character, x_pos, row):
+	width = character.rect.width
+	# Using our generators we can assign a specific location to each letter
+	character.x = width * x_pos
+	character.rect.x = character.x
+	character.rect.y = character.rect.height + (2 * (character.rect.height * row))
 
 
 
@@ -244,19 +270,29 @@ def make_space(columns):
 
 def get_cols(g_settings):
 	cols = int(g_settings.screen_width // int(g_settings.char_width))
-	print("COLS {}".format(cols))
-	print("GSET CHAR WIDTH {}".format(g_settings.char_width))
-	avail_space = int(cols * g_settings.char_width - (8 * int(g_settings.char_width)))
-	print(avail_space)
+	avail_space = int(cols * g_settings.char_width - (2 * int(g_settings.char_width)))
 	return int(avail_space)
 
 def get_rows(g_settings):
-	avail_space = float(g_settings.screen_height - (5 * g_settings.char_height))
+	avail_space = float(g_settings.screen_height - (2 * int(g_settings.char_height)))
 	return avail_space
 		
 def update_twits(g_settings, screen, stats, twits):
 	twits.update()
+	check_twit_edges(g_settings, twits)
 	
+def check_twit_edges(g_settings, twits):
+	for twit in twits.sprites():
+		if twit.check_edges():
+			change_army_direction(g_settings, twits)
+
+
+def change_army_direction(g_settings, twits):
+	for twit in twits.sprites():
+		twit.rect.y += g_settings.twit_drop_speed
+	g_settings.twit_direction *= -1
+
+
 def send_data_TEST(name, fail=0):
 	""" Activate the web server's view function to access the Twitter API """
 	resp = []
@@ -312,8 +348,8 @@ def get_infoz(events, g_settings, screen, ship, twits, stats, textbox):
 
 			# Safe to use direct call to analyzer_words here ...fully endorsed
 			create_army(g_settings, screen, twits, tokenized_tweets, \
-							analyzer._neg_words, \
-							analyzer._pos_words)
+												analyzer._neg_words, \
+												analyzer._pos_words)
 			stats.switch_game()
 			stats.game_active = True
 			return True
@@ -331,8 +367,11 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 							twits, stats, play_reg_btn, play_twit_btn):
 	# Mouse
 	mouse_x, mouse_y = pygame.mouse.get_pos()
+
+	pygame.display.flip()
 	# Load background so we dont leave ship footprints everywhere
 	g_settings.load_background(screen)
+
 	
 	if stats.game_active:
 		# if _current_game is true...
@@ -350,7 +389,8 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 		play_twit_btn.create_button()
 		# If everything breaks
 
-	pygame.display.flip()
+
+	
 		
 
 

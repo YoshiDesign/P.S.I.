@@ -21,18 +21,24 @@ class Tweeter(Sprite):
 		self.sentiment = text_data["sentiment"]
 
 		# Determine character to display
-		if self.text_data["letter"].isdigit():
+		# self.space is repetative for readability
+		if self.letter == "dots":
+
+			self.filepath = os.fsencode(str("sprites/characters/ddd.png"))
+			self.space = False
+
+		elif self.letter.isdigit():
 
 			self.filepath = os.fsencode(str("sprites/characters/" + \
 								"good" + str(self.letter) + ".png"))
 			self.space = False
 
-		elif self.text_data["letter"] == "space":
+		elif self.letter == "space":
 
 			self.filepath = os.fsencode(str("sprites/characters/space.png"))
 			self.space = True
 
-		elif self.text_data["sentiment"] == 1:
+		elif self.sentiment == 1:
 
 			self.filepath = os.fsencode(str("sprites/characters/" + \
 								"good" + str(self.letter.upper()) + ".png"))
@@ -60,7 +66,7 @@ class Tweeter(Sprite):
 		screen_rect = self.screen.get_rect()
 		if self.rect.right >= screen_rect.right:
 			return True
-		elif self.rect <= 0:
+		elif self.rect.left <= 0:
 			return True
 		else:
 			# moot
@@ -68,7 +74,7 @@ class Tweeter(Sprite):
 
 	def update(self):
 		# Movement
-		self.x += (self.g_settings.twit_speed *\
+		self.x += (self.g_settings.twit_drop_speed *\
 				self.g_settings.twit_direction)
 		self.rect.x = self.x
 

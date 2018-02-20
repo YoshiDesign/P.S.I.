@@ -46,19 +46,25 @@ def Main():
 				off_y=(g_settings.screen_height // 8) * -1 )
 
 	while True:
+
 		
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 									twits, stats, play_reg_btn, play_twit_btn)
-				
+
 		gf.check_events(g_settings, screen, ship, aliens, stats, textbox, \
 										twits, play_twit_btn, play_reg_btn)
 
+				
+		
 		if stats.game_active == True:
 			if stats.twit_active:
 				gf.update_twits(g_settings, screen, twits, stats)
 
+			gf.update_twits(g_settings, screen, stats, twits)
 
-		pygame.display.flip()
+
+
+		
 
 if __name__ == "__main__":
 
