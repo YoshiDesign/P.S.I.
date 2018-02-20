@@ -25,19 +25,22 @@ class Tweeter(Sprite):
 
 			self.filepath = os.fsencode(str("sprites/characters/" + \
 								"good" + str(self.letter) + ".png"))
+			self.space = False
 
 		elif self.text_data["letter"] == "space":
 
 			self.filepath = os.fsencode(str("sprites/characters/space.png"))
 			self.space = True
 
-		elif self.text_data["sentiment"]:
-			
+		elif self.text_data["sentiment"] == 1:
+
 			self.filepath = os.fsencode(str("sprites/characters/" + \
 								"good" + str(self.letter.upper()) + ".png"))
+			self.space = False
 		else:
 			self.filepath = os.fsencode(str("sprites/characters/" + \
 								"bad" + str(self.letter.upper()) + ".png"))
+			self.space = False
 
 		self.g_settings = g_settings
 		self.screen = screen

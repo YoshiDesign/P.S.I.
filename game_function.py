@@ -139,9 +139,10 @@ def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 
 
 def create_army(g_settings, screen, twits, tokenized, \
-							neg_words, pos_words, start=0,act=3):
+							neg_words, pos_words, start=0,act=2):
 
 	import re
+	dots = 0
 	end_char = 0
 	text_data = {}
 	available_x = int(get_cols(g_settings))
@@ -159,21 +160,23 @@ def create_army(g_settings, screen, twits, tokenized, \
 		print(tweet)
 
 		for word in tweet:
+			# FLAG : if tweet cut off
+			if word == "...":
+				dots = 1
+				break
 
-			
+			word = word.lower()
 
 			if re.search(re_alphaNum, word):
 
 				if word in Analyzer._neg_words:
-		 			# insert POD RACER
-		 			print("NEGATORY {}".format(word))
+		 			# FLAG : determine sentiment
 		 			sentiment = 0
 				else:
 					sentiment = 1
 
 				for n, letter in enumerate(word):
-
-					# Identify the last char of word
+					# FLAG : Identify the last char of the word
 					if n == len(word) - 1:
 						end_char = 1
 					else:
@@ -185,28 +188,24 @@ def create_army(g_settings, screen, twits, tokenized, \
 					# Instantiate generators
 					text_data["end_char"] = int(end_char)
 					text_data["letter"] = str(letter.lower())
-					text_data["sentiment"] = str(sentiment)
+					text_data["sentiment"] = sentiment
 					
 
 					character = Tweeter(g_settings, screen, text_data=text_data)
 
 					try:
-						width = character.rect.width
 						# Using our generators we can assign a specific location to each letter
-
+						width = character.rect.width
 						character.x = width * next(position_x)
 						character.rect.x = character.x
 						character.rect.y = character.rect.height + (2 * (character.rect.height * y))
 						twits.add(character)
 
 						# If we are towards to right edge and at the end of a word
-						if next(position_x) >= 45 and text_data["end_char"] == 1:
+						if next(position_x) >= 40 and text_data["end_char"] == 1:
 							y = next(position_y)
 							position_x = make_space(available_x)
 
-################################
-################################
-################################
 
 						if text_data["end_char"] == 1:
 
@@ -219,22 +218,24 @@ def create_army(g_settings, screen, twits, tokenized, \
 							character.rect.y = character.rect.height + (2 * (character.rect.height * y))
 							twits.add(character)
 						
-							
-
 					# When we run out of X positions to assign in a row
 					except StopIteration:
 						# We move to the next row down, and start from position 0
 						y = next(position_y)
 						position_x = make_space(available_x)
-
-
-			else:
-				continue
+		if dots:
 
 		y = next(position_y)
 
 	# Clean up
 	text_data = {}
+
+
+
+def assign_create(sentiment, end_char, available_x, available_y)
+
+
+
 
 # Generator from 0 to total COLS
 def make_space(columns):

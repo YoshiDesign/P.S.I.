@@ -18,7 +18,7 @@ class Analyzer():
         """Initialize Analyzer."""
         # This will store 2 lists / all_p and all_n words
         self.dict_words = {"pos" : [], "neg" : []}
-        self.tolkein = TweetTokenizer()
+        self.tokenizer = TweetTokenizer()
         #Building all_words dictionary
         with open(positive, "r") as fp:
             try:
@@ -50,19 +50,20 @@ class Analyzer():
         """ Sentiment Analyzer """
 
         # Proper tokenizing
-        self.words = self.tolkein.tokenize(tweet)
+        self.words = self.tokenizer.tokenize(tweet)
         #print("WORDS == {}".format(words))
 
         # Positive analysis
         for word in self.words:
-            self.pResult = [item for item in self.dict_words["pos"] if item == word.strip()]
+
+            self.pResult = [item for item in self.dict_words["pos"] if item.strip() == word.lower().strip()]
             # Cache Data
             if self.pResult:
                 self.track_words(p=self.pResult)
 
         # Negative analysis
         for word in self.words:
-            self.nResult = [item for item in self.dict_words["neg"] if item == word.strip()]
+            self.nResult = [item for item in self.dict_words["neg"] if item.strip() == word.lower().strip()]
             # Cache Data
             if self.nResult:
                 self.track_words(n=self.nResult)
