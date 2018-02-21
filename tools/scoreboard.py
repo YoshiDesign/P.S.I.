@@ -1,7 +1,8 @@
 import pygame
+import os
 from pygame.sprite import Group
 
-from entity.ship import Ship
+from tools.lives import Life
 
 class Score():
 
@@ -17,6 +18,7 @@ class Score():
 		self.color2 = (255, 90, 90)
 		self.font = pygame.font.SysFont(None, 48)
 		self.font2 = pygame.font.SysFont(None, 32)
+		self.font3 = pygame.font.SysFont(None, 36)
 
 		self.prep_score()
 		self.prep_high_score()
@@ -28,7 +30,7 @@ class Score():
 		""" Track Lives """
 		self.ships = Group()
 		for ship_number in range(self.stats.ships_left):
-			ship = Ship(self.screen, self.g_settings, self.stats)
+			ship = Life(self.g_settings, self.screen)
 			ship.rect.width -= 10
 			ship.rect.x = self.screen_rect.centerx + ship_number * ship.rect.width
 			ship.rect.y = 15
@@ -45,12 +47,12 @@ class Score():
 
 	def prep_high_score(self):
 
-		score_str = "High Score : {:,}".format(self.stats.high_score)
+		score_str = "{:,}".format(self.stats.high_score)
 		self.high_score_image = self.font2.render(score_str, True, self.white, \
 																  False)
 		self.high_score_rect = self.high_score_image.get_rect()
 		self.high_score_rect.centerx = self.screen_rect.centerx
-		self.high_score_rect.top = self.screen_rect.bottom - 45
+		self.high_score_rect.top = self.screen_rect.bottom - 30
 
 	def prep_level(self, up=0):
 		""" Track Level """
@@ -61,7 +63,14 @@ class Score():
 
 		self.level_rect = self.level_image.get_rect()
 		self.level_rect.left = self.screen_rect.left + 10
-		self.level_rect.top = self.score_rect.top + 30
+		self.level_rect.top = self.score_rect.top + 38
+
+	def prep_tweeter(self, handle):
+		self.tweeter_image = self.font3.render(str(handle.lstrip("@")), True, self.white, False)
+		self.tweeter_rect = self.tweeter_image.get_rect()
+		self.tweeter_rect.left = self.screen_rect.left + 39
+		self.tweeter_rect.top = self.score_rect.top + 7
+
 
 	def show_score(self):
 
@@ -69,3 +78,19 @@ class Score():
 		self.screen.blit(self.high_score_image, self.high_score_rect)
 		self.screen.blit(self.level_image, self.level_rect)
 		self.ships.draw(self.screen)
+		if self.stats._current_game:
+			self.screen.blit(self.tweeter_image, self.tweeter_rect)
+
+	def start_game(self):
+
+		""" Start a new game """
+		self.stats.game_active = True
+		self.g_settings.init_dynamic_settings()
+		self.prep_score()
+		self.prep_high_score()
+		self.prep_level()
+		self.prep_ships()
+
+		if self.stats._current_game:
+			# Change to a twitter game
+			print("ENGAGE TWITTER")

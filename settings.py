@@ -43,7 +43,7 @@ class Settings():
 		self.char_width = 20
 		self.char_height = 24
 		self.char_spacing = 1
-		self.twit_drop_speed = 80
+		self.twit_drop_speed = 20
 		self.twit_points = 10
 
 		# Create dynamic settings
@@ -60,12 +60,14 @@ class Settings():
 		# Twits
 		self.twit_speed = 4
 		self.twit_hp = 2
+
+		self.score_multiplier = 1.48
 		
 		# Ship
-		self.ship_speed_right = 1.8
+		self.ship_speed_right = 2.0
 		self.ship_speed_up = 3.0
 		self.ship_speed_down = 1.8
-		self.ship_speed_left = 1.8
+		self.ship_speed_left = 2.0
 		# Other
 		self.alien_speed = 1
 		

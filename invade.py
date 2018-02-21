@@ -59,13 +59,16 @@ def Main():
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 						twits, bullets, stats, scores, play_reg_btn, play_twit_btn)
 
-		gf.check_events(g_settings, screen, ship, aliens, stats, textbox, \
+		gf.check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
 										twits, bullets, play_twit_btn, play_reg_btn)
 
 		if stats.game_active == True:
 			if stats._current_game:
 				gf.update_twits(g_settings, screen, stats, ship, twits, scores, bullets)
-				gf.update_bullets(g_settings, screen, stats, ship, twits, scores, bullets, powerup)
+				gf.update_bullets(g_settings, screen, stats, ship, scores, bullets, powerup, twits=twits)
+			else:
+				# gf.update_bullets(g_settings, screen, stats, ship, scores, aliens, bullets, powerup)
+				pass
 
 			# gf.update_twits(g_settings, screen, stats, ship, twits)
 

@@ -30,16 +30,10 @@ class Stats():
 		else:
 			Stats._current_game = 0
 	
-	def start_game(self):
+	
 
-		""" Start a new game """
-		self.game_active = True
-		self.g_settings.init_dynamic_settings()
-		pygame.mouse.set_visible(False)
-
-		if Stats._current_game:
-			# Change to a twitter game
-			print("ENGAGE TWITTER")
+	def update_tweets(self):
+		pass
 			
 
 	def reset_all(self):

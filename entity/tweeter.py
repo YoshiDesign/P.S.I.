@@ -18,6 +18,7 @@ class Tweeter(Sprite):
 		self.letter = text_data["letter"]
 		self.sentiment = text_data["sentiment"]
 		self.space = text_data["space"]
+		self.index = text_data["index"]
 
 		# Determine Letter_Image to display
 		if self.letter == "dots":
@@ -65,10 +66,17 @@ class Tweeter(Sprite):
 			# moot
 			return False
 
+	@classmethod
+	def reset(self, twitters):
+		pass
+
+
+
 	def update(self):
 		# Movement
-		self.x += (self.g_settings.twit_speed * self.g_settings.twit_direction)
-		self.rect.x = self.x
+		if not self.letter == "space":
+			self.x += (self.g_settings.twit_speed * self.g_settings.twit_direction)
+			self.rect.x = self.x
 
 	def blitme(self, screen):
 	 	self.screen.blit(self.image, self.rect)

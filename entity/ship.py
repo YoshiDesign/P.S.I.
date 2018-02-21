@@ -13,12 +13,10 @@ class Ship(Sprite):
 		super(Ship, self).__init__()
 		
 		self.fp = os.fsencode("spritesheets/shipsheet.png")
-		self.lives = os.fsencode("sprites/alien/a1_Alien.png")
-				
+
 		# Get screen & Screen Object
 		self.screen = screen
 		self.screen_rect = screen.get_rect()
-		self.image = pygame.image.load(os.fsdecode(self.lives))
 
 		self.stats = stats
 		self.sheet = Spritesheet(self.fp, 4, 1)
@@ -35,6 +33,7 @@ class Ship(Sprite):
 		# +4 for a tighter hit-box
 		self.rect = pygame.Rect(self.ship_x + 4, self.ship_y + 4, 28, 28)
 
+
 		# Movement Flags
 		self.move_right = False
 		self.move_left  = False
@@ -50,6 +49,7 @@ class Ship(Sprite):
 
 	def update(self, game_type=0):
 		
+
 		if self.index < 100:
 			self.index += 1
 		else:
@@ -74,15 +74,15 @@ class Ship(Sprite):
 			self.ship_y -= self.settings.ship_speed_up
 		if self.move_down and self.ship_y < self.screen_rect.bottom:
 			self.ship_y += self.settings.ship_speed_left
-		
+
 		self.rect.x = self.ship_x
 		self.rect.y = self.ship_y
-	
+
+
 
 			
-			
 	def center_ship(self):
-		pass
+		self.ship_x = self.screen_rect.centerx
 		# self.center = self.screen_rect.centerx
 	
 		
