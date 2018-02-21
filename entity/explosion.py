@@ -6,7 +6,7 @@ class Explosion():
 
 	def __init__(self, g_settings, screen, twit):
 		self.screen = screen
-		self.twit = twit[0]
+		self.twit = twit
 		self.fp = os.fsencode("spritesheets/splodesheet.png")
 		self.sheet = Spritesheet(self.fp, 5, 4, index=0)
 		self.loc_x = self.twit.rect.centerx

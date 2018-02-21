@@ -9,6 +9,7 @@ from tools.pygame_textinput import TextInput
 from tools.spritesheet import Spritesheet as sheet
 from tools.statistic import Stats
 from settings import Settings
+from entity.powerup import Powerups
 from entity.buttons import Button
 from entity.reticle import Reticle
 from entity.alien import Alien
@@ -37,6 +38,7 @@ def Main():
 	textbox = TextInput()
 	aliens = Alien(screen, g_settings)
 	scores = Score(g_settings, screen, stats)
+	powerup = Powerups(g_settings)
 	twits = Group()
 	bullets = Group()
 
@@ -63,7 +65,7 @@ def Main():
 		if stats.game_active == True:
 			if stats._current_game:
 				gf.update_twits(g_settings, screen, stats, ship, twits, scores, bullets)
-				gf.update_bullets(g_settings, screen, stats, ship, twits, scores, bullets)
+				gf.update_bullets(g_settings, screen, stats, ship, twits, scores, bullets, powerup)
 
 			# gf.update_twits(g_settings, screen, stats, ship, twits)
 

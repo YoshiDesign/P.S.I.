@@ -241,6 +241,8 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, end_char, generate
 		return False
 	# Hats off to ye'
 	del(text_data)
+### ### ### ### ### ### ### ### Tweet Placement ### ### ### ### ### ### ### ### 
+
 
 def give_twit_dimension(character, x_pos, row):
 	""" Tells each character where to appear on screen """
@@ -268,6 +270,9 @@ def check_twit_edges(g_settings, twits):
 		if twit.check_edges():
 			change_army_direction(g_settings, twits)
 
+
+### ### ### ### ### ### ### ### ### Twitter mode Functions ### ### ### ### ### 
+
 def change_army_direction(g_settings, twits):
 
 	for twit in twits.sprites():
@@ -284,7 +289,7 @@ def update_twits(g_settings, screen, stats, ship, twits, scores, bullets):
 	if pygame.sprite.spritecollideany(ship, twits):
 		ship_hit(g_settings, screen, stats, ship, twits, scores, bullets)
 
-### ### ### ### ### ### ### ### ### ### NETWORK ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### NETWORK ### ### ### ### ### ### ### ###
 
 def send_data_TEST(name, fail=0):
 	""" Activate the web server's view function to access the Twitter API """
@@ -352,7 +357,10 @@ def get_infoz(events, g_settings, screen, ship, twits, stats, textbox):
 		screen.blit(textbox.get_surface(), (x*3-100, y*3-80))
 		return False
 
-def update_bullets(g_settings, screen, stats, ship, twits, scores, bullets):
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
+
+def update_bullets(g_settings, screen, stats, ship, twits, scores, \
+										 bullets, powerup):
 	""" Bullet events (add / remove / upgrade)"""
 	bullets.update()
 	for bullet in bullets.copy():
@@ -363,15 +371,16 @@ def update_bullets(g_settings, screen, stats, ship, twits, scores, bullets):
 
 	if shot_down:
 		
-		for twit in shot_down.values():
+		for bull, twit in shot_down.items():
+			print("SDV == {}".format(shot_down.values()))
 			print("TWIT {}".format(twit))
-			explode = Explosion(g_settings, screen, twit)
-			explode.explode()
+			#for i in twits:
+			for i in twit:
+				explode = Explosion(g_settings, screen, i)
+				explode.explode()
 			stats.score += g_settings.twit_points * len(twit)
 			print("SCORE {}".format(stats.score))
 		scores.prep_score()
-
-
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 							twits, bullets, stats, scores, play_reg_btn, play_twit_btn):

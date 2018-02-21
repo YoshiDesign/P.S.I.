@@ -26,7 +26,7 @@ class Settings():
 		# Bullets
 		self.bullet_speed = 15
 		self.bullet_length = 2
-		self.bullet_width = 2
+		self.bullet_width = 100
 		self.bullet_color = (255,255,190)
 		# Lazers
 		self.lazer_color = (255,255,190)

@@ -67,8 +67,7 @@ class Tweeter(Sprite):
 
 	def update(self):
 		# Movement
-		self.x += (self.g_settings.twit_speed *\
-				self.g_settings.twit_direction)
+		self.x += (self.g_settings.twit_speed * self.g_settings.twit_direction)
 		self.rect.x = self.x
 
 	def blitme(self, screen):
