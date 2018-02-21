@@ -37,6 +37,10 @@ def Main():
 	textbox = TextInput()
 	aliens = Alien(screen, g_settings)
 	twits = Group()
+	bullets = Group()
+
+	clock = pygame.time.Clock()
+	FPS = 31
 
 	play_twit_btn = Button(g_settings, screen, text="Tweets", \
 						 off_x=(g_settings.screen_width // 4))
@@ -47,20 +51,20 @@ def Main():
 
 	while True:
 
-		
+		clock.tick(FPS)
+
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-									twits, stats, play_reg_btn, play_twit_btn)
+									twits, bullets, stats, play_reg_btn, play_twit_btn)
 
 		gf.check_events(g_settings, screen, ship, aliens, stats, textbox, \
-										twits, play_twit_btn, play_reg_btn)
+										twits, bullets, play_twit_btn, play_reg_btn)
 
-				
-		
 		if stats.game_active == True:
-			if stats.twit_active:
-				gf.update_twits(g_settings, screen, twits, stats)
+			if stats._current_game:
+				gf.update_twits(g_settings, screen, stats, ship, twits)
+				gf.update_bullets(g_settings, screen, stats, ship, twits, bullets)
 
-			gf.update_twits(g_settings, screen, stats, twits)
+			gf.update_twits(g_settings, screen, stats, ship, twits)
 
 
 

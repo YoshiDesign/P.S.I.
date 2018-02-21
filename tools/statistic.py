@@ -12,8 +12,7 @@ class Stats():
 		self.reset_all()
 		# Game States
 		self.game_active = False
-		self.play_active = False
-		self.twit_active = False
+
 		# Statistics
 		self.score = 0
 		self.high_score = 0
@@ -21,7 +20,8 @@ class Stats():
 	@staticmethod
 	def switch_game():
 		""" 
-			THIS IS AN ENDPOINT for post sentiment analysis checks
+			if its 0, change it to 1, otherwise it is zero
+			THIS IS THE ENDPOINT for post analysis checks before game starts
 			@staticmethod required
 		"""
 		if Stats._current_game == 0:
@@ -29,21 +29,19 @@ class Stats():
 		else:
 			Stats._current_game = 0
 	
-		
-		
+	def start_game(self):
 
-	def start_game(self, game=""):
+		""" Start a new game """
 
 		self.game_active = True
-		
 		self.g_settings.init_dynamic_settings()
 
 		pygame.mouse.set_visible(False)
 
-		if game == "tw":
+		if Stats._current_game:
 			# Change to a twitter game
 			print("ENGAGE TWITTER")
-			Stats.switch_game()
+			
 
 	def reset_all(self):
 		""" Revert stats to initial state """

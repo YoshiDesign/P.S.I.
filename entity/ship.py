@@ -1,4 +1,5 @@
 import pygame
+from pygame.sprite import Sprite
 import sys, os
 from tools.spritesheet import Spritesheet
 
@@ -8,6 +9,8 @@ class Ship():
 	_current_game = 0
 
 	def __init__(self, screen, g_settings, stats):
+
+		super(Ship, self).__init__()
 		
 		self.fp = os.fsencode("spritesheets/shipsheet.png")
 				
@@ -25,7 +28,9 @@ class Ship():
 		
 		self.ship_x = 600
 		self.ship_y = 700
-		
+		# -4 for a tighter hit-box
+		self.rect = pygame.Rect(self.ship_x + 4, self.ship_y + 4, 28, 28)
+
 		# Movement Flags
 		self.move_right = False
 		self.move_left  = False
@@ -65,22 +70,16 @@ class Ship():
 			self.ship_y -= self.settings.ship_speed_up
 		if self.move_down and self.ship_y < self.screen_rect.bottom:
 			self.ship_y += self.settings.ship_speed_left
-	
+		
+		self.rect.x = self.ship_x
+		self.rect.y = self.ship_y
 	
 
 			
 			
-			
-			
-			
-			
-		
-		
-			
-			
-		
 	def center_ship(self):
-		self.center = self.screen_rect.centerx
+		pass
+		# self.center = self.screen_rect.centerx
 	
 		
 		

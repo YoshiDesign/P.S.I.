@@ -10,54 +10,48 @@ from analyze import Analyzer
 class Tweeter(Sprite):
 	_tweet = []
 	_tweets_read = 0
-	# Good or bad -- for debuggin'
-	_total_twits = 0
-	# (... sentiment=1...) infers positive by default
+	_total_twits_destroyed = 0
+	
 	def __init__(self, g_settings, screen, text_data={}):
-		Tweeter._total_twits += 1
+
 		super(Tweeter, self).__init__()
-		self.text_data = text_data
+		
 		self.letter = text_data["letter"]
 		self.sentiment = text_data["sentiment"]
+		self.space = text_data["space"]
 
-		# Determine character to display
-		# self.space is repetative for readability
+		# Determine Letter_Image to display
 		if self.letter == "dots":
 
 			self.filepath = os.fsencode(str("sprites/characters/ddd.png"))
-			self.space = False
 
 		elif self.letter.isdigit():
 
 			self.filepath = os.fsencode(str("sprites/characters/" + \
 								"good" + str(self.letter) + ".png"))
-			self.space = False
 
 		elif self.letter == "space":
 
 			self.filepath = os.fsencode(str("sprites/characters/space.png"))
-			self.space = True
 
 		elif self.sentiment == 1:
 
 			self.filepath = os.fsencode(str("sprites/characters/" + \
 								"good" + str(self.letter.upper()) + ".png"))
-			self.space = False
 		else:
 			self.filepath = os.fsencode(str("sprites/characters/" + \
 								"bad" + str(self.letter.upper()) + ".png"))
-			self.space = False
 
 		self.g_settings = g_settings
 		self.screen = screen
 		self.screen_rect = screen.get_rect()		
 		self.image = pygame.image.load(os.fsdecode(self.filepath))
 		self.rect = self.image.get_rect()
-		# Dimensions
+		
+		# Spacial props
 		self.rect.y = self.rect.height
 		self.rect.x = self.rect.width
 		self.char_spacing = self.g_settings.char_spacing
-		# For more granular horizontal movement
 		self.x = float(self.rect.x)
 
 
@@ -74,7 +68,7 @@ class Tweeter(Sprite):
 
 	def update(self):
 		# Movement
-		self.x += (self.g_settings.twit_drop_speed *\
+		self.x += (self.g_settings.twit_speed *\
 				self.g_settings.twit_direction)
 		self.rect.x = self.x
 

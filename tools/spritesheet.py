@@ -30,6 +30,8 @@ class Spritesheet:
 		(0,0), (-hw,0), (-w,0),
 		(0, -hh), (-hw, -hh), (-w, -hh),
 		(0, -h), (-hw, -h), (-w, -h),])
+
+		
 		
 	def blitme(self, surface, cellindex, x, y, handle=0):
 		# Cuts out our selected sprite
