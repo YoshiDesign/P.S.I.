@@ -11,10 +11,10 @@ class Settings():
 		self.screen_width = 1200
 		self.screen_height = 800
 		# Load Image / sprites
-		self.fp = os.fsencode("media/Back.jpg")
-		self.f2 = os.fsencode("media/Back2.jpg")
+		self.fp = os.fsencode("sprites/GameBack1.jpg")
+		self.f2 = os.fsencode("sprites/GameBack2.jpg")
 		self.background = pygame.image.load(os.fsdecode(self.fp))
-		self.background2 = pygame.image.load(os.fsdecode(self.fp))
+		self.background2 = pygame.image.load(os.fsdecode(self.f2))
 		# Essentially same as the screen object rect?
 		self.background_rect = self.background.get_rect()
 		
@@ -84,9 +84,11 @@ class Settings():
 	def change_reticle(self, reticle):
 		pass 
 		
-	def load_background(self, screen):
-
-		screen.blit(self.background, self.background_rect)
+	def load_background(self, screen, game=0):
+		if not game:
+			screen.blit(self.background, self.background_rect)
+		if game:
+			screen.blit(self.background2, self.background_rect)
 
 		#self.reticle.blit(self.background)
 

@@ -3,6 +3,8 @@ import pygame
 from pygame.sprite import Group
 from pygame.locals import *
 import game_function as gf
+
+from tools.scoreboard import Score
 from tools.pygame_textinput import TextInput
 from tools.spritesheet import Spritesheet as sheet
 from tools.statistic import Stats
@@ -17,8 +19,6 @@ from entity.tweeter import Tweeter
 	pygame.display.toggle_fullscreen
 				  .set_icon
 """
-
-
 
 def Main():
 	
@@ -36,6 +36,7 @@ def Main():
 	reticle = Reticle(g_settings, screen)
 	textbox = TextInput()
 	aliens = Alien(screen, g_settings)
+	scores = Score(g_settings, screen, stats)
 	twits = Group()
 	bullets = Group()
 
@@ -54,7 +55,7 @@ def Main():
 		clock.tick(FPS)
 
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-									twits, bullets, stats, play_reg_btn, play_twit_btn)
+						twits, bullets, stats, scores, play_reg_btn, play_twit_btn)
 
 		gf.check_events(g_settings, screen, ship, aliens, stats, textbox, \
 										twits, bullets, play_twit_btn, play_reg_btn)
@@ -62,9 +63,9 @@ def Main():
 		if stats.game_active == True:
 			if stats._current_game:
 				gf.update_twits(g_settings, screen, stats, ship, twits)
-				gf.update_bullets(g_settings, screen, stats, ship, twits, bullets)
+				gf.update_bullets(g_settings, screen, stats, ship, twits, scores, bullets)
 
-			gf.update_twits(g_settings, screen, stats, ship, twits)
+			# gf.update_twits(g_settings, screen, stats, ship, twits)
 
 
 

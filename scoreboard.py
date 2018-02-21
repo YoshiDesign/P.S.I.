@@ -15,7 +15,7 @@ class Score():
 		# Font
 		self.white = (255,255,255)
 		self.color2 = (255, 90, 90)
-		self.font = pygame.font.SysFont(None, 48)
+		self.font = pygame.font.SysFont(None, 32)
 		self.font2 = pygame.font.SysFont(None, 32)
 
 		self.prep_score()
@@ -28,36 +28,37 @@ class Score():
 		""" Track Lives """
 		self.ships = Group()
 		for ship_number in range(self.stats.ships_left):
-			ship = Ship(self.screen, self.g_settings, self.stats)
+			ship = Ship(self.ai_settings, self.screen)
 			ship.rect.width -= 100
 			ship.rect.x = 10 + ship_number * ship.rect.width
 			ship.rect.y = 25
 			self.ships.add(ship)
 
+
 	def prep_score(self):
 
 		score_str = "{:,}".format(self.stats.score)
-		self.score_image = self.font.render(score_str, True, self.white, \
-															 False)
+		self.score_image = self.font.render(score_str, True, self.text_color, \
+															 self.color2)
 		self.score_rect = self.score_image.get_rect()
-		self.score_rect.right = self.screen_rect.right - 50
-		self.score_rect.top = 12
+		self.score_rect.right = self.screen_rect.right - 100
+		self.score_rect.top = 20
 
 	def prep_high_score(self):
 
-		score_str = "High Score : {:,}".format(self.stats.high_score)
-		self.high_score_image = self.font2.render(score_str, True, self.white, \
-																  False)
+		score_str = "{:,}".format(self.stats.high_score)
+		self.high_score_image = self.font.render(score_str, True, self.text_color, \
+																  self.color2)
 		self.high_score_rect = self.high_score_image.get_rect()
 		self.high_score_rect.centerx = self.screen_rect.centerx
-		self.high_score_rect.top = self.screen_rect.bottom - 45
+		self.high_score_rect.top = self.screen_rect.bottom - 100
 
 	def prep_level(self, up=0):
 		""" Track Level """
 		if up:
 			self.stats.level += 1
 		self.level_image = self.font2.render(str("Level " + str(self.stats.level)), \
-													True, self.white, False)
+													True, self.text_color, self.color2)
 
 		self.level_rect = self.level_image.get_rect()
 		self.level_rect.left = self.screen_rect.left + 10

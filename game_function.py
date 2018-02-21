@@ -1,6 +1,5 @@
 import pygame
 import sys, os
-import multiprocessing
 from time import sleep
 import requests
 
@@ -10,7 +9,8 @@ from entity.bullets import Bullet
 from entity.alien import Alien
 from entity.tweeter import Tweeter
 	
-def check_events(g_settings, screen, ship, aliens, stats, textbox, twits, bullets, play_twit_btn, play_reg_btn):
+def check_events(g_settings, screen, ship, aliens, stats, textbox, \
+						twits, bullets, play_twit_btn, play_reg_btn):
 	""" Tracks text input box and all player events """
 
 	events = pygame.event.get()
@@ -27,17 +27,21 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, twits, bullet
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 
 			mousex, mousey = pygame.mouse.get_pos()
-			print("oy")
+
 			if not stats.game_active:
 				# OP : check_play_buttons and check_player_clicks could be 1 functions
 				# as the conditions for check_play_buttons, arent entirely verbose
-				print("oyo")
 				check_play_buttons(events, g_settings, screen, ship, stats, textbox, play_reg_btn, \
-																play_twit_btn, aliens, mousex, mousey)
+												play_twit_btn, aliens, mousex=mousex, mousey=mousey)
 			else:
 				check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
+
 		elif event.type == pygame.KEYDOWN:
 			keydown_event(event, g_settings, screen, ship, stats, bullets)
+			if not stats.game_active:
+				check_play_buttons(events, g_settings, screen, ship, stats, textbox, play_reg_btn, \
+																			play_twit_btn, aliens)
+
 		elif event.type == pygame.KEYUP:
 			keyup_event(event, ship, stats)
 			
@@ -68,10 +72,13 @@ def keydown_event(event, g_settings, screen, ship, stats, bullets):
 			ship.move_up = True
 		elif event.key == pygame.K_SPACE:
 			fire_bullets(g_settings, screen, ship, bullets)
+		elif event.key == pygame.K_b:
+			stats._current_game = 0
+			stats.start_game()
 
 def check_play_buttons(events, g_settings, screen, ship, \
 							stats, textbox, play_reg_btn, \
-							play_twit_btn, aliens, mousex, mousey):
+							play_twit_btn, aliens, mousex=0, mousey=0):
 	""" 
 		Checks for our button activity
 		Only Callable while game_active = 0
@@ -324,7 +331,7 @@ def get_infoz(events, g_settings, screen, ship, twits, stats, textbox):
 												analyzer._neg_words, \
 												analyzer._pos_words)
 			stats.switch_game()
-			stats.game_active = True
+			stats.start_game()
 			return True
 		# Secondary Error catch should we somehow bypass an erroneous server response
 		else:
@@ -336,7 +343,7 @@ def get_infoz(events, g_settings, screen, ship, twits, stats, textbox):
 		screen.blit(textbox.get_surface(), (x*3-100, y*3-80))
 		return False
 
-def update_bullets(g_settings, screen, stats, ship, twits, bullets):
+def update_bullets(g_settings, screen, stats, ship, twits, scores, bullets):
 	""" Bullet events (add / remove / upgrade)"""
 	bullets.update()
 	for bullet in bullets.copy():
@@ -353,16 +360,18 @@ def update_bullets(g_settings, screen, stats, ship, twits, bullets):
 			explode.explode()
 			stats.score += g_settings.twit_points * len(twit)
 			print("SCORE {}".format(stats.score))
+		scores.prep_score()
+
 
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-							twits, bullets, stats, play_reg_btn, play_twit_btn):
+							twits, bullets, stats, scores, play_reg_btn, play_twit_btn):
 	# Mouse
 	mouse_x, mouse_y = pygame.mouse.get_pos()
 
 	pygame.display.flip()
 	# Load background so we dont leave ship footprints everywhere
-	g_settings.load_background(screen)
+	g_settings.load_background(screen, game=stats._current_game)
 
 	for bullet in bullets.sprites():
 		bullet.draw_bullet()
@@ -379,6 +388,8 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 			ship.update()
 			reticle.blitme(mouse_x, mouse_y)
 			# aliens.blitmeh()
+		scores.show_score()
+
 	else:
 		play_reg_btn.create_button()
 		play_twit_btn.create_button()

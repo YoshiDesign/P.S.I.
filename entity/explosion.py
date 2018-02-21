@@ -2,7 +2,6 @@ import pygame
 import os
 from tools.spritesheet import Spritesheet
 
-
 class Explosion():
 
 	def __init__(self, g_settings, screen, twit):

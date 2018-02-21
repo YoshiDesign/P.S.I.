@@ -3,7 +3,7 @@ from pygame.sprite import Sprite
 import sys, os
 from tools.spritesheet import Spritesheet
 
-class Ship():
+class Ship(Sprite):
 
 	# 0 = reg || 1 = twitter
 	_current_game = 0
@@ -13,12 +13,14 @@ class Ship():
 		super(Ship, self).__init__()
 		
 		self.fp = os.fsencode("spritesheets/shipsheet.png")
+		self.lives = os.fsencode("sprites/alien/a1_Alien.png")
 				
 		# Get screen & Screen Object
 		self.screen = screen
 		self.screen_rect = screen.get_rect()
 		self.stats = stats
 		self.sheet = Spritesheet(self.fp, 4, 1)
+		self.image = pygame.image.load(os.fsdecode(self.lives))
 		self.index = 0
 		self.settings = g_settings
 		

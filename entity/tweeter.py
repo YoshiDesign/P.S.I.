@@ -1,6 +1,5 @@
 import pygame
 from pygame.sprite import Sprite
-from collections import OrderedDict as OD
 import os
 from analyze import Analyzer
 
@@ -47,7 +46,7 @@ class Tweeter(Sprite):
 		self.screen_rect = screen.get_rect()		
 		self.image = pygame.image.load(os.fsdecode(self.filepath))
 		self.rect = self.image.get_rect()
-		
+
 		# Spacial props
 		self.rect.y = self.rect.height
 		self.rect.x = self.rect.width

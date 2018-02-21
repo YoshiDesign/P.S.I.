@@ -16,6 +16,7 @@ class Stats():
 		# Statistics
 		self.score = 0
 		self.high_score = 0
+		self.level = 1
 		
 	@staticmethod
 	def switch_game():
@@ -35,7 +36,6 @@ class Stats():
 
 		self.game_active = True
 		self.g_settings.init_dynamic_settings()
-
 		pygame.mouse.set_visible(False)
 
 		if Stats._current_game:
