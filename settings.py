@@ -43,7 +43,7 @@ class Settings():
 		self.char_width = 20
 		self.char_height = 24
 		self.char_spacing = 1
-		self.twit_drop_speed = 5
+		self.twit_drop_speed = 80
 		self.twit_points = 10
 
 		# Create dynamic settings

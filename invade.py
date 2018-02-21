@@ -62,7 +62,7 @@ def Main():
 
 		if stats.game_active == True:
 			if stats._current_game:
-				gf.update_twits(g_settings, screen, stats, ship, twits)
+				gf.update_twits(g_settings, screen, stats, ship, twits, scores, bullets)
 				gf.update_bullets(g_settings, screen, stats, ship, twits, scores, bullets)
 
 			# gf.update_twits(g_settings, screen, stats, ship, twits)

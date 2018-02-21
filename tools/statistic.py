@@ -33,7 +33,6 @@ class Stats():
 	def start_game(self):
 
 		""" Start a new game """
-
 		self.game_active = True
 		self.g_settings.init_dynamic_settings()
 		pygame.mouse.set_visible(False)

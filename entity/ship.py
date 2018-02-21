@@ -8,7 +8,7 @@ class Ship(Sprite):
 	# 0 = reg || 1 = twitter
 	_current_game = 0
 
-	def __init__(self, screen, g_settings, stats):
+	def __init__(self, screen, g_settings, stats, no_sprite=0):
 
 		super(Ship, self).__init__()
 		
@@ -18,9 +18,11 @@ class Ship(Sprite):
 		# Get screen & Screen Object
 		self.screen = screen
 		self.screen_rect = screen.get_rect()
+		self.image = pygame.image.load(os.fsdecode(self.lives))
+
 		self.stats = stats
 		self.sheet = Spritesheet(self.fp, 4, 1)
-		self.image = pygame.image.load(os.fsdecode(self.lives))
+		# Used for life counter
 		self.index = 0
 		self.settings = g_settings
 		
@@ -30,7 +32,7 @@ class Ship(Sprite):
 		
 		self.ship_x = 600
 		self.ship_y = 700
-		# -4 for a tighter hit-box
+		# +4 for a tighter hit-box
 		self.rect = pygame.Rect(self.ship_x + 4, self.ship_y + 4, 28, 28)
 
 		# Movement Flags

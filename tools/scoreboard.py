@@ -29,9 +29,9 @@ class Score():
 		self.ships = Group()
 		for ship_number in range(self.stats.ships_left):
 			ship = Ship(self.screen, self.g_settings, self.stats)
-			ship.rect.width -= 100
-			ship.rect.x = 10 + ship_number * ship.rect.width
-			ship.rect.y = 25
+			ship.rect.width -= 10
+			ship.rect.x = self.screen_rect.centerx + ship_number * ship.rect.width
+			ship.rect.y = 15
 			self.ships.add(ship)
 
 	def prep_score(self):

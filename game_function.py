@@ -115,8 +115,17 @@ def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 	""" Click """
 	pass
 
-def ship_hit(g_settings, screen, stats, ship, twits):
-	sys.exit()
+def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets):
+	if stats.ships_left > 0:
+		stats.ships_left -= 1
+		scores.prep_ships()
+		bullets.empty()
+		twits.empty()
+
+		ship.center_ship()
+
+
+
 
 def fire_bullets(g_settings, screen, ship, bullets):
 	if len(bullets) < 40:
@@ -125,7 +134,7 @@ def fire_bullets(g_settings, screen, ship, bullets):
 		bullets.add(new_bullet)
 
 def create_army(g_settings, screen, twits, tokenized, \
-							neg_words, pos_words, start=0,act=3):
+					neg_words, pos_words, start=0,act=3):
 
 	import re
 	re_alphaNum = r"^[a-zA-Z0-9 ]+$"
@@ -267,13 +276,13 @@ def change_army_direction(g_settings, twits):
 		twit.rect.y += g_settings.twit_drop_speed
 	g_settings.twit_direction *= -1
 
-def update_twits(g_settings, screen, stats, ship, twits):
+def update_twits(g_settings, screen, stats, ship, twits, scores, bullets):
 	twits.update()
 	# Check if twits touch edges
 	check_twit_edges(g_settings, twits)
 	# If twits hit the ship
 	if pygame.sprite.spritecollideany(ship, twits):
-		ship_hit(g_settings, screen, stats, ship, twits)
+		ship_hit(g_settings, screen, stats, ship, twits, scores, bullets)
 
 ### ### ### ### ### ### ### ### ### ### NETWORK ### ### ### ### ### ### ### ### ### ### ### ### ###
 
