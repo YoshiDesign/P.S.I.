@@ -56,6 +56,7 @@ def Main():
 
 		clock.tick(FPS)
 
+
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 						twits, bullets, stats, scores, play_reg_btn, play_twit_btn)
 
@@ -66,11 +67,16 @@ def Main():
 			if stats._current_game:
 				gf.update_twits(g_settings, screen, stats, ship, twits, scores, bullets)
 				gf.update_bullets(g_settings, screen, stats, ship, scores, bullets, powerup, twits=twits)
+
+			
 			else:
 				# gf.update_bullets(g_settings, screen, stats, ship, scores, aliens, bullets, powerup)
 				pass
 
+
 			# gf.update_twits(g_settings, screen, stats, ship, twits)
+	
+
 
 
 

@@ -12,6 +12,7 @@ class Stats():
 		self.reset_all()
 		# Game States
 		self.game_active = False
+		self.end_game = False
 
 		# Statistics
 		self.score = 0

@@ -51,8 +51,8 @@ class Score():
 		self.high_score_image = self.font2.render(score_str, True, self.white, \
 																  False)
 		self.high_score_rect = self.high_score_image.get_rect()
-		self.high_score_rect.centerx = self.screen_rect.centerx
-		self.high_score_rect.top = self.screen_rect.bottom - 30
+		self.high_score_rect.centerx = self.screen_rect.centerx + 45
+		self.high_score_rect.top = self.screen_rect.bottom - 55
 
 	def prep_level(self, up=0):
 		""" Track Level """
@@ -70,7 +70,6 @@ class Score():
 		self.tweeter_rect = self.tweeter_image.get_rect()
 		self.tweeter_rect.left = self.screen_rect.left + 39
 		self.tweeter_rect.top = self.score_rect.top + 7
-
 
 	def show_score(self):
 

@@ -19,14 +19,14 @@ class Settings():
 		self.background_rect = self.background.get_rect()
 		
 		# Lives
-		self.ship_limit = 3
+		self.ship_limit = 1
 		# score multiplier
 		self.score_mult = 1.2
 		
 		# Bullets
 		self.bullet_speed = 15
-		self.bullet_length = 2
-		self.bullet_width = 100
+		self.bullet_length = 3
+		self.bullet_width = 2
 		self.bullet_color = (255,255,190)
 		# Lazers
 		self.lazer_color = (255,255,190)
@@ -43,7 +43,7 @@ class Settings():
 		self.char_width = 20
 		self.char_height = 24
 		self.char_spacing = 1
-		self.twit_drop_speed = 20
+		self.twit_drop_speed = 100
 		self.twit_points = 10
 
 		# Create dynamic settings

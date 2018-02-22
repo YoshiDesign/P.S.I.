@@ -19,15 +19,17 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
 	events = pygame.event.get()
 	if not stats.game_active:
 		# Activates text box
-		get_infoz(events, g_settings, screen, ship, twits, stats, scores, textbox)
+		pass
 	# Events
 	for event in events:
 		if event.type == pygame.QUIT:
 			sys.exit()
 		# If textinput.update() == True, user pressed Return
 		elif event.type == pygame.MOUSEBUTTONDOWN:
+			print("click")
 
 			mousex, mousey = pygame.mouse.get_pos()
+			print("x y".format(mousex, mousey))
 
 			if not stats.game_active:
 				# OP : check_play_buttons and check_player_clicks could be 1 functions
@@ -102,7 +104,7 @@ def check_play_buttons(events, g_settings, screen, ship, twits, \
 			pass
 			# scores.start_game()
 			
-		elif (btn_twit_clicked and textbox.get_text()):
+		elif (btn_twit_clicked and textbox.get_text()) and not stats.game_active:
 			""" Fires when user clicks instead of pressing Enter """
 
 			print("TWITTER MODE")
@@ -123,23 +125,35 @@ def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 	pass
 
 
-
 def end_game(g_settings, screen, stats):
 	stats.game_active = False
+	g_settings.init_dynamic_settings()
+	stats.end_game == True
 
 
-def reset_army(twits):
-	pass
+def reset_army(screen, twits):
+	print("Resetting Army")
+	screen_rect = screen.get_rect()
+	y = 1
+	for n, twit in enumerate(twits):
+		# print("n {}".format(n) )
+		if not n % 8:
+			y += 1
+			# print("Y % 60 {}".format(y))
+
+		twit.rect.x = screen_rect.left + twit.rect.width * n
+		twit.rect.y = screen_rect.top + (twit.rect.height * y) + 20
 
 
 def create_army(g_settings, screen, twits, tokenized, \
-					neg_words, pos_words, start=0,act=3):
+					neg_words, pos_words, start=0,act=2):
 
 	import re
-	re_alphaNum = r"^[a-zA-Z0-9 ]+$"
+	re_alphaNum = r"^[a-zA-Z0-9 ',\"]+$"
 	# Idk what 'wild' is, hopefully it doesn't cause portability errors
 	wild 		= '…'
 	wild2		= '...'
+	punct		= [",","'","\"","."]
 	dots 		= 0
 	end_char 	= 0
 	available_x = int(get_cols(g_settings))
@@ -159,7 +173,7 @@ def create_army(g_settings, screen, twits, tokenized, \
 		# Add our own delimiter
 		tweet.append("...")
 
-		print("TWEET {}".format(tweet))
+		# print("TWEET {}".format(tweet))
 		for word in tweet:
 
 			# 3 simple flag checks are not worth an 
@@ -169,7 +183,7 @@ def create_army(g_settings, screen, twits, tokenized, \
 			# FLAG : if tweet cut off
 			if word == "...":
 				word = "."
-				print("DOTS {}".format(word))
+				# print("DOTS {}".format(word))
 				dots = 1
 				
 			if re.search(re_alphaNum, word) or dots:
@@ -182,6 +196,8 @@ def create_army(g_settings, screen, twits, tokenized, \
 
 				for n, letter in enumerate(word):
 					# FLAG : Identify the last char of the word
+					if letter in punct:
+						continue
 					if n == len(word) - 1:
 						end_char = 1
 					else:
@@ -227,7 +243,7 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, end_char, generate
 		total_twits += 1
 		twits_list.append(total_twits - 1)
 
-		print("TWIT 000 STUFF {}\n{}".format(total_twits, twits_list))
+		#print("TWIT 000 STUFF {}\n{}".format(total_twits, twits_list))
 
 	# Only text-wrap after we've printed a whole word
 	if x_pos + 1 >= 40 and text_data["end_char"] == 1:
@@ -254,7 +270,7 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, end_char, generate
 
 		
 
-		print("TWIT 2 STUFF {}\n{}".format(total_twits, twits_list))
+		# print("TWIT 2 STUFF {}\n{}".format(total_twits, twits_list))
 		return False
 	else:
 		# If the character created is not last in the word
@@ -297,7 +313,10 @@ def change_army_direction(g_settings, twits):
 
 	for twit in twits.sprites():
 		# Space Buffer
-		twit.rect.x += 5
+		if twit.rect.x > 600:
+			twit.rect.x -= 5
+		elif twit.rect.x < 600:
+			twit.rect.x += 5
 		twit.rect.y += g_settings.twit_drop_speed
 	g_settings.twit_direction *= -1
 
@@ -311,6 +330,7 @@ def update_twits(g_settings, screen, stats, ship, twits, scores, bullets):
 		for twit in twits.sprites():
 			# useless?
 			if twit.letter == "space":
+				# potential problem point
 				continue
 			else:
 				ship_hit(g_settings, screen, stats, ship, twits, scores, bullets)
@@ -324,24 +344,27 @@ def check_twit_bottom(g_settings, stats, scores, screen, ship, twits, bullets):
 		# The "not twit.letter == space" should be unnecessary. We removed all space
 		# Sprites in update_bullets() This might be useless <-- search "useless" to find all
 		if twit.rect.bottom >= screen_rect.bottom and not twit.letter == "space":
-			ship_hit(g_settings, screen, stats, ship, twits, scores, bullets)
+			ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=1)
 			break
 
-def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets):
+def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
 
+	
 	if stats.ships_left > 0:
+		if bottom:
+			reset_army(screen, twits)
 		stats.ships_left -= 1
 		scores.prep_ships()
 		bullets.empty()
-		twits.empty()
 		ship.center_ship()
 
 	else:
+		# Game Over
 
+		twits.empty()
+		bullets.empty()
 		get_high_score(stats, scores)
 		end_game(g_settings, screen, stats)
-
-
 	sleep(0.5)
 	ship.center_ship()
 
@@ -409,6 +432,7 @@ def get_infoz(events, g_settings, screen, ship, twits, stats, scores, textbox, c
 			stats.switch_game()
 			scores.prep_tweeter(handle)
 			scores.start_game()
+			textbox.clear_text()
 
 			return True
 		# Secondary Error catch should we somehow bypass an erroneous server response
@@ -452,8 +476,8 @@ def update_bullets(g_settings, screen, stats, ship, scores,  \
 	if shot_down:
 		
 		for bull, twit in shot_down.items():
-			print("SDV == {}".format(shot_down.values()))
-			print("TWIT {}".format(twit))
+			# print("SDV == {}".format(shot_down.values()))
+			# print("TWIT {}".format(twit))
 			#for i in twits: since it's a weird container type returned by groupcollide
 			for i in twit:
 				# spaces were removed about 15 lines up, this might be useless
@@ -462,9 +486,9 @@ def update_bullets(g_settings, screen, stats, ship, scores,  \
 					explode.explode()
 					twits_list.remove(int(i.index))
 					total_twits -= 1
-					print("TWIT UPDATE {}\n{}\n\n".format(total_twits, twits_list))
+					# print("TWIT UPDATE {}\n{}\n\n".format(total_twits, twits_list))
 			stats.score += g_settings.twit_points * len(twit)
-			print("SCORE {}".format(stats.score))
+			# print("SCORE {}".format(stats.score))
 		scores.prep_score()
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
@@ -478,8 +502,6 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 	# Load background so we dont leave ship footprints everywhere
 	g_settings.load_background(screen, game=stats._current_game)
 	
-	
-
 	if stats.game_active:
 		# if _current_game is true...
 		if stats._current_game:
@@ -497,5 +519,9 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 	else:
 		play_reg_btn.create_button()
 		play_twit_btn.create_button()
+
+		events = pygame.event.get()
+		get_infoz(events, g_settings, screen, ship, twits, stats, scores, textbox)
+
 		# If everything breaks
-	print("LEN OF TWITS = {}".format(len(twits)))
+	# print("LEN OF TWITS = {}".format(len(twits)))
