@@ -9,6 +9,7 @@ from entity.bullets import Bullet
 from entity.alien import Alien
 from entity.tweeter import Tweeter
 
+dropped_space = 1
 total_twits = 0
 twits_list = []
 	
@@ -80,7 +81,7 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, bullets):
 			fire_bullets(g_settings, screen, ship, bullets)
 		elif event.key == pygame.K_b:
 			stats._current_game = 0
-			scores.start_game()
+			scores.start_game(mode=0)
 
 def check_play_buttons(events, g_settings, screen, ship, twits, \
 							stats, textbox, scores, play_reg_btn, \
@@ -125,10 +126,14 @@ def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 	pass
 
 
-def end_game(g_settings, screen, stats):
+def end_game(g_settings, screen, stats, scores):
+
 	stats.game_active = False
+	scores.prep_score()
 	g_settings.init_dynamic_settings()
-	stats.end_game == True
+	stats.base_mode()
+	x, y = g_settings.screen_width // 4, g_settings.screen_height // 6
+	# screen.blit(textbox.get_surface(), (x*3-100, y*3-80))
 
 
 def reset_army(screen, twits):
@@ -149,11 +154,13 @@ def create_army(g_settings, screen, twits, tokenized, \
 					neg_words, pos_words, start=0,act=2):
 
 	import re
-	re_alphaNum = r"^[a-zA-Z0-9 ',\"]+$"
+	global twit_list
+	re_alphaNum = r"^[a-zA-Z0-9]+$"
+	re_ascii	= r"[^\u0000-\u007F]"
+	re_nother	= r"(?<=\u0000-\u007F)[a-Z0-9]"
 	# Idk what 'wild' is, hopefully it doesn't cause portability errors
-	wild 		= '…'
-	wild2		= '...'
-	punct		= [",","'","\"","."]
+	#wild 		= '…'
+	punct		= [",","'","\"",".",":"]
 	dots 		= 0
 	end_char 	= 0
 	available_x = int(get_cols(g_settings))
@@ -161,21 +168,21 @@ def create_army(g_settings, screen, twits, tokenized, \
 	generate_x 	= make_space(available_x)
 	generate_y 	= make_space(available_y)
 	row = next(generate_y)
+	# print(tokenized)
 	# ROW is assigned because unlike X, it is not reset, it has a stable vector throughout.
 	# ROW is now 0
 	for tweet in tokenized[start:act]:
 		# Get rid of the confusing bits
-		if wild2 in tweet:
-			tweet.remove(wild2)
-		if wild in tweet:
-			tweet.remove(wild)
+		if "..." in tweet:
+			tweet.remove("...")
+		#if wild in tweet:
+			#tweet.remove(wild)
 
 		# Add our own delimiter
 		tweet.append("...")
 
 		# print("TWEET {}".format(tweet))
 		for word in tweet:
-
 			# 3 simple flag checks are not worth an 
 			# extra function on the stack frame imo
 
@@ -185,8 +192,12 @@ def create_army(g_settings, screen, twits, tokenized, \
 				word = "."
 				# print("DOTS {}".format(word))
 				dots = 1
-				
-			if re.search(re_alphaNum, word) or dots:
+			else:
+				dots = 0
+
+			print("Testing Regex on -- {}".format(word))
+			if (re.findall(re_alphaNum, word) and word.isalpha()) or dots:
+				print("PASSED")
 
 				if word in Analyzer._neg_words:
 		 			# FLAG : determine sentiment
@@ -216,8 +227,23 @@ def create_army(g_settings, screen, twits, tokenized, \
 						""" This more than likely wont incur from the above algo"""
 						row = next(generate_y)
 						position_x = make_space(available_x)
-
+			else:
+				continue
 	row = next(generate_y)
+
+
+	# RECONSIDER this placement? Should be a separate function
+	if total_twits == 0:
+		tokenized.pop()
+		tokenized.pop()
+		if len(tokenized) == 0:
+			print("Tweets Exhausted")
+			return False
+		else:
+			create_army(g_settings, screen, twits, tokenized, \
+						neg_words, pos_words, start=start+2,act=act+2)
+
+	
 
 def assign_twit(g_settings, screen, twits, letter, sentiment, end_char, generate_x, row, dots=0):
 	""" Construct an individual character and its properties to be displayed.
@@ -232,6 +258,8 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, end_char, generate
 	text_data["sentiment"] 	= sentiment
 	text_data["space"] 		= 0
 	text_data["index"]		= total_twits
+	
+	print("assinging Tweet")
 
 	# Using our generators we can systematically assign each letter
 	if not dots:
@@ -307,6 +335,7 @@ def check_twit_edges(g_settings, twits):
 			change_army_direction(g_settings, twits)
 
 
+
 ### ### ### ### ### ### ### ### ### Twitter mode Functions ### ### ### ### ### 
 
 def change_army_direction(g_settings, twits):
@@ -320,21 +349,26 @@ def change_army_direction(g_settings, twits):
 		twit.rect.y += g_settings.twit_drop_speed
 	g_settings.twit_direction *= -1
 
-def update_twits(g_settings, screen, stats, ship, twits, scores, bullets):
+def update_twits(g_settings, screen, stats, ship, twits, scores, bullets, init=0):
+	global dropped_space
 	twits.update()
 	# Check if twits touch edges
 	check_twit_edges(g_settings, twits)
 	check_twit_bottom(g_settings, stats, scores, screen, ship, twits, bullets)
 	# If twits hit the ship
-	if pygame.sprite.spritecollideany(ship, twits):
+	
+	if pygame.sprite.spritecollideany(ship, twits) # and not twit.letter == "space":
+		
+		ship_hit(g_settings, screen, stats, ship, twits, scores, bullets)
+
+	# dropped_space global, this will only occur once and remove all empty space placeholders
+	if dropped_space:
+		dropped_space = 0
 		for twit in twits.sprites():
-			# useless?
 			if twit.letter == "space":
-				# potential problem point
-				continue
-			else:
-				ship_hit(g_settings, screen, stats, ship, twits, scores, bullets)
-			return False
+				twits.remove(twit)
+	return 0
+
 
 ### ### ### ### ### ### ### ### ### ### NETWORK ### ### ### ### ### ### ### ###
 
@@ -364,11 +398,13 @@ def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
 		twits.empty()
 		bullets.empty()
 		get_high_score(stats, scores)
-		end_game(g_settings, screen, stats)
+		end_game(g_settings, screen, stats, scores)
+
 	sleep(0.5)
 	ship.center_ship()
 
 def get_high_score(stats, scores):
+	""" Saves the high score """ 
 	if stats.score > stats.high_score:
 		stats.high_score = stats.score
 		scores.prep_high_score()
@@ -429,10 +465,13 @@ def get_infoz(events, g_settings, screen, ship, twits, stats, scores, textbox, c
 			create_army(g_settings, screen, twits, tokenized_tweets, \
 												analyzer._neg_words, \
 												analyzer._pos_words)
-			stats.switch_game()
-			scores.prep_tweeter(handle)
-			scores.start_game()
+			
+			
 			textbox.clear_text()
+			textbox.input_string = ""
+			textbox.reset()
+			scores.start_game(mode=1, handle=handle)
+			
 
 			return True
 		# Secondary Error catch should we somehow bypass an erroneous server response
@@ -462,11 +501,6 @@ def update_bullets(g_settings, screen, stats, ship, scores,  \
 	for bullet in bullets.copy():
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
-
-	# Delete space entities, no need for a separate function...meh
-	for twit in twits.sprites():
-		if twit.letter == "space":
-			twits.remove(twit)
 
 	if stats._current_game:
 		shot_down = pygame.sprite.groupcollide(bullets, twits, True, True)

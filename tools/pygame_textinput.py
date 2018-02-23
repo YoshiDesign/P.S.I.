@@ -41,15 +41,16 @@ class TextInput:
         # Text-surface will be created during the first update call:
         self.surface = pygame.Surface((1, 1))
         self.surface.set_alpha(0)
-
+        self.reset()
+    def reset(self):
         # Vars to make keydowns repeat after user pressed a key for some time:
         self.keyrepeat_counters = {} # {event.key: (counter_int, event.unicode)} (look for "***")
-        self.keyrepeat_intial_interval_ms = repeat_keys_initial_ms
-        self.keyrepeat_interval_ms = repeat_keys_interval_ms
+        self.keyrepeat_intial_interval_ms = 400
+        self.keyrepeat_interval_ms = 35
 
         # Things cursor:
-        self.cursor_surface = pygame.Surface((int(self.font_size/20+1), self.font_size))
-        self.cursor_surface.fill(cursor_color)
+        self.cursor_surface = pygame.Surface((int(35/20+1), 35))
+        self.cursor_surface.fill((255, 255, 255))
         self.cursor_position = 0 # Inside text
         self.cursor_visible = True # Switches every self.cursor_switch_ms ms
         self.cursor_switch_ms = 500 # /|\
@@ -78,6 +79,7 @@ class TextInput:
 
                 ### ### ### ###
                 elif event.key == pl.K_RETURN and self.get_text():
+
                     return True
                 elif event.key == pl.K_RETURN:
                     self.clear_text()

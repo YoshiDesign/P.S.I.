@@ -32,7 +32,7 @@ class Score():
 		for ship_number in range(self.stats.ships_left):
 			ship = Life(self.g_settings, self.screen)
 			ship.rect.width -= 10
-			ship.rect.x = self.screen_rect.centerx + ship_number * ship.rect.width
+			ship.rect.x = self.screen_rect.centerx + ship_number * (ship.rect.width - 6)
 			ship.rect.y = 15
 			self.ships.add(ship)
 
@@ -80,16 +80,20 @@ class Score():
 		if self.stats._current_game:
 			self.screen.blit(self.tweeter_image, self.tweeter_rect)
 
-	def start_game(self):
+	def start_game(self, mode=0, handle=""):
 
-		""" Start a new game """
-		self.stats.game_active = True
-		self.g_settings.init_dynamic_settings()
-		self.prep_score()
-		self.prep_high_score()
-		self.prep_level()
-		self.prep_ships()
+		if mode:
+			""" Start a PSI game """ 
+			self.stats.twit_mode()
+			self.prep_tweeter(handle)
+			self.stats.game_active = True
+		else:
+			""" Start an Asteroid2018 game """
+			self.stats.base_mode()
 
-		if self.stats._current_game:
-			# Change to a twitter game
-			print("ENGAGE TWITTER")
+			self.stats.game_active = True
+			self.g_settings.init_dynamic_settings()
+			self.prep_score()
+			self.prep_high_score()
+			self.prep_level()
+			self.prep_ships()

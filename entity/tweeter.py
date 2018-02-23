@@ -19,7 +19,6 @@ class Tweeter(Sprite):
 		self.sentiment = text_data["sentiment"]
 		self.space = text_data["space"]
 		self.index = text_data["index"]
-
 		# Determine Letter_Image to display
 		if self.letter == "dots":
 
@@ -54,7 +53,6 @@ class Tweeter(Sprite):
 		self.char_spacing = self.g_settings.char_spacing
 		self.x = float(self.rect.x)
 
-
 	def check_edges(self):
 		# True if touching
 		screen_rect = self.screen.get_rect()
@@ -65,12 +63,6 @@ class Tweeter(Sprite):
 		else:
 			# moot
 			return False
-
-	@classmethod
-	def reset(self, twitters):
-		pass
-
-
 
 	def update(self):
 		# Movement

@@ -12,7 +12,7 @@ class Stats():
 		self.reset_all()
 		# Game States
 		self.game_active = False
-		self.end_game = False
+		# self.end_game = False
 
 		# Statistics
 		self.score = 0
@@ -20,16 +20,23 @@ class Stats():
 		self.level = 1
 		
 	@staticmethod
-	def switch_game():
+	def base_mode():
 		""" 
-			if its 0, change it to 1, otherwise it is zero
-			THIS IS THE ENDPOINT for post analysis checks before game starts
+			Game mode sanity check
+			A good endpoint for post analysis results before game begins
 			@staticmethod required
 		"""
+		if Stats._current_game == 1:
+			Stats._current_game = 0
+		else:
+			Stats._current_game = 0
+			
+	@staticmethod
+	def twit_mode():
 		if Stats._current_game == 0:
 			Stats._current_game = 1
 		else:
-			Stats._current_game = 0
+			Stats._current_game = 1
 	
 	
 

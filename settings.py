@@ -18,8 +18,7 @@ class Settings():
 		# Essentially same as the screen object rect?
 		self.background_rect = self.background.get_rect()
 		
-		# Lives
-		self.ship_limit = 1
+		
 		# score multiplier
 		self.score_mult = 1.2
 		
@@ -39,7 +38,6 @@ class Settings():
 		#self.Lazer_ret = 
 
 		# Twitter stuff. Twit = A single letter of a tweet
-		self.twit_direction = 1
 		self.char_width = 20
 		self.char_height = 24
 		self.char_spacing = 1
@@ -48,21 +46,19 @@ class Settings():
 
 		# Create dynamic settings
 		self.init_dynamic_settings()
-
-		@staticmethod
-		def switch_game():
-			Settings._current_game = 1
-		#
 		
 
 	def init_dynamic_settings(self):
 
 		# Twits
+		self.twit_direction = 1
 		self.twit_speed = 4
 		self.twit_hp = 2
-
 		self.score_multiplier = 1.48
 		
+		
+		# Lives
+		self.ship_limit = 1
 		# Ship
 		self.ship_speed_right = 2.0
 		self.ship_speed_up = 3.0
@@ -91,11 +87,6 @@ class Settings():
 			screen.blit(self.background, self.background_rect)
 		if game:
 			screen.blit(self.background2, self.background_rect)
-
-		#self.reticle.blit(self.background)
-
-	def switch_background(self, screen):
-		pass
 
 
 		
