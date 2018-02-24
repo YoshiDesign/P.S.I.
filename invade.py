@@ -50,6 +50,12 @@ def Main():
 				off_x=(g_settings.screen_width // 4) * -1, \
 				off_y=(g_settings.screen_height // 8) * -1 )
 
+
+
+	""" KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py for efficiency 
+		When gameplay is active, textbox.update() ceases, and check_events takes over
+	"""
+
 	while True:
 
 		clock.tick(FPS)
@@ -59,6 +65,7 @@ def Main():
 						twits, bullets, stats, scores, play_reg_btn, play_twit_btn)
 
 		if stats.game_active == True:
+			# As per the DocString
 			gf.check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
 										twits, bullets, play_twit_btn, play_reg_btn)
 			if stats._current_game:

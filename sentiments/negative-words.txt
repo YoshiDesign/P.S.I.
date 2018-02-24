@@ -153,6 +153,7 @@ ambivalent
 ambush
 amiss
 amputate
+anal
 anarchism
 anarchist
 anarchistic
@@ -181,6 +182,10 @@ antagonistic
 antagonize
 anti-
 anti-american
+anti-everything
+anti-human
+anti-humanity
+anti-earth
 anti-israeli
 anti-occupation
 anti-proliferation
@@ -305,6 +310,7 @@ bashed
 bashful
 bashing
 bastard
+bastardized
 bastards
 battered
 battering
@@ -1828,7 +1834,13 @@ frustratingly
 frustration
 frustrations
 fuck
+fucked
+fucks
 fucking
+fuckup
+fuckups
+fucky
+fuck-up
 fudge
 fugitive
 full-blown
@@ -2141,7 +2153,6 @@ idiot
 idiotic
 idiotically
 idiots
-idle
 ignoble
 ignominious
 ignominiously
@@ -2868,7 +2879,6 @@ measly
 meddle
 meddling
 meddleing
-melania
 meddlesome
 mediocre
 mediocrity
@@ -3019,6 +3029,7 @@ murky
 muscle-flexing
 mushy
 musty
+myopic
 mysterious
 mysteriously
 mystery
@@ -3331,6 +3342,11 @@ pillory
 pimple
 pinch
 pique
+piss
+pissed
+pisser
+pissing
+pissy
 pitiable
 pitiful
 pitifully
@@ -3820,6 +3836,9 @@ shipwreck
 shirk
 shirker
 shit
+shitting
+shits
+shitty
 shiver
 shock
 shocked
@@ -4704,6 +4723,10 @@ wail
 wallow
 wane
 waning
+wank
+wanked
+wanker
+wanking
 wanton
 war-like
 warily

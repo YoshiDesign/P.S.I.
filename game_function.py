@@ -24,12 +24,12 @@ flag_1 = 0
 	
 def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
 						twits, bullets, play_twit_btn, play_reg_btn):
-	""" Tracks text input box and all player events """
+
+	""" Tracks text input box and all player events while game_active == True """
+
 	mousex, mousey = pygame.mouse.get_pos()
 	events = pygame.event.get()
-	if not stats.game_active:
-		# Activates text box
-		pass
+
 	# Events
 	for event in events:
 		if event.type == pygame.QUIT:
@@ -41,24 +41,11 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
 			mousex, mousey = pygame.mouse.get_pos()
 			#print("x y".format(mousex, mousey))
 
-			if not stats.game_active:
-				# OP : check_play_buttons and check_player_clicks could be 1 functions
-				# as the conditions for check_play_buttons, arent entirely verbose
-				# check_play_buttons(events, g_settings, screen, ship, twits, \
-				# 										stats, textbox, \
-				# 										scores, play_reg_btn, \
-				# 										play_twit_btn,  \
-				# 										mousex=mousex, mousey=mousey)
-				pass
 			else:
 				check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 
 		elif event.type == pygame.KEYDOWN:
 			keydown_event(event, g_settings, screen, ship, stats, scores, bullets)
-			if not stats.game_active:
-				pass
-				# check_play_buttons(events, g_settings, screen, ship, twits, stats, textbox, scores, play_reg_btn, \
-				# 															play_twit_btn)
 
 		elif event.type == pygame.KEYUP:
 			keyup_event(event, ship, stats)
