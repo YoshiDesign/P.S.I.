@@ -25,7 +25,6 @@ class Score():
 		self.prep_level()
 		self.prep_ships()
 
-
 	def prep_ships(self):
 		""" Track Lives """
 		self.ships = Group()
@@ -39,8 +38,9 @@ class Score():
 	def prep_score(self):
 
 		score_str = "{:,}".format(self.stats.score)
-		self.score_image = self.font.render(score_str, True, self.white, \
-															 False)
+		self.score_image = self.font.render(score_str, True, \
+											self.white, False)
+
 		self.score_rect = self.score_image.get_rect()
 		self.score_rect.right = self.screen_rect.right - 50
 		self.score_rect.top = 12
@@ -48,8 +48,9 @@ class Score():
 	def prep_high_score(self):
 
 		score_str = "{:,}".format(self.stats.high_score)
-		self.high_score_image = self.font2.render(score_str, True, self.white, \
-																  False)
+		self.high_score_image = self.font2.render(score_str, True,\
+												self.white, False)
+		
 		self.high_score_rect = self.high_score_image.get_rect()
 		self.high_score_rect.centerx = self.screen_rect.centerx + 45
 		self.high_score_rect.top = self.screen_rect.bottom - 55
@@ -58,9 +59,8 @@ class Score():
 		""" Track Level """
 		if up:
 			self.stats.level += 1
-		self.level_image = self.font2.render(str("Level " + str(self.stats.level)), \
-													True, self.white, False)
-
+		self.level_image = self.font2.render(str("Level " + str(self.stats.level)),\
+															True, self.white, False)
 		self.level_rect = self.level_image.get_rect()
 		self.level_rect.left = self.screen_rect.left + 10
 		self.level_rect.top = self.score_rect.top + 38
@@ -82,18 +82,20 @@ class Score():
 
 	def start_game(self, mode=0, handle=""):
 
+		self.stats.reset_all()
+
 		if mode:
 			""" Start a PSI game """ 
 			self.stats.twit_mode()
 			self.prep_tweeter(handle)
 			self.stats.game_active = True
+			
 		else:
 			""" Start an Asteroid2018 game """
 			self.stats.base_mode()
-
 			self.stats.game_active = True
-			self.g_settings.init_dynamic_settings()
 			self.prep_score()
 			self.prep_high_score()
 			self.prep_level()
-			self.prep_ships()
+
+		self.prep_ships()

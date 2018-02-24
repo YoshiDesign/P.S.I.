@@ -9,9 +9,18 @@ from entity.bullets import Bullet
 from entity.alien import Alien
 from entity.tweeter import Tweeter
 
+# unused
+_offline = False
+# Initial deletion of blank twits
 dropped_space = 1
+
 total_twits = 0
+# List of literal indices
 twits_list = []
+# List of full tweets
+all_tweets = []
+# Arbitrary
+flag_1 = 0
 	
 def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
 						twits, bullets, play_twit_btn, play_reg_btn):
@@ -102,7 +111,7 @@ def check_play_buttons(events, g_settings, screen, ship, twits, \
 		if btn_reg_clicked:
 			print("REGULAR MODE")
 			# Start reg
-			pass
+			scores.start_game(mode=0)
 			# scores.start_game()
 			
 		elif (btn_twit_clicked and textbox.get_text()) and not stats.game_active:
@@ -129,14 +138,15 @@ def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 def end_game(g_settings, screen, stats, scores):
 
 	stats.game_active = False
+	stats.reset_all()
 	scores.prep_score()
-	g_settings.init_dynamic_settings()
 	stats.base_mode()
 	x, y = g_settings.screen_width // 4, g_settings.screen_height // 6
 	# screen.blit(textbox.get_surface(), (x*3-100, y*3-80))
 
 
 def reset_army(screen, twits):
+	""" Place twits at the top of the screen """ 
 	print("Resetting Army")
 	screen_rect = screen.get_rect()
 	y = 1
@@ -150,16 +160,16 @@ def reset_army(screen, twits):
 		twit.rect.y = screen_rect.top + (twit.rect.height * y) + 20
 
 
-def create_army(g_settings, screen, twits, tokenized, \
-					neg_words, pos_words, start=0,act=2):
+def create_army(g_settings, screen, twits, all_tweets, \
+										start=0, act=2):
 
 	import re
 	global twit_list
+	# start = int(start)
+	# act = int(act)
 	re_alphaNum = r"^[a-zA-Z0-9]+$"
 	re_ascii	= r"[^\u0000-\u007F]"
 	re_nother	= r"(?<=\u0000-\u007F)[a-Z0-9]"
-	# Idk what 'wild' is, hopefully it doesn't cause portability errors
-	#wild 		= '…'
 	punct		= [",","'","\"",".",":"]
 	dots 		= 0
 	end_char 	= 0
@@ -168,10 +178,10 @@ def create_army(g_settings, screen, twits, tokenized, \
 	generate_x 	= make_space(available_x)
 	generate_y 	= make_space(available_y)
 	row = next(generate_y)
-	# print(tokenized)
+	# print(all_tweets)
 	# ROW is assigned because unlike X, it is not reset, it has a stable vector throughout.
 	# ROW is now 0
-	for tweet in tokenized[start:act]:
+	for tweet in all_tweets[start:act]:
 		# Get rid of the confusing bits
 		if "..." in tweet:
 			tweet.remove("...")
@@ -195,9 +205,7 @@ def create_army(g_settings, screen, twits, tokenized, \
 			else:
 				dots = 0
 
-			print("Testing Regex on -- {}".format(word))
 			if (re.findall(re_alphaNum, word) and word.isalpha()) or dots:
-				print("PASSED")
 
 				if word in Analyzer._neg_words:
 		 			# FLAG : determine sentiment
@@ -229,24 +237,33 @@ def create_army(g_settings, screen, twits, tokenized, \
 						position_x = make_space(available_x)
 			else:
 				continue
+
+	# Destroy the first 2 tweets
+	x = all_tweets.pop(0)
+	x = all_tweets.pop(0)
+	x = ""
+
 	row = next(generate_y)
 
 
+	""" 		NOT TO BE CONFUSED WITH UPDATE_TWIT
+		This returns a tweet, or searches exhaustively and gives up
+										 					"""
 	# RECONSIDER this placement? Should be a separate function
+	# This looks for more tweets to create the army with. It is recursive
 	if total_twits == 0:
-		tokenized.pop()
-		tokenized.pop()
-		if len(tokenized) == 0:
+		if len(all_tweets) == 0:
+			# Destroy the tweets we just blasted and tidy up
 			print("Tweets Exhausted")
+			# TODO -- Ask for another Handle? or submit score. Or both
 			return False
 		else:
-			create_army(g_settings, screen, twits, tokenized, \
-						neg_words, pos_words, start=start+2,act=act+2)
-
+			create_army(g_settings, screen, twits, all_tweets)
 	
 
-def assign_twit(g_settings, screen, twits, letter, sentiment, end_char, generate_x, row, dots=0):
-	""" Construct an individual character and its properties to be displayed.
+def assign_twit(g_settings, screen, twits, letter, sentiment, \
+							end_char, generate_x, row, dots=0):
+	""" Construct an individual character and its properties to be blasted.
 		'dots' is a result of the Twitter API being handled by the nltk tokenizer """
 	# Defaults
 	global total_twits
@@ -335,7 +352,6 @@ def check_twit_edges(g_settings, twits):
 			change_army_direction(g_settings, twits)
 
 
-
 ### ### ### ### ### ### ### ### ### Twitter mode Functions ### ### ### ### ### 
 
 def change_army_direction(g_settings, twits):
@@ -349,24 +365,41 @@ def change_army_direction(g_settings, twits):
 		twit.rect.y += g_settings.twit_drop_speed
 	g_settings.twit_direction *= -1
 
-def update_twits(g_settings, screen, stats, ship, twits, scores, bullets, init=0):
+def update_twits(g_settings, screen, stats, ship, \
+					twits, scores, bullets, init=0):
+
 	global dropped_space
+	global all_tweets
 	twits.update()
 	# Check if twits touch edges
 	check_twit_edges(g_settings, twits)
 	check_twit_bottom(g_settings, stats, scores, screen, ship, twits, bullets)
 	# If twits hit the ship
 	
-	if pygame.sprite.spritecollideany(ship, twits) # and not twit.letter == "space":
+	if pygame.sprite.spritecollideany(ship, twits): # and not twit.letter == "space":
 		
 		ship_hit(g_settings, screen, stats, ship, twits, scores, bullets)
 
 	# dropped_space global, this will only occur once and remove all empty space placeholders
 	if dropped_space:
+		print("DROPPING SPACE CHARS")
 		dropped_space = 0
 		for twit in twits.sprites():
+
 			if twit.letter == "space":
+				print("{}".format(twit.letter))
 				twits.remove(twit)
+
+	print(len(twits.sprites()))
+
+	# DONT NOTICE ME!
+	global flag_1
+	# DIFFICULTY SETTING -> 5
+	# PROBLEM - this is also activating when we ship_hit due to twit.empty()
+	if len(twits.sprites()) <= 5:
+		dropped_space = 0
+		# Instantiates the next 2-tweet militia
+		create_army(g_settings, screen, twits, all_tweets)
 	return 0
 
 
@@ -382,8 +415,8 @@ def check_twit_bottom(g_settings, stats, scores, screen, ship, twits, bullets):
 			break
 
 def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
-
-	
+	global flag_1
+	global dropped_space
 	if stats.ships_left > 0:
 		if bottom:
 			reset_army(screen, twits)
@@ -394,13 +427,13 @@ def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
 
 	else:
 		# Game Over
-
+		flag_1 = 1
+		dropped_space = 0
 		twits.empty()
 		bullets.empty()
 		get_high_score(stats, scores)
 		end_game(g_settings, screen, stats, scores)
 
-	sleep(0.5)
 	ship.center_ship()
 
 def get_high_score(stats, scores):
@@ -418,34 +451,39 @@ def send_data_TEST(name, fail=0):
 	resp = requests.get(url)
 	return resp.json()
 
-def get_infoz(events, g_settings, screen, ship, twits, stats, scores, textbox, clicked=0):
+def get_infoz(events, g_settings, screen, ship, twits,\
+					 stats, scores, textbox, clicked=0):
 	""" 
 		This function's modularity is in its order 
 		of operations as opposed to ad-hoc functions
+		Enjoy
 	"""
 	for event in events:
 		if event.type == pygame.QUIT:
 			sys.exit()
-	
+
+	# If player presses ENTER or clicks the Twitter button
 	if textbox.update(events) or clicked:
 		
 		# handle is the user's input
 		handle = textbox.get_text()
+		if not handle or handle == "":
+			return False
 		
 		print("Getting tweets from @{}".format(handle))
-
 		# No interruptions but still traceback to stderr
 		try:
 			tweet_bot = send_data_TEST(handle)
 		except:
-			# If the tweets did not make it we get falsey >> terminal
-			print("Something went wrong : {}".format(sys.exc_info()[:-1]))
+			# Any erroneous or otherwise NULL returns
+			print("Something went wrong : " \
+			"{}".format(sys.exc_info()[:-1]))
 				
 			return False
 
 		if tweet_bot:
+			global all_tweets
 			# If Twitter API responds
-			tokenized_tweets = []
 			# Get (probably) POSIX paths to txt files
 			positive = os.path.join(sys.path[0], \
 					"sentiments/positive-words.txt")
@@ -456,27 +494,23 @@ def get_infoz(events, g_settings, screen, ship, twits, stats, scores, textbox, c
 			for i, tweet in enumerate(tweet_bot):
 				"""
 					Tweets are stored in a list as the analysis occurs.
-							tokenized_tweets looks like:
+							all_tweets_tweets looks like:
 					[["This", "is", "tweet", "one", "!"],["and", "two"]...etc]
 				"""
-				tokenized_tweets.append(analyzer.analyze(tweet))
+				all_tweets.append(analyzer.analyze(tweet))
 
 			# Safe to use direct call to analyzer_words here ...fully endorsed
-			create_army(g_settings, screen, twits, tokenized_tweets, \
-												analyzer._neg_words, \
-												analyzer._pos_words)
-			
-			
-			textbox.clear_text()
-			textbox.input_string = ""
+			create_army(g_settings, screen, twits, all_tweets)
 			textbox.reset()
 			scores.start_game(mode=1, handle=handle)
 			
-
 			return True
 		# Secondary Error catch should we somehow bypass an erroneous server response
 		else:
+			
 			print("Could not receive tweets from server")
+			# BLIT MSG TO SCREEN, "Play offline instead? Y/N"
+			""" THIS IS WHERE WE BEGIN AN OFFLINE GAME """
 			return False
 	else:
 		# Display our text input and gather user input
@@ -526,7 +560,8 @@ def update_bullets(g_settings, screen, stats, ship, scores,  \
 		scores.prep_score()
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-							twits, bullets, stats, scores, play_reg_btn, play_twit_btn):
+										twits, bullets, stats, scores, \
+											play_reg_btn, play_twit_btn):
 	# Mouse
 	mouse_x, mouse_y = pygame.mouse.get_pos()
 	pygame.mouse.set_visible(False)
@@ -542,14 +577,16 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 			# ...A twitter-mode game started
 			# print("starting twitter mode")
 			ship.update(game_type=1)
+			twits.draw(screen)
 			for bullet in bullets.sprites():
 				bullet.draw_bullet()
-			twits.draw(screen)
+
 		elif not stats._current_game:
-			ship.update()
-			reticle.blitme(mouse_x, mouse_y)
+			ship.update(game_type=0)
 			# aliens.blitmeh()
+
 		scores.show_score()
+
 	else:
 		play_reg_btn.create_button()
 		play_twit_btn.create_button()

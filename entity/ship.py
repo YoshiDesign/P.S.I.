@@ -33,7 +33,6 @@ class Ship(Sprite):
 		# +4 for a tighter hit-box
 		self.rect = pygame.Rect(self.ship_x + 4, self.ship_y + 4, 28, 28)
 
-
 		# Movement Flags
 		self.move_right = False
 		self.move_left  = False
@@ -43,13 +42,8 @@ class Ship(Sprite):
 		self.move_up = False
 		self.move_down = False
 
-	@staticmethod
-	def switch_game():
-		Ship._current_game = 1
-
 	def update(self, game_type=0):
 		
-
 		if self.index < 100:
 			self.index += 1
 		else:
@@ -77,9 +71,6 @@ class Ship(Sprite):
 
 		self.rect.x = self.ship_x
 		self.rect.y = self.ship_y
-
-
-
 			
 	def center_ship(self):
 		self.ship_x = self.screen_rect.centerx

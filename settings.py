@@ -15,17 +15,19 @@ class Settings():
 		self.f2 = os.fsencode("sprites/GameBack2.jpg")
 		self.background = pygame.image.load(os.fsdecode(self.fp))
 		self.background2 = pygame.image.load(os.fsdecode(self.f2))
-		# Essentially same as the screen object rect?
+		# We are only tracking ONE rect during either background
 		self.background_rect = self.background.get_rect()
 		
 		
 		# score multiplier
-		self.score_mult = 1.2
+		self.score_mult = 1.25
+		self.damage_mult = 1.4
+		self.speed_mult = 1.2
 		
 		# Bullets
 		self.bullet_speed = 15
 		self.bullet_length = 3
-		self.bullet_width = 2
+		self.bullet_width = 100
 		self.bullet_color = (255,255,190)
 		# Lazers
 		self.lazer_color = (255,255,190)
@@ -56,21 +58,23 @@ class Settings():
 		self.twit_hp = 2
 		self.score_multiplier = 1.48
 		
-		
 		# Lives
 		self.ship_limit = 1
+
 		# Ship
 		self.ship_speed_right = 2.0
 		self.ship_speed_up = 3.0
 		self.ship_speed_down = 1.8
 		self.ship_speed_left = 2.0
-		# Other
+
+		# Aliens (Offline twit mode)
 		self.alien_speed = 1
 		
 		# Damage Grades
 		self.bomb_dmg = 2
 		self.lazer_dmg = 1
 		self.bullet_dmg = 1
+		print("DYNAMIC SETTINGS \nLIVES {}".format(self.ship_limit))
 		
 	# def get_tweet(self):
 	# 	""" Called until a game begins """ 

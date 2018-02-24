@@ -68,18 +68,6 @@ def Main():
 				gf.update_twits(g_settings, screen, stats, ship, twits, scores, bullets)
 				gf.update_bullets(g_settings, screen, stats, ship, scores, bullets, powerup, twits=twits)
 
-			
-			else:
-				# gf.update_bullets(g_settings, screen, stats, ship, scores, aliens, bullets, powerup)
-				pass
-
-
-			# gf.update_twits(g_settings, screen, stats, ship, twits)
-	
-
-
-
-
 		
 
 if __name__ == "__main__":

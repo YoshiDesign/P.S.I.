@@ -49,6 +49,7 @@ class Stats():
 		self.ships_left = self.g_settings.ship_limit
 		self.score = 0
 		self.level = 1
+		self.g_settings.init_dynamic_settings()
 		
 	def game_over_net(self):
 		""" Communicate to Leaderboard """
