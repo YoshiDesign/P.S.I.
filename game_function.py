@@ -64,7 +64,20 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
 			keyup_event(event, ship, stats)
 
 	return 0
-			
+	
+def menu_keys(event):
+	""" Only from main menu """
+	# jic
+	if not stats.game_active:
+		#
+		if event.key == pygame.K_b:
+			stats._current_game = 0
+			scores.start_game(mode=0)
+
+##########
+# ADD ALT+Z TO TURN OFF UI
+##########
+
 def keyup_event(event, ship, stats):
 	""" Keyups """
 	# More events
@@ -77,6 +90,9 @@ def keyup_event(event, ship, stats):
 			ship.move_down = False
 		elif event.key == pygame.K_w:
 			ship.move_up = False
+
+
+	return False
 
 
 
@@ -94,9 +110,9 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, bullets):
 			ship.move_up = True
 		elif event.key == pygame.K_SPACE:
 			fire_bullets(g_settings, screen, ship, bullets)
-		elif event.key == pygame.K_b:
-			stats._current_game = 0
-			scores.start_game(mode=0)
+		
+
+	return False
 
 def check_play_buttons(stats, textbox, scores, play_reg_btn, \
 							play_twit_btn, mousex=0, mousey=0):
@@ -129,15 +145,7 @@ def check_play_buttons(stats, textbox, scores, play_reg_btn, \
 			
 			return True
 
-		# elif btn_twit_clicked and not textbox.update(events):
-		# 	print("NOPE")
-		# else:
-		# 	print("BUG CHECK btn_reg_clicked == {}\n btn_twit_clicked == {}\n {}")
-
-		# return False
-
-		# reset ship
-		# reset reticle
+	return False
 
 def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey):
 	""" Click """
