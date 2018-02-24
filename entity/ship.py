@@ -24,10 +24,6 @@ class Ship(Sprite):
 		self.index = 0
 		self.settings = g_settings
 		
-		# Ship Positioning
-		#~ self.rect.centerx = self.screen_rect.centerx
-		#~ self.rect.bottom = self.screen_rect.bottom + 10
-		
 		self.ship_x = 600
 		self.ship_y = 700
 		# +4 for a tighter hit-box

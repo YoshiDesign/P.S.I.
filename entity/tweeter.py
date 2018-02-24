@@ -28,7 +28,6 @@ class Tweeter(Sprite):
 
 			self.filepath = os.fsencode(str("sprites/characters/" + \
 								"good" + str(self.letter) + ".png"))
-
 		elif self.letter == "space":
 
 			self.filepath = os.fsencode(str("sprites/characters/space.png"))

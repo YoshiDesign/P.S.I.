@@ -25,7 +25,7 @@ flag_1 = 0
 def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
 						twits, bullets, play_twit_btn, play_reg_btn):
 	""" Tracks text input box and all player events """
-
+	mousex, mousey = pygame.mouse.get_pos()
 	events = pygame.event.get()
 	if not stats.game_active:
 		# Activates text box
@@ -39,27 +39,31 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
 			print("click")
 
 			mousex, mousey = pygame.mouse.get_pos()
-			print("x y".format(mousex, mousey))
+			#print("x y".format(mousex, mousey))
 
 			if not stats.game_active:
 				# OP : check_play_buttons and check_player_clicks could be 1 functions
 				# as the conditions for check_play_buttons, arent entirely verbose
-				check_play_buttons(events, g_settings, screen, ship, twits, \
-														stats, textbox, \
-														scores, play_reg_btn, \
-														play_twit_btn, aliens, \
-														mousex=mousex, mousey=mousey)
+				# check_play_buttons(events, g_settings, screen, ship, twits, \
+				# 										stats, textbox, \
+				# 										scores, play_reg_btn, \
+				# 										play_twit_btn,  \
+				# 										mousex=mousex, mousey=mousey)
+				pass
 			else:
 				check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 
 		elif event.type == pygame.KEYDOWN:
 			keydown_event(event, g_settings, screen, ship, stats, scores, bullets)
 			if not stats.game_active:
-				check_play_buttons(events, g_settings, screen, ship, twits, stats, textbox, scores, play_reg_btn, \
-																			play_twit_btn, aliens)
+				pass
+				# check_play_buttons(events, g_settings, screen, ship, twits, stats, textbox, scores, play_reg_btn, \
+				# 															play_twit_btn)
 
 		elif event.type == pygame.KEYUP:
 			keyup_event(event, ship, stats)
+
+	return 0
 			
 def keyup_event(event, ship, stats):
 	""" Keyups """
@@ -73,6 +77,8 @@ def keyup_event(event, ship, stats):
 			ship.move_down = False
 		elif event.key == pygame.K_w:
 			ship.move_up = False
+
+
 
 def keydown_event(event, g_settings, screen, ship, stats, scores, bullets):
 	""" Keydowns """
@@ -92,9 +98,8 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, bullets):
 			stats._current_game = 0
 			scores.start_game(mode=0)
 
-def check_play_buttons(events, g_settings, screen, ship, twits, \
-							stats, textbox, scores, play_reg_btn, \
-							play_twit_btn, aliens, mousex=0, mousey=0):
+def check_play_buttons(stats, textbox, scores, play_reg_btn, \
+							play_twit_btn, mousex=0, mousey=0):
 	""" 
 		Checks for our button activity
 		Only Callable while game_active = 0
@@ -113,19 +118,23 @@ def check_play_buttons(events, g_settings, screen, ship, twits, \
 			# Start reg
 			scores.start_game(mode=0)
 			# scores.start_game()
+			return True
 			
 		elif (btn_twit_clicked and textbox.get_text()) and not stats.game_active:
 			""" Fires when user clicks instead of pressing Enter """
 
 			print("TWITTER MODE")
 			# Start twitter
-			get_infoz(events, g_settings, screen, ship, twits, stats, scores, textbox, clicked=1)
+			#get_infoz(g_settings, screen, ship, twits, stats, scores, textbox, play_reg_btn, play_twit_btn, clicked=1)
 			
-			
-		elif btn_twit_clicked and not textbox.update(events):
-			print("NOPE")
-		else:
-			print("BUG CHECK btn_reg_clicked == {}\n btn_twit_clicked == {}\n {}")
+			return True
+
+		# elif btn_twit_clicked and not textbox.update(events):
+		# 	print("NOPE")
+		# else:
+		# 	print("BUG CHECK btn_reg_clicked == {}\n btn_twit_clicked == {}\n {}")
+
+		# return False
 
 		# reset ship
 		# reset reticle
@@ -136,6 +145,16 @@ def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 
 
 def end_game(g_settings, screen, stats, scores):
+
+	global dropped_space
+	global total_twits
+	global twits_list
+	global all_tweets
+
+	dropped_space = 1
+	total_twits = 0
+	twits_list = []
+	all_tweets = []
 
 	stats.game_active = False
 	stats.reset_all()
@@ -365,8 +384,16 @@ def change_army_direction(g_settings, twits):
 		twit.rect.y += g_settings.twit_drop_speed
 	g_settings.twit_direction *= -1
 
+
+test = 0
+
 def update_twits(g_settings, screen, stats, ship, \
 					twits, scores, bullets, init=0):
+	
+	global test
+	if test != len(twits.sprites()):
+		print(len(twits.sprites()))
+		test = len(twits.sprites())
 
 	global dropped_space
 	global all_tweets
@@ -389,14 +416,13 @@ def update_twits(g_settings, screen, stats, ship, \
 			if twit.letter == "space":
 				print("{}".format(twit.letter))
 				twits.remove(twit)
-
-	print(len(twits.sprites()))
+				print("Verify ==== {}".format(twit))
 
 	# DONT NOTICE ME!
 	global flag_1
 	# DIFFICULTY SETTING -> 5
 	# PROBLEM - this is also activating when we ship_hit due to twit.empty()
-	if len(twits.sprites()) <= 5:
+	if len(twits.sprites()) <= 5 and stats.game_active:
 		dropped_space = 0
 		# Instantiates the next 2-tweet militia
 		create_army(g_settings, screen, twits, all_tweets)
@@ -451,19 +477,23 @@ def send_data_TEST(name, fail=0):
 	resp = requests.get(url)
 	return resp.json()
 
-def get_infoz(events, g_settings, screen, ship, twits,\
-					 stats, scores, textbox, clicked=0):
+def get_infoz(g_settings, screen, ship, twits,\
+				stats, scores, textbox, play_reg_btn, \
+				play_twit_btn, clicked=0, init=0):
 	""" 
 		This function's modularity is in its order 
 		of operations as opposed to ad-hoc functions
 		Enjoy
 	"""
-	for event in events:
-		if event.type == pygame.QUIT:
-			sys.exit()
+	
+	play_reg_btn.create_button()
+	play_twit_btn.create_button()
 
+	events = pygame.event.get()
 	# If player presses ENTER or clicks the Twitter button
-	if textbox.update(events) or clicked:
+	if textbox.update(events, stats, textbox, \
+		scores, play_reg_btn, play_twit_btn)  \
+	or clicked:
 		
 		# handle is the user's input
 		handle = textbox.get_text()
@@ -514,8 +544,9 @@ def get_infoz(events, g_settings, screen, ship, twits,\
 			return False
 	else:
 		# Display our text input and gather user input
-		x, y = g_settings.screen_width // 4, g_settings.screen_height // 6
-		screen.blit(textbox.get_surface(), (x*3-100, y*3-80))
+		screen.blit(textbox.get_surface(), ((g_settings.screen_width//4)*3-100, \
+											 (g_settings.screen_height//6)*3-80))
+		
 		return False
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
@@ -525,8 +556,8 @@ def fire_bullets(g_settings, screen, ship, bullets):
 		new_bullet = Bullet(g_settings, screen, ship)
 		bullets.add(new_bullet)
 
-def update_bullets(g_settings, screen, stats, ship, scores,  \
-										 bullets, powerup, aliens=0, twits=0):
+def update_bullets(g_settings, screen, stats, ship, scores, \
+						bullets, powerup, aliens=0, twits=0):
 	""" Bullet events (add / remove / upgrade)"""
 	global twits_list
 	global total_twits
@@ -563,11 +594,7 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 										twits, bullets, stats, scores, \
 											play_reg_btn, play_twit_btn):
 	# Mouse
-	mouse_x, mouse_y = pygame.mouse.get_pos()
-	pygame.mouse.set_visible(False)
-	reticle.blitme(mouse_x, mouse_y)
-	pygame.display.flip()
-
+	
 	# Load background so we dont leave ship footprints everywhere
 	g_settings.load_background(screen, game=stats._current_game)
 	
@@ -588,11 +615,22 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 		scores.show_score()
 
 	else:
-		play_reg_btn.create_button()
-		play_twit_btn.create_button()
 
-		events = pygame.event.get()
-		get_infoz(events, g_settings, screen, ship, twits, stats, scores, textbox)
+		
+		get_infoz(g_settings, screen, ship, twits, stats, scores, textbox, play_reg_btn, play_twit_btn)
+		mouse_x, mouse_y = pygame.mouse.get_pos()
+		pygame.mouse.set_visible(False)
+		reticle.blitme(mouse_x, mouse_y)
+
+	pygame.display.flip()
+
+
+		
+
+		
+
+
+		
 
 		# If everything breaks
 	# print("LEN OF TWITS = {}".format(len(twits)))

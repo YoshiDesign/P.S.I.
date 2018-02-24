@@ -37,8 +37,7 @@ class Button():
 													  self.color)
 		self.msg_rect = self.msg_image.get_rect()
 		self.msg_rect.center = self.rect.center
-		
-		
+
 	def create_button(self):
 		""" Button Factory """
 

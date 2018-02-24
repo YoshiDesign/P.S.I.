@@ -9,7 +9,6 @@ class Stats():
 	def __init__(self, g_settings):
 		
 		self.g_settings = g_settings
-		self.reset_all()
 		# Game States
 		self.game_active = False
 		# self.end_game = False
@@ -18,13 +17,14 @@ class Stats():
 		self.score = 0
 		self.high_score = 0
 		self.level = 1
+
+		self.reset_all()
 		
 	@staticmethod
 	def base_mode():
 		""" 
 			Game mode sanity check
 			A good endpoint for post analysis results before game begins
-			@staticmethod required
 		"""
 		if Stats._current_game == 1:
 			Stats._current_game = 0
