@@ -30,7 +30,6 @@ class Button():
 		# Required
 		self.prep_msg(text)
 
-
 	def prep_msg(self, msg):
 
 		self.msg_image = self.font.render(self.text, True, self.text_color, \
@@ -43,10 +42,3 @@ class Button():
 
 		self.screen.fill(self.color, self.rect)
 		self.screen.blit(self.msg_image, self.msg_rect)
-		
-		
-		
-		
-		
-		
-		

@@ -36,19 +36,18 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
 			sys.exit()
 		# If textinput.update() == True, user pressed Return
 		elif event.type == pygame.MOUSEBUTTONDOWN:
-			print("click")
+			print("click, you glorious bitch, CLICK!")
+			
 
 			mousex, mousey = pygame.mouse.get_pos()
-			#print("x y".format(mousex, mousey))
+			
 
-			else:
-				check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 
 		elif event.type == pygame.KEYDOWN:
 			keydown_event(event, g_settings, screen, ship, stats, scores, bullets)
 
 		elif event.type == pygame.KEYUP:
-			keyup_event(event, ship, stats)
+			keyup_event(event, g_settings, ship, stats)
 
 	return 0
 	
@@ -65,18 +64,18 @@ def menu_keys(event):
 # ADD ALT+Z TO TURN OFF UI
 ##########
 
-def keyup_event(event, ship, stats):
+def keyup_event(event, g_settings, ship, stats):
 	""" Keyups """
 	# More events
 	if stats.game_active:
 		if event.key == pygame.K_d:
-			ship.move_right = False
+			g_settings.move_right = False
 		elif event.key == pygame.K_a:
-			ship.move_left = False
+			g_settings.move_left = False
 		elif event.key == pygame.K_s:
-			ship.move_down = False
+			g_settings.move_down = False
 		elif event.key == pygame.K_w:
-			ship.move_up = False
+			g_settings.move_up = False
 
 
 	return False
@@ -87,14 +86,15 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, bullets):
 	""" Keydowns """
 	# Aka more events
 	if stats.game_active:
+
 		if event.key == pygame.K_d:
-			ship.move_right = True
+			g_settings.move_right = True
 		elif event.key == pygame.K_a:
-			ship.move_left = True
+			g_settings.move_left = True
 		elif event.key == pygame.K_s:
-			ship.move_down = True
+			g_settings.move_down = True
 		elif event.key == pygame.K_w:
-			ship.move_up = True
+			g_settings.move_up = True
 		elif event.key == pygame.K_SPACE:
 			fire_bullets(g_settings, screen, ship, bullets)
 		
@@ -114,7 +114,7 @@ def check_play_buttons(stats, textbox, scores, play_reg_btn, \
 	if (btn_reg_clicked or btn_twit_clicked) and not stats.game_active:
 
 		# Reset game stats
-		stats.reset_all()
+		# stats.reset_all() ...It's in start_game
 		
 		if btn_reg_clicked:
 			print("REGULAR MODE")
@@ -127,6 +127,7 @@ def check_play_buttons(stats, textbox, scores, play_reg_btn, \
 			""" Fires when user clicks instead of pressing Enter """
 
 			print("TWITTER MODE")
+			scores.start_game(mode=1)
 			# Start twitter
 			#get_infoz(g_settings, screen, ship, twits, stats, scores, textbox, play_reg_btn, play_twit_btn, clicked=1)
 			
@@ -138,26 +139,27 @@ def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 	""" Click """
 	pass
 
-
-def end_game(g_settings, screen, stats, scores):
+def end_game(g_settings, screen, stats, ship, twits, bullets, scores, game_won=0):
 
 	global dropped_space
 	global total_twits
 	global twits_list
 	global all_tweets
 
-	dropped_space = 1
+	if game_won:
+
+		bullets.empty()
+		twits.empty()
+
 	total_twits = 0
 	twits_list = []
 	all_tweets = []
 
+	get_high_score(stats, scores)
 	stats.game_active = False
 	stats.reset_all()
 	scores.prep_score()
 	stats.base_mode()
-	x, y = g_settings.screen_width // 4, g_settings.screen_height // 6
-	# screen.blit(textbox.get_surface(), (x*3-100, y*3-80))
-
 
 def reset_army(screen, twits):
 	""" Place twits at the top of the screen """ 
@@ -168,14 +170,14 @@ def reset_army(screen, twits):
 		# print("n {}".format(n) )
 		if not n % 8:
 			y += 1
-			# print("Y % 60 {}".format(y))
 
 		twit.rect.x = screen_rect.left + twit.rect.width * n
 		twit.rect.y = screen_rect.top + (twit.rect.height * y) + 20
 
-
 def create_army(g_settings, screen, twits, all_tweets, \
 										start=0, act=2):
+
+	""" Blit 2 entire tweets to the screen """
 
 	import re
 	global twit_list
@@ -184,6 +186,7 @@ def create_army(g_settings, screen, twits, all_tweets, \
 	re_alphaNum = r"^[a-zA-Z0-9]+$"
 	re_ascii	= r"[^\u0000-\u007F]"
 	re_nother	= r"(?<=\u0000-\u007F)[a-Z0-9]"
+	twit_id 	= 0
 	punct		= [",","'","\"",".",":"]
 	dots 		= 0
 	end_char 	= 0
@@ -192,10 +195,12 @@ def create_army(g_settings, screen, twits, all_tweets, \
 	generate_x 	= make_space(available_x)
 	generate_y 	= make_space(available_y)
 	row = next(generate_y)
-	# print(all_tweets)
-	# ROW is assigned because unlike X, it is not reset, it has a stable vector throughout.
+
+	# ROW is assigned because unlike X, it is not reset, it has a stable vector throughout assignment.
 	# ROW is now 0
 	for tweet in all_tweets[start:act]:
+		twit_id = g_settings.twit_id
+
 		# Get rid of the confusing bits
 		if "..." in tweet:
 			tweet.remove("...")
@@ -237,7 +242,7 @@ def create_army(g_settings, screen, twits, all_tweets, \
 						end_char = 0					
 					try:
 						make = assign_twit(g_settings, screen, twits, letter, sentiment, \
-													end_char, generate_x, row, dots=dots)
+											end_char, generate_x, row, twit_id, dots=dots)
 
 						if make or dots: # (Is the last char and >= position 40)
 							# Carriage return + newline
@@ -252,31 +257,40 @@ def create_army(g_settings, screen, twits, all_tweets, \
 			else:
 				continue
 
-	# Destroy the first 2 tweets
-	x = all_tweets.pop(0)
-	x = all_tweets.pop(0)
-	x = ""
+		# Logical Grouping of all twits in a tweet
+		g_settings.twit_id += 1
 
 	row = next(generate_y)
-
-
+	if len(all_tweets) > 0:
+		# Destroy the first 2 tweets
+		x = all_tweets.pop(0)
+		print("POPPING 11 -- {}".format(x))
+		x = all_tweets.pop(0)
+		print("POPPING 22 -- {}".format(x))
+		x = ""
 	""" 		NOT TO BE CONFUSED WITH UPDATE_TWIT
 		This returns a tweet, or searches exhaustively and gives up
 										 					"""
 	# RECONSIDER this placement? Should be a separate function
 	# This looks for more tweets to create the army with. It is recursive
 	if total_twits == 0:
-		if len(all_tweets) == 0:
+		if len(all_tweets) <= 2:
 			# Destroy the tweets we just blasted and tidy up
 			print("Tweets Exhausted")
 			# TODO -- Ask for another Handle? or submit score. Or both
-			return False
+			end_game(g_settings, screen, stats, ship, twits, bullets, scores, game_won=1)
+
+			return True
 		else:
 			create_army(g_settings, screen, twits, all_tweets)
-	
+	else:
+
+		return False
+			
+		
 
 def assign_twit(g_settings, screen, twits, letter, sentiment, \
-							end_char, generate_x, row, dots=0):
+							end_char, generate_x, row, twit_id, dots=0):
 	""" Construct an individual character and its properties to be blasted.
 		'dots' is a result of the Twitter API being handled by the nltk tokenizer """
 	# Defaults
@@ -289,6 +303,7 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 	text_data["sentiment"] 	= sentiment
 	text_data["space"] 		= 0
 	text_data["index"]		= total_twits
+	text_data["twit_id"]	= twit_id
 	
 	print("assinging Tweet")
 
@@ -298,7 +313,7 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 		character = Tweeter(g_settings, screen, text_data=text_data)
 		give_twit_dimension(character, x_pos, row)
 		twits.add(character)
-
+		# Update globals
 		total_twits += 1
 		twits_list.append(total_twits - 1)
 
@@ -307,37 +322,31 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 	# Only text-wrap after we've printed a whole word
 	if x_pos + 1 >= 40 and text_data["end_char"] == 1:
 		return True
+
 	elif text_data["end_char"] == 1 or dots:
 		# Acquire the next location
 		x_pos = next(generate_x)
 		# Enter data for a space character
-		text_data["letter"] = "space"
-		text_data["space"] = 1
 
-		# Could be an Ordered Dict too..
 		if dots:
-			text_data["space"] = 0
+			# Adds "..." character in case tweet is cut short.
 			text_data["letter"] = "dots"
 			text_data["index"] =  total_twits
-			total_twits += 1
+			
+			character = Tweeter(g_settings, screen, text_data=text_data)
+			give_twit_dimension(character, x_pos, row)
+			twits.add(character)
 			twits_list.append(total_twits - 1)
-
-		# Make a space char
-		character = Tweeter(g_settings, screen, text_data=text_data)
-		give_twit_dimension(character, x_pos, row)
-		twits.add(character)
-
-		
-
-		# print("TWIT 2 STUFF {}\n{}".format(total_twits, twits_list))
+			total_twits += 1
+			
 		return False
 	else:
 		# If the character created is not last in the word
 		return False
-
-	# Hats off to ye'
+	# 'Til next time
 	del(text_data)
-### ### ### ### ### ### ### ### Tweet Placement ### ### ### ### ### ### ### ### 
+
+### ### ### ### ### ### ### ### Twit Placement ### ### ### ### ### ### ### ### 
 
 def give_twit_dimension(character, x_pos, row):
 	""" Tells each character where to appear on screen """
@@ -359,40 +368,42 @@ def get_cols(g_settings):
 def get_rows(g_settings):
 	avail_space = float(g_settings.screen_height - (2 * int(g_settings.char_height)))
 	return avail_space
+### ### ### ### ### ### ### ### ### Twitter mode Functions ### ### ### ### ### 
 
 def check_twit_edges(g_settings, twits):
 	for twit in twits.sprites():
 		if twit.check_edges():
-			change_army_direction(g_settings, twits)
+			change_army_direction(g_settings, twits, twit.twit_id)
 
-
-### ### ### ### ### ### ### ### ### Twitter mode Functions ### ### ### ### ### 
-
-def change_army_direction(g_settings, twits):
+def change_army_direction(g_settings, twits, twit_id):
 
 	for twit in twits.sprites():
 		# Space Buffer
-		if twit.rect.x > 600:
-			twit.rect.x -= 5
-		elif twit.rect.x < 600:
-			twit.rect.x += 5
-		twit.rect.y += g_settings.twit_drop_speed
-	g_settings.twit_direction *= -1
+		if twit.twit_id == twit_id:
 
+			if twit.rect.x > 600:
+				twit.rect.x -= 15
+			elif twit.rect.x < 600:
+				twit.rect.x += 15
+			twit.rect.y += g_settings.twit_drop_speed
+			twit.twit_direction *= -1
 
 test = 0
-
 def update_twits(g_settings, screen, stats, ship, \
 					twits, scores, bullets, init=0):
 	
 	global test
+	global all_tweets
+
 	if test != len(twits.sprites()):
-		print(len(twits.sprites()))
+		# Constant list of all sprites, prints list if twits are created or destroyed
+		print("ALL SPRITES == {}".format(len(twits.sprites())))
+		print("ALL_TWEETS == {}".format(len(all_tweets)))
 		test = len(twits.sprites())
 
-	global dropped_space
-	global all_tweets
+	active_ids = []
 	twits.update()
+
 	# Check if twits touch edges
 	check_twit_edges(g_settings, twits)
 	check_twit_bottom(g_settings, stats, scores, screen, ship, twits, bullets)
@@ -401,17 +412,6 @@ def update_twits(g_settings, screen, stats, ship, \
 	if pygame.sprite.spritecollideany(ship, twits): # and not twit.letter == "space":
 		
 		ship_hit(g_settings, screen, stats, ship, twits, scores, bullets)
-
-	# dropped_space global, this will only occur once and remove all empty space placeholders
-	if dropped_space:
-		print("DROPPING SPACE CHARS")
-		dropped_space = 0
-		for twit in twits.sprites():
-
-			if twit.letter == "space":
-				print("{}".format(twit.letter))
-				twits.remove(twit)
-				print("Verify ==== {}".format(twit))
 
 	# DONT NOTICE ME!
 	global flag_1
@@ -438,6 +438,7 @@ def check_twit_bottom(g_settings, stats, scores, screen, ship, twits, bullets):
 def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
 	global flag_1
 	global dropped_space
+
 	if stats.ships_left > 0:
 		if bottom:
 			reset_army(screen, twits)
@@ -447,15 +448,12 @@ def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
 		ship.center_ship()
 
 	else:
-		# Game Over
-		flag_1 = 1
-		dropped_space = 0
+
 		twits.empty()
 		bullets.empty()
-		get_high_score(stats, scores)
-		end_game(g_settings, screen, stats, scores)
+		end_game(g_settings, screen, stats, ship, twits, bullets, scores)
 
-	ship.center_ship()
+	return 0
 
 def get_high_score(stats, scores):
 	""" Saves the high score """ 
@@ -465,20 +463,19 @@ def get_high_score(stats, scores):
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
 
-def send_data_TEST(name, fail=0):
+def send_data_TEST(name, url=0, fail=0):
 	""" Activate the web server's view function to access the Twitter API """
 	resp = []
-	url = "https://sleepy-river-27272.herokuapp.com/twit?h=" + name
+	url = "https://psigames.herokuapp.com/twit?h=" + name
 	resp = requests.get(url)
 	return resp.json()
 
-def get_infoz(g_settings, screen, ship, twits,\
+def get_infoz(g_settings, screen, twits,\
 				stats, scores, textbox, play_reg_btn, \
 				play_twit_btn, clicked=0, init=0):
 	""" 
-		This function's modularity is in its order 
-		of operations as opposed to ad-hoc functions
-		Enjoy
+		Check user input, get tweets from server, analyze them and begin game.
+		textbox.update() returns True if use presses Enter 
 	"""
 	
 	play_reg_btn.create_button()
@@ -598,34 +595,26 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 		if stats._current_game:
 			# ...A twitter-mode game started
 			# print("starting twitter mode")
-			ship.update(game_type=1)
+			ship.update()
 			twits.draw(screen)
 			for bullet in bullets.sprites():
 				bullet.draw_bullet()
 
 		elif not stats._current_game:
-			ship.update(game_type=0)
+			ship.update()
 			# aliens.blitmeh()
 
 		scores.show_score()
 
 	else:
 
-		
-		get_infoz(g_settings, screen, ship, twits, stats, scores, textbox, play_reg_btn, play_twit_btn)
+		get_infoz(g_settings, screen, twits, stats, scores, textbox, play_reg_btn, play_twit_btn)
 		mouse_x, mouse_y = pygame.mouse.get_pos()
 		pygame.mouse.set_visible(False)
 		reticle.blitme(mouse_x, mouse_y)
 
 	pygame.display.flip()
 
-
-		
-
-		
-
-
-		
 
 		# If everything breaks
 	# print("LEN OF TWITS = {}".format(len(twits)))

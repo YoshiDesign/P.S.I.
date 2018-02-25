@@ -35,13 +35,13 @@ def Main():
 	reticle = Reticle(g_settings, screen)
 	textbox = TextInput()
 	aliens = Alien(screen, g_settings)
-	scores = Score(g_settings, screen, stats)
+	scores = Score(g_settings, screen, stats, ship)
 	powerup = Powerups(g_settings)
 	twits = Group()
 	bullets = Group()
 
-	clock = pygame.time.Clock()
-	FPS = 31
+	# clock = pygame.time.Clock()
+	# FPS = 31
 
 	play_twit_btn = Button(g_settings, screen, text="Tweets", \
 						 off_x=(g_settings.screen_width // 4))
@@ -50,16 +50,13 @@ def Main():
 				off_x=(g_settings.screen_width // 4) * -1, \
 				off_y=(g_settings.screen_height // 8) * -1 )
 
-
-
 	""" KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py for efficiency 
 		When gameplay is active, textbox.update() ceases, and check_events takes over
 	"""
 
 	while True:
 
-		clock.tick(FPS)
-		
+		# clock.tick(FPS)
 		
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 						twits, bullets, stats, scores, play_reg_btn, play_twit_btn)
@@ -74,8 +71,6 @@ def Main():
 
 		else:
 			pass
-
-		
 
 if __name__ == "__main__":
 

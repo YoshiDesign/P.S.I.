@@ -38,17 +38,15 @@ class Stats():
 		else:
 			Stats._current_game = 1
 	
-	
-
 	def update_tweets(self):
 		pass
 			
-
 	def reset_all(self):
 		""" Revert stats to initial state """
 		self.ships_left = self.g_settings.ship_limit
 		self.score = 0
 		self.level = 1
+		# finally
 		self.g_settings.init_dynamic_settings()
 		
 	def game_over_net(self):

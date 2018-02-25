@@ -6,12 +6,13 @@ from tools.lives import Life
 
 class Score():
 
-	def __init__(self, g_settings, screen, stats):
+	def __init__(self, g_settings, screen, stats, ship):
 
 		self.screen = screen
 		self.screen_rect = screen.get_rect()
 		self.g_settings = g_settings
 		self.stats = stats
+		self.ship = ship
 
 		# Font
 		self.white = (255,255,255)
@@ -83,6 +84,7 @@ class Score():
 	def start_game(self, mode=0, handle=""):
 
 		self.stats.reset_all()
+		self.ship.center_ship()
 
 		if mode:
 			""" Start a PSI game """ 

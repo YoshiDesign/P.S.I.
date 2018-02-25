@@ -17,8 +17,10 @@ class Tweeter(Sprite):
 		
 		self.letter = text_data["letter"]
 		self.sentiment = text_data["sentiment"]
-		self.space = text_data["space"]
+		self.twit_id = text_data["twit_id"]
 		self.index = text_data["index"]
+		self.twit_direction = 1
+
 		# Determine Letter_Image to display
 		if self.letter == "dots":
 
@@ -27,18 +29,14 @@ class Tweeter(Sprite):
 		elif self.letter.isdigit():
 
 			self.filepath = os.fsencode(str("sprites/characters/" + \
-								"good" + str(self.letter) + ".png"))
-		elif self.letter == "space":
-
-			self.filepath = os.fsencode(str("sprites/characters/space.png"))
-
+							"good" + str(self.letter) + ".png"))
 		elif self.sentiment == 1:
 
 			self.filepath = os.fsencode(str("sprites/characters/" + \
-								"good" + str(self.letter.upper()) + ".png"))
+							"good" + str(self.letter.upper()) + ".png"))
 		else:
 			self.filepath = os.fsencode(str("sprites/characters/" + \
-								"bad" + str(self.letter.upper()) + ".png"))
+							"bad" + str(self.letter.upper()) + ".png"))
 
 		self.g_settings = g_settings
 		self.screen = screen
@@ -66,7 +64,7 @@ class Tweeter(Sprite):
 	def update(self):
 		# Movement
 		if not self.letter == "space":
-			self.x += (self.g_settings.twit_speed * self.g_settings.twit_direction)
+			self.x += (self.g_settings.twit_speed * self.twit_direction)
 			self.rect.x = self.x
 
 	def blitme(self, screen):

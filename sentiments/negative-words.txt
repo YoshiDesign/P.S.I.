@@ -234,10 +234,14 @@ askance
 asperse
 aspersion
 aspersions
+ass
 assail
 assassin
 assassinate
 assault
+asshole
+assinine
+assinide
 assult
 astray
 asunder
@@ -473,6 +477,8 @@ breaking
 breaks
 breakup
 breakups
+bribe
+bribed
 bribery
 brimstone
 bristle
@@ -1746,8 +1752,6 @@ flickers
 flighty
 flimflam
 flimsy
-flirt
-flirty
 floored
 flounder
 floundering
@@ -2055,11 +2059,14 @@ heathen
 heavy-handed
 heavyhearted
 heck
+heckin
 heckle
 heckled
 heckles
 hectic
 hedge
+hedonist
+hedonism
 hedonistic
 heedless
 hefty
@@ -2077,6 +2084,7 @@ helplessness
 heresy
 heretic
 heretical
+heroin
 hesitant
 hestitant
 hideous
@@ -2113,6 +2121,7 @@ horrify
 horrifying
 horrifys
 hostage
+hostages
 hostile
 hostilities
 hostility
@@ -2584,11 +2593,9 @@ irksome
 irksomely
 irksomeness
 irksomenesses
-ironic
 ironical
 ironically
 ironies
-irony
 irragularity
 irrational
 irrationalities
@@ -3409,7 +3416,6 @@ preposterously
 presumptuous
 presumptuously
 pretence
-pretend
 pretense
 pretentious
 pretentiously
@@ -3462,6 +3468,10 @@ puppets
 puzzled
 puzzlement
 puzzling
+pwn
+pwnt
+pwnd
+pwned
 quack
 qualm
 qualms
@@ -3494,9 +3504,12 @@ raked
 rampage
 rampant
 ramshackle
+rancid
 rancor
 randomly
 rankle
+ransom
+ransomware
 rant
 ranted
 ranting
@@ -3784,6 +3797,7 @@ sedentary
 seedy
 seethe
 seething
+segregation
 self-coup
 self-criticism
 self-defeating
@@ -3932,9 +3946,11 @@ slowww
 slowwww
 slug
 sluggish
+slum
 slump
 slumping
 slumpping
+slums
 slur
 slut
 sluts
@@ -4684,6 +4700,9 @@ vicious
 viciously
 viciousness
 victimize
+victim
+victimized
+victimization
 vile
 vileness
 vilify
@@ -4728,6 +4747,7 @@ wanked
 wanker
 wanking
 wanton
+war
 war-like
 warily
 wariness

@@ -86,6 +86,7 @@ class TextInput:
 
                     return True
                 elif event.key == pl.K_RETURN:
+                    # jic
                     self.clear_text()
                     return False
                 ### ### ### ###

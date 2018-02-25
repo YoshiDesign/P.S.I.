@@ -43,13 +43,12 @@ class Settings():
 		self.char_width = 20
 		self.char_height = 24
 		self.char_spacing = 1
-		self.twit_drop_speed = 100
+		self.twit_drop_speed = 20
 		self.twit_points = 10
 
 		# Create dynamic settings
 		self.init_dynamic_settings()
 		
-
 	def init_dynamic_settings(self):
 
 		# Twits
@@ -57,15 +56,16 @@ class Settings():
 		self.twit_speed = 4
 		self.twit_hp = 2
 		self.score_multiplier = 1.48
-		
+		# Enumerates whole twits so they shift direction independently
+		self.twit_id = 0
 		# Lives
 		self.ship_limit = 1
 
 		# Ship
-		self.ship_speed_right = 2.0
+		self.ship_speed_right = 5.0
 		self.ship_speed_up = 3.0
 		self.ship_speed_down = 1.8
-		self.ship_speed_left = 2.0
+		self.ship_speed_left = 5.0
 
 		# Aliens (Offline twit mode)
 		self.alien_speed = 1
@@ -74,14 +74,18 @@ class Settings():
 		self.bomb_dmg = 2
 		self.lazer_dmg = 1
 		self.bullet_dmg = 1
-		print("DYNAMIC SETTINGS \nLIVES {}".format(self.ship_limit))
-		
-	# def get_tweet(self):
-	# 	""" Called until a game begins """ 
-	# 	self.textbox = textbox
-	# 	return self.textbox.update(event)
 
+		print("DYNAMIC SETTINGS \nLIVES {}\nSHIP LEFT = {}"\
+			"\nSHIP RIGHT = {}\nSHIP LIMIT = {}".format(self.ship_limit, self.ship_speed_left, self.ship_speed_right, self.ship_limit))
 
+		# Movement Flags
+		self.move_right = False
+		self.move_left  = False
+		self.move_forward = False
+		self.turn_left = False
+		self.turn_right = False
+		self.move_up = False
+		self.move_down = False
 
 	def change_reticle(self, reticle):
 		pass 
