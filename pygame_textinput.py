@@ -1,6 +1,6 @@
 """017, Silas Gyger, silasgyger@gmail.com, All rights reserved.
 """
-
+import sys
 import pygame
 import pygame.locals as pl
 import os.path
@@ -62,7 +62,9 @@ class TextInput:
 
         self.clock = pygame.time.Clock()
 
-    def update(self, events, stats, textbox, scores, play_reg_btn, play_twit_btn):
+    def update(self, events, stats, textbox, scores, login_btn, \
+                                    attack_twit_btn, about_btn, \
+                                        to_pass_btn, passed_btn):
         for event in events:
             if event.type == pygame.QUIT:
                     sys.exit()
@@ -71,8 +73,9 @@ class TextInput:
                 """ Recursive """
                 mousex, mousey = pygame.mouse.get_pos()
 
-                if gf.check_play_buttons(stats, textbox, scores, play_reg_btn, \
-                                    play_twit_btn, mousex=mousex, mousey=mousey):
+                if gf.check_play_buttons(stats, textbox, scores, login_btn, \
+                                    attack_twit_btn, about_btn, to_pass_btn, \
+                                    passed_btn, mousex=mousex, mousey=mousey):
 
                     return True
 

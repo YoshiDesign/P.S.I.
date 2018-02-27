@@ -3,8 +3,8 @@ from analyze import Analyzer
 
 class Stats():
 	
-	# 0 = reg || 1 = twitter
-	_current_game = 0
+	# 0 = menu 1 = twitter
+	_current_screen = 0
 
 	def __init__(self, g_settings):
 		
@@ -21,23 +21,44 @@ class Stats():
 		self.reset_all()
 		
 	@staticmethod
-	def base_mode():
+	def menu_mode():
 		""" 
 			Game mode sanity check
 			A good endpoint for post analysis results before game begins
 		"""
-		if Stats._current_game == 1:
-			Stats._current_game = 0
+		if Stats._current_screen:
+			Stats._current_screen = 0
 		else:
-			Stats._current_game = 0
+			Stats._current_screen = 0
+
+		return True
 			
 	@staticmethod
 	def twit_mode():
-		if Stats._current_game == 0:
-			Stats._current_game = 1
+		if Stats._current_screen == 0:
+			Stats._current_screen = 3
 		else:
-			Stats._current_game = 1
-	
+			Stats._current_screen = 3
+
+		return True
+
+	@staticmethod
+	def login_mode():
+		if Stats._current_screen == 0 or Stats._current_screen:
+			Stats._current_screen = 1
+		else:
+			Stats._current_screen = 0
+
+		return True
+
+	@staticmethod
+	def pass_mode():
+		if Stats._current_screen == 1:
+			Stats._current_screen = 2
+		else:
+			Stats._current_screen = 2
+		return True
+
 	def update_tweets(self):
 		pass
 			

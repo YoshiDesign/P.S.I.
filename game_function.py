@@ -20,17 +20,17 @@ twits_list = []
 # List of full tweets
 all_tweets = []
 # Arbitrary
-flag_1 = 0
+cur_scrn = 0
 	
-def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
-						twits, bullets, play_twit_btn, play_reg_btn):
+def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits, bullets):
 
 	""" Tracks text input box and all player events while game_active == True """
+
 
 	mousex, mousey = pygame.mouse.get_pos()
 	events = pygame.event.get()
 
-	# Events
+	# Events : This wont run at the same time event in events occurs in textbox.update() in get_infoz
 	for event in events:
 		if event.type == pygame.QUIT:
 			sys.exit()
@@ -57,8 +57,9 @@ def menu_keys(event):
 	if not stats.game_active:
 		#
 		if event.key == pygame.K_b:
-			stats._current_game = 0
-			scores.start_game(mode=0)
+			# Offline play
+			stats._current_screen = 3
+			# scores.start_game(mode=0)
 
 ##########
 # ADD ALT+Z TO TURN OFF UI
@@ -101,37 +102,66 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, bullets):
 
 	return False
 
-def check_play_buttons(stats, textbox, scores, play_reg_btn, \
-							play_twit_btn, mousex=0, mousey=0):
+def check_play_buttons(stats, textbox, scores, login_btn, \
+								attack_twit_btn, about_btn, \
+									to_pass_btn, passed_btn, \
+									cur_scrn=0, mousex=0, mousey=0):
 	""" 
 		Checks for our button activity
 		Only Callable while game_active = 0
 	"""
 	# Check which game mode was selected
-	btn_reg_clicked = play_reg_btn.rect.collidepoint(mousex, mousey)
-	btn_twit_clicked = play_twit_btn.rect.collidepoint(mousex, mousey)
+	login_clicked = login_btn.rect.collidepoint(mousex, mousey)
+	about_clicked = about_btn.rect.collidepoint(mousex, mousey)
+	twit_clicked = attack_twit_btn.rect.collidepoint(mousex, mousey)
+	to_pass_clicked = to_pass_btn.rect.collidepoint(mousex, mousey)
+	passed_clicked = passed_btn.rect.collidepoint(mousex, mousey)
 
-	if (btn_reg_clicked or btn_twit_clicked) and not stats.game_active:
+	""" 
+		display = stats._current_screen
+
+		display 0 : base_mode // wont show up here
+		display 1 : login_mode
+		display 2 : pass_mode
+		display 3 : In-Game
+			
+	"""
+
+	if (login_clicked or twit_clicked \
+		or about_clicked or to_pass_clicked \
+		or passed_clicked) and not stats.game_active:
 
 		# Reset game stats
 		# stats.reset_all() ...It's in start_game
 		
-		if btn_reg_clicked:
-			print("REGULAR MODE")
-			# Start reg
-			scores.start_game(mode=0)
-			# scores.start_game()
+		if login_clicked and cur_scrn == 0:
+			print("LOGIN")
+			stats.login_mode()
 			return True
-			
-		elif (btn_twit_clicked and textbox.get_text()) and not stats.game_active:
-			""" Fires when user clicks instead of pressing Enter """
 
-			print("TWITTER MODE")
-			scores.start_game(mode=1)
-			# Start twitter
-			#get_infoz(g_settings, screen, ship, twits, stats, scores, textbox, play_reg_btn, play_twit_btn, clicked=1)
-			
+		if to_pass_clicked and stats._current_screen == 1:
+			print("PASSWD")
+			if not textbox.get_text():
+				print("NO INPUT")
+				return False
+			stats.pass_mode()
 			return True
+
+		if passed_clicked and cur_scrn == 2:
+			stats.base_mode()
+			print("Pretending to be logged in!")
+			x = "happy"
+
+		elif (twit_clicked and textbox.get_text()) and not stats.game_active:
+			
+			""" Fires when user clicks instead of pressing Enter """
+			print("TWITTER MODE")
+			# Initializes stats.twit_mode() within stats.start_game()
+			scores.start_game(mode=1)
+			return True
+
+		elif about_clicked:
+			print("bout")
 
 	return False
 
@@ -159,7 +189,7 @@ def end_game(g_settings, screen, stats, ship, twits, bullets, scores, game_won=0
 	stats.game_active = False
 	stats.reset_all()
 	scores.prep_score()
-	stats.base_mode()
+	stats.menu_mode()
 
 def reset_army(screen, twits):
 	""" Place twits at the top of the screen """ 
@@ -261,13 +291,24 @@ def create_army(g_settings, screen, twits, all_tweets, \
 		g_settings.twit_id += 1
 
 	row = next(generate_y)
-	if len(all_tweets) > 0:
+
+	if len(all_tweets) > 1:
 		# Destroy the first 2 tweets
 		x = all_tweets.pop(0)
 		print("POPPING 11 -- {}".format(x))
 		x = all_tweets.pop(0)
 		print("POPPING 22 -- {}".format(x))
 		x = ""
+	else:
+		# There was an odd number of tweets
+		x = all_tweets.pop(0)
+		x = ""
+		# Could technically end the game here
+		return 1
+
+
+
+
 	""" 		NOT TO BE CONFUSED WITH UPDATE_TWIT
 		This returns a tweet, or searches exhaustively and gives up
 										 					"""
@@ -414,7 +455,7 @@ def update_twits(g_settings, screen, stats, ship, \
 		ship_hit(g_settings, screen, stats, ship, twits, scores, bullets)
 
 	# DONT NOTICE ME!
-	global flag_1
+	
 	# DIFFICULTY SETTING -> 5
 	# PROBLEM - this is also activating when we ship_hit due to twit.empty()
 	if len(twits.sprites()) <= 5 and stats.game_active:
@@ -436,7 +477,7 @@ def check_twit_bottom(g_settings, stats, scores, screen, ship, twits, bullets):
 			break
 
 def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
-	global flag_1
+	
 	global dropped_space
 
 	if stats.ships_left > 0:
@@ -471,73 +512,104 @@ def send_data_TEST(name, url=0, fail=0):
 	return resp.json()
 
 def get_infoz(g_settings, screen, twits,\
-				stats, scores, textbox, play_reg_btn, \
-				play_twit_btn, clicked=0, init=0):
+				stats, scores, textbox, login_btn, \
+				attack_twit_btn, about_btn, to_pass_btn, \
+									passed_btn, cur_scrn=0):
 	""" 
 		Check user input, get tweets from server, analyze them and begin game.
 		textbox.update() returns True if use presses Enter 
 	"""
-	
-	play_reg_btn.create_button()
-	play_twit_btn.create_button()
+	if cur_scrn == 1:
+		# Username Screen
+		to_pass_btn.create_button()
+	if cur_scrn == 2:
+		# Password Screen
+		passed_btn.create_button()
+
+	elif cur_scrn == 0:
+		login_btn.create_button()
+		attack_twit_btn.create_button()
+		about_btn.create_button()
 
 	events = pygame.event.get()
 	# If player presses ENTER or clicks the Twitter button
 	if textbox.update(events, stats, textbox, \
-		scores, play_reg_btn, play_twit_btn)  \
-	or clicked:
+				scores,login_btn, attack_twit_btn, \
+				about_btn, to_pass_btn, passed_btn):
+
+		if cur_scrn == 0:
 		
-		# handle is the user's input
-		handle = textbox.get_text()
-		if not handle or handle == "":
-			return False
-		
-		print("Getting tweets from @{}".format(handle))
-		# No interruptions but still traceback to stderr
-		try:
-			tweet_bot = send_data_TEST(handle)
-		except:
-			# Any erroneous or otherwise NULL returns
-			print("Something went wrong : " \
-			"{}".format(sys.exc_info()[:-1]))
+			# handle is the user's input
+			handle = textbox.get_text()
+			if not handle or handle == "":
+				return False
+			
+			print("Getting tweets from @{}".format(handle))
+			# No interruptions but still traceback to stderr
+			try:
+				tweet_bot = send_data_TEST(handle)
+			except:
+				# Any erroneous or otherwise NULL returns
+				print("Something went wrong : " \
+				"{}".format(sys.exc_info()[:-1]))
+					
+				return False
+
+			if tweet_bot:
+				global all_tweets
+				# If Twitter API responds
+				# Get (probably) POSIX paths to txt files
+				positive = os.path.join(sys.path[0], \
+						"sentiments/positive-words.txt")
+				negative = os.path.join(sys.path[0], \
+						"sentiments/negative-words.txt")
+				analyzer = Analyzer(positive, negative, stats)
+
+				for i, tweet in enumerate(tweet_bot):
+					"""
+						Tweets are stored in a list as the analysis occurs.
+								all_tweets_tweets looks like:
+						[["This", "is", "tweet", "one", "!"],["and", "two"]...etc]
+					"""
+					all_tweets.append(analyzer.analyze(tweet))
+
+				# Safe to use direct call to analyzer_words here ...fully endorsed
+				create_army(g_settings, screen, twits, all_tweets)
+				textbox.reset()
+				scores.start_game(mode=1, handle=handle)
 				
-			return False
+				return True
 
-		if tweet_bot:
-			global all_tweets
-			# If Twitter API responds
-			# Get (probably) POSIX paths to txt files
-			positive = os.path.join(sys.path[0], \
-					"sentiments/positive-words.txt")
-			negative = os.path.join(sys.path[0], \
-					"sentiments/negative-words.txt")
-			analyzer = Analyzer(positive, negative, stats)
+			# Secondary Error catch should we somehow bypass an erroneous server response
+			else:
+				
+				print("Could not receive tweets from server")
+				# BLIT MSG TO SCREEN, "Play offline instead? Y/N"
+				""" THIS IS WHERE WE BEGIN AN OFFLINE GAME """
+				return False
+		elif cur_scrn == 1:
+			pass
+		elif cur_scrn == 2:
+			pass
 
-			for i, tweet in enumerate(tweet_bot):
-				"""
-					Tweets are stored in a list as the analysis occurs.
-							all_tweets_tweets looks like:
-					[["This", "is", "tweet", "one", "!"],["and", "two"]...etc]
-				"""
-				all_tweets.append(analyzer.analyze(tweet))
 
-			# Safe to use direct call to analyzer_words here ...fully endorsed
-			create_army(g_settings, screen, twits, all_tweets)
-			textbox.reset()
-			scores.start_game(mode=1, handle=handle)
-			
-			return True
-		# Secondary Error catch should we somehow bypass an erroneous server response
-		else:
-			
-			print("Could not receive tweets from server")
-			# BLIT MSG TO SCREEN, "Play offline instead? Y/N"
-			""" THIS IS WHERE WE BEGIN AN OFFLINE GAME """
-			return False
 	else:
-		# Display our text input and gather user input
-		screen.blit(textbox.get_surface(), ((g_settings.screen_width//4)*3-100, \
-											 (g_settings.screen_height//6)*3-80))
+		# Display our text input field based on cur_scrn
+		if cur_scrn == 0:
+			screen.blit(textbox.get_surface(), ((g_settings.screen_width//4)*3+5, \
+											 	(g_settings.screen_height//6)*3-80))
+		elif cur_scrn == 1:
+			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2), \
+											 	(g_settings.screen_height//2)))
+
+		elif cur_scrn == 2:
+			screen.blit(textbox.get_surface(), ((g_settings.screen_width//4)*2-100, \
+											 	(g_settings.screen_height//6)*2-67))
+
+		elif cur_scrn == 3:
+			# THis should NOT occur
+			screen.blit(textbox.get_surface(), ((g_settings.screen_width//4)*3-32, \
+											 	(g_settings.screen_height//6)*3-120))
 		
 		return False
 
@@ -562,6 +634,7 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 	if stats._current_game:
 		shot_down = pygame.sprite.groupcollide(bullets, twits, True, True)
 	else:
+		# Not being used yet
 		shot_down = pygame.sprite.groupcollide(bullets, aliens, True, True)
 
 	if shot_down:
@@ -584,31 +657,34 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 										twits, bullets, stats, scores, \
-											play_reg_btn, play_twit_btn):
+											login_btn, attack_twit_btn, \
+												about_btn, to_pass_btn,  \
+															passed_btn):
 	# Mouse
 	
 	# Load background so we dont leave ship footprints everywhere
-	g_settings.load_background(screen, game=stats._current_game)
+	g_settings.load_background(screen, display=stats._current_screen)
 	
 	if stats.game_active:
 		# if _current_game is true...
-		if stats._current_game:
-			# ...A twitter-mode game started
+		if stats._current_screen == 3:
+		
 			# print("starting twitter mode")
 			ship.update()
 			twits.draw(screen)
 			for bullet in bullets.sprites():
 				bullet.draw_bullet()
 
-		elif not stats._current_game:
-			ship.update()
-			# aliens.blitmeh()
-
+	
 		scores.show_score()
 
 	else:
 
-		get_infoz(g_settings, screen, twits, stats, scores, textbox, play_reg_btn, play_twit_btn)
+		get_infoz(g_settings, screen, twits, stats, scores, \
+						textbox, login_btn, attack_twit_btn, \
+							about_btn, to_pass_btn, passed_btn, \
+								cur_scrn=stats._current_screen)
+
 		mouse_x, mouse_y = pygame.mouse.get_pos()
 		pygame.mouse.set_visible(False)
 		reticle.blitme(mouse_x, mouse_y)

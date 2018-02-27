@@ -85,19 +85,19 @@ class Score():
 
 		self.stats.reset_all()
 		self.ship.center_ship()
+		self.prep_ships()
 
 		if mode:
 			""" Start a PSI game """ 
+			# Changes current_screen
 			self.stats.twit_mode()
+			# Get handle of user's enemy
 			self.prep_tweeter(handle)
+			# Change state
 			self.stats.game_active = True
 			
-		else:
-			""" Start an Asteroid2018 game """
-			self.stats.base_mode()
-			self.stats.game_active = True
 			self.prep_score()
 			self.prep_high_score()
 			self.prep_level()
 
-		self.prep_ships()
+		

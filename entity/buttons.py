@@ -31,7 +31,7 @@ class Button():
 		self.prep_msg(text)
 
 	def prep_msg(self, msg):
-
+		""" Might not need this method """
 		self.msg_image = self.font.render(self.text, True, self.text_color, \
 													  self.color)
 		self.msg_rect = self.msg_image.get_rect()

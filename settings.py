@@ -11,12 +11,21 @@ class Settings():
 		self.screen_width = 1200
 		self.screen_height = 800
 		# Load Image / sprites
-		self.fp = os.fsencode("sprites/GameBack1.jpg")
-		self.f2 = os.fsencode("sprites/GameBack2.jpg")
-		self.background = pygame.image.load(os.fsdecode(self.fp))
+		self.f1 = os.fsencode("media/BackMain.jpg")
+		self.f2 = os.fsencode("media/BackUsr.jpg")
+		self.f3 = os.fsencode("media/BackPwd.jpg")
+		self.f4 = os.fsencode("media/GameBack.jpg")
+		# self.f5 = os.fsencode("media")
+
+		# SLOW DOWN? If the game slow down, make loading the bg a dynamic init
+		# SEPARATE from the dynamic init properties of game elements
+		self.background1 = pygame.image.load(os.fsdecode(self.f1))
 		self.background2 = pygame.image.load(os.fsdecode(self.f2))
-		# We are only tracking ONE rect during either background
-		self.background_rect = self.background.get_rect()
+		self.background3 = pygame.image.load(os.fsdecode(self.f3))
+		self.background4 = pygame.image.load(os.fsdecode(self.f4))
+
+		# We are only tracking ONE rect during any background display
+		self.background_rect = self.background1.get_rect()
 		
 		
 		# score multiplier
@@ -90,11 +99,25 @@ class Settings():
 	def change_reticle(self, reticle):
 		pass 
 		
-	def load_background(self, screen, game=0):
-		if not game:
-			screen.blit(self.background, self.background_rect)
-		if game:
+	def load_background(self, screen, display=0):
+		""" 
+			display 0 : Main menu
+			display 1 : Username
+			display 2 : Password
+			display 3 : In-Game
+			...
+		"""
+		if not display:
+			screen.blit(self.background1, self.background_rect)
+		elif display == 1:
 			screen.blit(self.background2, self.background_rect)
+		elif display == 2:
+			screen.blit(self.background3, self.background_rect)
+		elif display == 3:
+			screen.blit(self.background4, self.background_rect)
+
+
+
 
 
 		

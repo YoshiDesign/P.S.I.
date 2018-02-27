@@ -43,12 +43,22 @@ def Main():
 	# clock = pygame.time.Clock()
 	# FPS = 31
 
-	play_twit_btn = Button(g_settings, screen, text="Tweets", \
+	attack_twit_btn = Button(g_settings, screen, text="attk_twt", \
 						 off_x=(g_settings.screen_width // 4))
 
-	play_reg_btn = Button(g_settings, screen, text="PLAY", \
+	login_btn = Button(g_settings, screen, text="logins", \
 				off_x=(g_settings.screen_width // 4) * -1, \
 				off_y=(g_settings.screen_height // 8) * -1 )
+
+	about_btn = Button(g_settings, screen, text="abut", \
+						 off_x=(g_settings.screen_width // 4))
+
+	to_pass_btn = Button(g_settings, screen, text="next", \
+						 off_x=(g_settings.screen_width // 1))
+
+	passed_btn = Button(g_settings, screen, text="nexted", \
+						 off_x=(g_settings.screen_width // 1))
+
 
 	""" KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py for efficiency 
 		When gameplay is active, textbox.update() ceases, and check_events takes over
@@ -59,12 +69,12 @@ def Main():
 		# clock.tick(FPS)
 		
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-						twits, bullets, stats, scores, play_reg_btn, play_twit_btn)
+									twits, bullets, stats, scores, login_btn, \
+									attack_twit_btn, about_btn, to_pass_btn, passed_btn)
 
 		if stats.game_active == True:
 			# As per the DocString
-			gf.check_events(g_settings, screen, ship, aliens, stats, textbox, scores, \
-										twits, bullets, play_twit_btn, play_reg_btn)
+			gf.check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits, bullets)
 			if stats._current_game:
 				gf.update_twits(g_settings, screen, stats, ship, twits, scores, bullets)
 				gf.update_bullets(g_settings, screen, stats, ship, scores, bullets, powerup, twits=twits)
