@@ -21,11 +21,15 @@ class Stats():
 		self.reset_all()
 		
 	@staticmethod
-	def menu_mode():
+	def menu_mode(flagged=0):
 		""" 
 			Game mode sanity check
 			A good endpoint for post analysis results before game begins
 		"""
+		if flagged:
+			Stats._current_screen = 4
+			return True
+
 		if Stats._current_screen:
 			Stats._current_screen = 0
 		else:

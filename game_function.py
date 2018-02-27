@@ -21,6 +21,8 @@ twits_list = []
 all_tweets = []
 # Arbitrary
 cur_scrn = 0
+# logged in
+flagged = 0
 	
 def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits, bullets):
 
@@ -106,6 +108,7 @@ def check_play_buttons(stats, textbox, scores, login_btn, \
 								attack_twit_btn, about_btn, \
 									to_pass_btn, passed_btn, \
 									cur_scrn=0, mousex=0, mousey=0):
+	global flagged
 	""" 
 		Checks for our button activity
 		Only Callable while game_active = 0
@@ -140,17 +143,27 @@ def check_play_buttons(stats, textbox, scores, login_btn, \
 			return True
 
 		if to_pass_clicked and stats._current_screen == 1:
-			print("PASSWD")
+			print("NEXT CLICKED")
 			if not textbox.get_text():
 				print("NO INPUT")
 				return False
 			stats.pass_mode()
+			USERNAME = textbox.get_text()
+			print("USERNAME  {}".format(USERNAME))
+			textbox.reset()
 			return True
 
 		if passed_clicked and cur_scrn == 2:
 			stats.base_mode()
+			PASSWORD = textbox.get_text()
+			print("PASSWORD  {}".format(PASSWORD))
+			textbox.clear_text()
 			print("Pretending to be logged in!")
+			flagged = 1
+			print(flagged)
 			x = "happy"
+			# Return to menu as a logged in user
+			stats.menu_mode(flagged=flagged)
 
 		elif (twit_clicked and textbox.get_text()) and not stats.game_active:
 			
@@ -188,8 +201,9 @@ def end_game(g_settings, screen, stats, ship, twits, bullets, scores, game_won=0
 	get_high_score(stats, scores)
 	stats.game_active = False
 	stats.reset_all()
+	# OPT might not need prep_score here
 	scores.prep_score()
-	stats.menu_mode()
+	stats.menu_mode(flagged=flagged)
 
 def reset_army(screen, twits):
 	""" Place twits at the top of the screen """ 
@@ -595,12 +609,12 @@ def get_infoz(g_settings, screen, twits,\
 
 	else:
 		# Display our text input field based on cur_scrn
-		if cur_scrn == 0:
+		if cur_scrn == 0 or cur_scrn == 4:
 			screen.blit(textbox.get_surface(), ((g_settings.screen_width//4)*3+5, \
 											 	(g_settings.screen_height//6)*3-80))
 		elif cur_scrn == 1:
-			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2), \
-											 	(g_settings.screen_height//2)))
+			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2) - 100, \
+											 	(g_settings.screen_height//2) - 200))
 
 		elif cur_scrn == 2:
 			screen.blit(textbox.get_surface(), ((g_settings.screen_width//4)*2-100, \
@@ -661,7 +675,11 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 												about_btn, to_pass_btn,  \
 															passed_btn):
 	# Mouse
-	
+	global cur_scrn
+	if not cur_scrn == stats._current_screen:
+		cur_scrn = stats._current_screen
+		print("cur scrn == {}".format(stats._current_screen))
+
 	# Load background so we dont leave ship footprints everywhere
 	g_settings.load_background(screen, display=stats._current_screen)
 	

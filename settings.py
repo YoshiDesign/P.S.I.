@@ -15,6 +15,7 @@ class Settings():
 		self.f2 = os.fsencode("media/BackUsr.jpg")
 		self.f3 = os.fsencode("media/BackPwd.jpg")
 		self.f4 = os.fsencode("media/GameBack.jpg")
+		self.f5 = os.fsencode("media/BackMain2.jpg")
 		# self.f5 = os.fsencode("media")
 
 		# SLOW DOWN? If the game slow down, make loading the bg a dynamic init
@@ -23,6 +24,8 @@ class Settings():
 		self.background2 = pygame.image.load(os.fsdecode(self.f2))
 		self.background3 = pygame.image.load(os.fsdecode(self.f3))
 		self.background4 = pygame.image.load(os.fsdecode(self.f4))
+		self.background5 = pygame.image.load(os.fsdecode(self.f5))
+
 
 		# We are only tracking ONE rect during any background display
 		self.background_rect = self.background1.get_rect()
@@ -105,6 +108,7 @@ class Settings():
 			display 1 : Username
 			display 2 : Password
 			display 3 : In-Game
+			display 4 : Main menu Logged In
 			...
 		"""
 		if not display:
@@ -115,6 +119,9 @@ class Settings():
 			screen.blit(self.background3, self.background_rect)
 		elif display == 3:
 			screen.blit(self.background4, self.background_rect)
+		elif display == 4:
+			screen.blit(self.background5, self.background_rect)
+
 
 
 

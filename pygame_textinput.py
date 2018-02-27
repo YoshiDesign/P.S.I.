@@ -121,10 +121,13 @@ class TextInput:
 
                 else:
                     # If no special key is pressed, add unicode of key to input_string
-                    self.input_string = self.input_string[:self.cursor_position] + \
-                                        event.unicode + \
-                                        self.input_string[self.cursor_position:]
-                    self.cursor_position += len(event.unicode) # Some are empty, e.g. K_UP
+                    if not hide:
+                        self.input_string = self.input_string[:self.cursor_position] + \
+                                            event.unicode + \
+                                            self.input_string[self.cursor_position:]
+                        self.cursor_position += len(event.unicode) # Some are empty, e.g. K_UP
+                    if hide:
+                        pass
 
             elif event.type == pl.KEYUP:
                 # *** Because KEYUP doesn't include event.unicode, this dict is stored in such a weird way

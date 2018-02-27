@@ -53,14 +53,13 @@ def Main():
 	about_btn = Button(g_settings, screen, text="abut", \
 						 off_x=(g_settings.screen_width // 4))
 
-	to_pass_btn = Button(g_settings, screen, text="next", \
-						 off_x=(g_settings.screen_width // 1))
+	to_pass_btn = Button(g_settings, screen, text="Next")
 
-	passed_btn = Button(g_settings, screen, text="nexted", \
-						 off_x=(g_settings.screen_width // 1))
+	passed_btn = Button(g_settings, screen, text="Enter")
 
 
-	""" KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py for efficiency 
+	""" 
+		KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py for efficiency 
 		When gameplay is active, textbox.update() ceases, and check_events takes over
 	"""
 
