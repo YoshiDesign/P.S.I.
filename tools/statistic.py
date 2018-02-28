@@ -23,8 +23,7 @@ class Stats():
 	@staticmethod
 	def menu_mode(flagged=0):
 		""" 
-			Game mode sanity check
-			A good endpoint for post analysis results before game begins
+			Main menu. flagged == logged-in
 		"""
 		if flagged:
 			Stats._current_screen = 4
@@ -38,7 +37,8 @@ class Stats():
 		return True
 			
 	@staticmethod
-	def twit_mode():
+	def play_mode():
+		""" Screen when game is active """ 
 		if Stats._current_screen == 0:
 			Stats._current_screen = 3
 		else:
@@ -48,6 +48,7 @@ class Stats():
 
 	@staticmethod
 	def login_mode():
+		""" Screen when entering username """
 		if Stats._current_screen == 0 or Stats._current_screen:
 			Stats._current_screen = 1
 		else:
@@ -57,6 +58,7 @@ class Stats():
 
 	@staticmethod
 	def pass_mode():
+		""" Screen when entering password """
 		if Stats._current_screen == 1:
 			Stats._current_screen = 2
 		else:

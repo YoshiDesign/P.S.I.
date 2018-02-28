@@ -64,7 +64,7 @@ class TextInput:
 
     def update(self, events, stats, textbox, scores, login_btn, \
                                     attack_twit_btn, about_btn, \
-                                        to_pass_btn, passed_btn):
+                                        to_pass_btn, passed_btn, cur_scrn=0, hide=0):
         for event in events:
             if event.type == pygame.QUIT:
                     sys.exit()
@@ -73,10 +73,12 @@ class TextInput:
                 """ Recursive """
                 mousex, mousey = pygame.mouse.get_pos()
 
+                # Returns true with a screen change // Handles all menu button clicks
                 if gf.check_play_buttons(stats, textbox, scores, login_btn, \
                                     attack_twit_btn, about_btn, to_pass_btn, \
-                                    passed_btn, mousex=mousex, mousey=mousey):
-
+                                                passed_btn, cur_scrn=cur_scrn, \
+                                                mousex=mousex, mousey=mousey):
+                    print("CLICKED@@!@@$@")
                     return True
 
             if event.type == pygame.KEYDOWN:
@@ -98,10 +100,9 @@ class TextInput:
 
                 ### ### ### ###
                 elif event.key == pl.K_RETURN and self.get_text():
-
                     return True
                 elif event.key == pl.K_RETURN:
-                    self.clear_text()
+
                     return False
                 ### ### ### ###
                 
@@ -121,13 +122,10 @@ class TextInput:
 
                 else:
                     # If no special key is pressed, add unicode of key to input_string
-                    if not hide:
-                        self.input_string = self.input_string[:self.cursor_position] + \
-                                            event.unicode + \
-                                            self.input_string[self.cursor_position:]
-                        self.cursor_position += len(event.unicode) # Some are empty, e.g. K_UP
-                    if hide:
-                        pass
+                    self.input_string = self.input_string[:self.cursor_position] + \
+                                        event.unicode + \
+                                        self.input_string[self.cursor_position:]
+                    self.cursor_position += len(event.unicode) # Some are empty, e.g. K_UP
 
             elif event.type == pl.KEYUP:
                 # *** Because KEYUP doesn't include event.unicode, this dict is stored in such a weird way
@@ -146,7 +144,12 @@ class TextInput:
                 pygame.event.post(pygame.event.Event(pl.KEYDOWN, key=event_key, unicode=event_unicode))
 
         # Rerender text surface:
-        self.surface = self.font_object.render(self.input_string, self.antialias, self.text_color)
+        if not hide:
+            self.surface = self.font_object.render(self.input_string, self.antialias, self.text_color)
+        else:
+            # Hide password
+            self.surface = self.font_object.render("...", self.antialias, self.text_color)
+
 
         # Update self.cursor_visible
         self.cursor_ms_counter += self.clock.get_time()
@@ -166,6 +169,9 @@ class TextInput:
 
     def get_surface(self):
         return self.surface
+
+    def get_len(self):
+        return len(self.input_string)
 
     def get_text(self):
         return self.input_string
