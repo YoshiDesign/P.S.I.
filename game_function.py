@@ -9,6 +9,9 @@ from entity.bullets import Bullet
 from entity.alien import Alien
 from entity.tweeter import Tweeter
 
+""" Username is a global var. Once we get the password we immediately auth w/ server """ 
+
+
 # unused currently
 _offline = False
 # Live count of active LETTERS on screen during gameplay
@@ -40,11 +43,8 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			print("click, you glorious bitch, CLICK!")
 			
-
 			mousex, mousey = pygame.mouse.get_pos()
 			
-
-
 		elif event.type == pygame.KEYDOWN:
 			keydown_event(event, g_settings, screen, ship, stats, scores, bullets)
 
@@ -109,7 +109,10 @@ def check_play_buttons(stats, textbox, scores, login_btn, \
 									to_pass_btn, passed_btn, cur_scrn=0, \
 									mousex=0, mousey=0):
 
-	""" Enables user-click responses in any menu """
+	""" 
+		Enables user-click responses in any menu 
+		Any True returned from here is to trigger textbox.update()
+	"""
 
 	global flagged
 
@@ -130,11 +133,10 @@ def check_play_buttons(stats, textbox, scores, login_btn, \
 		4 : Logged in menu_mode
 			
 	"""
-	print("CS {}".format(cur_scrn))
 
 	if (login_clicked or twit_clicked \
-		or about_clicked or to_pass_clicked \
-		or passed_clicked) and not stats.game_active:
+	or about_clicked or to_pass_clicked \
+	or passed_clicked) and not stats.game_active:
 		# Reset game stats
 		# stats.reset_all() ...It's in start_game
 		
@@ -158,12 +160,12 @@ def check_play_buttons(stats, textbox, scores, login_btn, \
 			return True
 
 		if passed_clicked and cur_scrn == 2:
+
+			# Need to auth before flagged = 1
+
 			if len(textbox.get_text()) == 0:
 				# Dont peek at the pw
 				return False
-			flagged = 1
-			# Return to menu as a logged in user
-			stats.menu_mode(flagged=flagged)
 			# Reset state
 			passed_clicked = False
 
@@ -311,19 +313,17 @@ def create_army(g_settings, screen, twits, all_tweets, \
 
 	row = next(generate_y)
 
-	if len(all_tweets) > 1:
+	if len(all_tweets) >= 2:
 		# Destroy the first 2 tweets
 		x = all_tweets.pop(0)
 		print("POPPING 11 -- {}".format(x))
 		x = all_tweets.pop(0)
 		print("POPPING 22 -- {}".format(x))
 		x = ""
-	else:
-		# There was an odd number of tweets
+
+	elif len(all_tweets):
 		x = all_tweets.pop(0)
-		x = ""
-		# Could technically end the game here
-		return 1
+		all_tweets = []
 
 
 
@@ -333,19 +333,13 @@ def create_army(g_settings, screen, twits, all_tweets, \
 										 					"""
 	# RECONSIDER this placement? Should be a separate function
 	# This looks for more tweets to create the army with. It is recursive
-	if total_twits == 0:
-		if len(all_tweets) <= 2:
-			# Destroy the tweets we just blasted and tidy up
-			print("Tweets Exhausted")
-			# TODO -- Ask for another Handle? or submit score. Or both
-			end_game(g_settings, screen, stats, ship, twits, bullets, scores, game_won=1)
+	# if total_twits == 0:
+		
+	# 	create_army(g_settings, screen, twits, all_tweets)
 
-			return True
-		else:
-			create_army(g_settings, screen, twits, all_tweets)
-	else:
+	# else:
 
-		return False
+	return False
 			
 		
 
@@ -457,8 +451,8 @@ def update_twits(g_settings, screen, stats, ship, \
 
 	if test != len(twits.sprites()):
 		# Constant list of all sprites, prints list if twits are created or destroyed
-		print("ALL SPRITES == {}".format(len(twits.sprites())))
-		print("ALL_TWEETS == {}".format(len(all_tweets)))
+		# print("ALL SPRITES == {}".format(len(twits.sprites())))
+		# print("ALL_TWEETS == {}".format(len(all_tweets)))
 		test = len(twits.sprites())
 
 	active_ids = []
@@ -497,7 +491,7 @@ def check_twit_bottom(g_settings, stats, scores, screen, ship, twits, bullets):
 
 def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
 	
-	global dropped_space
+	global flagged
 
 	if stats.ships_left > 0:
 		if bottom:
@@ -511,7 +505,7 @@ def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
 
 		twits.empty()
 		bullets.empty()
-		end_game(g_settings, screen, stats, ship, twits, bullets, scores)
+		end_game(g_settings, screen, stats, ship, twits, bullets, scores, flagged=flagged)
 
 	return 0
 
@@ -523,12 +517,29 @@ def get_high_score(stats, scores):
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
 
-def send_data_TEST(name, url=0, fail=0):
-	""" Activate the web server's view function to access the Twitter API """
-	resp = []
-	url = "https://psigames.herokuapp.com/twit?h=" + name
-	resp = requests.get(url)
-	return resp.json()
+def send_data_TEST(name, url=0, hash='', u_name='', flag=0):
+	""" 
+		flag = 0 = Activate the web server's view function to access the Twitter API 
+		flag = 1 = Authenticate user from client login
+
+	"""
+	if not flag: # We are getting tweets
+		resp = []
+		url = "https://psigames.herokuapp.com/twit?h=" + name
+		resp = requests.get(url)
+		return resp.json()
+
+	elif flag: # We are logging the user in if they have an account
+		ok = requests.post("https://psigames.herokuapp.com/servauth", \
+								data={'hash':hash, 'u_name': u_name})
+		if ok:
+			return 1
+		else:
+			print("BADNESS == {} - {}".\
+			format(ok.status_code, ok.reason))
+
+
+
 
 def get_infoz(g_settings, screen, twits,\
 				stats, scores, textbox, login_btn, \
@@ -538,14 +549,20 @@ def get_infoz(g_settings, screen, twits,\
 		Check user input, get tweets from server, analyze them and begin game.
 		textbox.update() returns True if use presses Enter 
 	"""
+	button_group = [login_btn, attack_twit_btn, about_btn, to_pass_btn, passed_btn]
+	mousex, mousey = pygame.mouse.get_pos()
+	print(mousex, mousey)
+	
 	events = pygame.event.get()
 	if not cur_scrn or cur_scrn == 4:
 
-		""" 			In Main Menu					"""
 
-		login_btn.create_button()
-		attack_twit_btn.create_button()
-		about_btn.create_button()
+
+		""" 			In Main Menu					"""
+        
+            
+		
+		
 		
 		if textbox.update(events, stats, textbox, \
 				scores,login_btn, attack_twit_btn, \
@@ -560,7 +577,8 @@ def get_infoz(g_settings, screen, twits,\
 			# No interruptions but still traceback to stderr
 			try:
 				# Get Tweets from Twitter
-				tweet_bot = send_data_TEST(handle)
+				tweet_bot = send_data_TEST(handle, flag=0)
+
 			except:
 				# Any erroneous or otherwise NULL returns
 				print("Something went wrong : " \
@@ -603,14 +621,14 @@ def get_infoz(g_settings, screen, twits,\
 				return False
 		else:
 			# Display our text input field based on cur_scrn
-			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2), \
-											(g_settings.screen_height//2) + 150))
+			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2) - 100, \
+											(g_settings.screen_height//2) + 80))
 
 	if cur_scrn == 1:
+		global names
 
 		""" 			In Username Menu			"""
 
-		global names
 		# Username Screen
 		to_pass_btn.create_button()
 		if textbox.update(events, stats, textbox, \
@@ -632,6 +650,7 @@ def get_infoz(g_settings, screen, twits,\
 											 	(g_settings.screen_height//2) - 200))
 
 	if cur_scrn == 2:
+		global flagged
 		
 		""" 			In Password Menu			"""
 		
@@ -640,32 +659,24 @@ def get_infoz(g_settings, screen, twits,\
 				scores,login_btn, attack_twit_btn, \
 				about_btn, to_pass_btn, passed_btn, cur_scrn=cur_scrn, hide=1):
 			x = textbox.get_text()
-			if x == 0:
-				print("nopes")
-				
-			print("x is {}".format(x))
-
+		
 			# je moet je wachtwoord verbergen
-			candy = con_text.hash(textbox.get_text())
-			x = textbox.get_text()
-			print("plaintext == {}".format(x))
+			candy = textbox.hash_word()
+
 			if con_text.verify(x, candy):
-				print("WINNER")
+				print("WOOOOOOOT")
 
-			print('PW =={}'.format(candy))
 
-			stats.menu_mode(flagged=1)
+			flagged = 1
 			textbox.reset()
 			# Send to server! WITH names
 
 			#############
-
+			stats.menu_mode(flagged=flagged)
 			# update screen if auth
 		else:
 			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2) - 100, \
 											 	(g_settings.screen_height//2) - 200))
-
-
 
 
 		####                          elif cur_scrn == 3:						###
@@ -688,12 +699,18 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 	global twits_list
 	global total_twits
 
+	""" 
+		There are several ways to determine an explosion. 
+		i.e. use the global vars - determine where to mark 
+		an explosion based upon which twit disappeared. 
+	"""
+
 	bullets.update()
 	for bullet in bullets.copy():
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
 
-	if stats._current_game:
+	if stats._current_screen == 3: # Specific to a twitter enabled game
 		shot_down = pygame.sprite.groupcollide(bullets, twits, True, True)
 	else:
 		# Not being used yet
@@ -702,14 +719,18 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 	if shot_down:
 		# for bull, twit in shot_down.items():
 		for twit in shot_down.values():
+			print("TWIT == {}".format(twit))
 			#for i in twits: since it's a weird container type returned by groupcollide
 			for i in twit:
+				print("I == {}".format(i))
+
 				# spaces were removed about 15 lines up, this might be useless
-				if not i.letter == "space":
-					explode = Explosion(g_settings, screen, i)
-					explode.explode()
-					twits_list.remove(int(i.index))
-					total_twits -= 1
+				
+				explode = Explosion(g_settings, screen, i)
+				explode.explode()
+				del(explode)
+				twits_list.remove(int(i.index))
+				total_twits -= 1
 					# print("TWIT UPDATE {}\n{}\n\n".format(total_twits, twits_list))
 			stats.score += g_settings.twit_points * len(twit)
 			# print("SCORE {}".format(stats.score))
@@ -732,17 +753,23 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 	if stats.game_active:
 		# if _current_game is true...
 		if stats._current_screen == 3:
-		
+
+			global all_tweets
+
 			# print("starting twitter mode")
 			ship.update()
 			twits.draw(screen)
 			for bullet in bullets.sprites():
 				bullet.draw_bullet()
 
-	
+		if len(all_tweets) == 0:
+
+			end_game(g_settings, screen, stats, ship, \
+						twits, bullets, scores, game_won=1)
+
 		scores.show_score()
 
-	else:
+	else: # Game is inactive. These are menus
 		if cur_scrn == 2:
 			get_infoz(g_settings, screen, twits, stats, scores, \
 							textbox, login_btn, attack_twit_btn, \

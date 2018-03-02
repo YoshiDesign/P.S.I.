@@ -9,7 +9,7 @@ class Reticle():
 		self.fp_lazer = os.fsencode("sprites/reticle/")
 		self.g_settings = g_settings
 		# Mouse
-		self.image = pygame.image.load(os.fsdecode(self.fp_lazer) + "Lazer_Reticle.png")
+		self.image = pygame.image.load(os.fsdecode(self.fp_lazer) + "Lazer_Reticle.png").convert_alpha()
 		self.rect = self.image.get_rect()
 		
 	def blitme(self, x, y):

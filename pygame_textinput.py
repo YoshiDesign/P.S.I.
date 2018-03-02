@@ -5,6 +5,8 @@ import pygame
 import pygame.locals as pl
 import os.path
 import game_function as gf
+from passlib.apps import custom_app_context as con_text
+
 pygame.font.init()
 
 
@@ -68,9 +70,10 @@ class TextInput:
         for event in events:
             if event.type == pygame.QUIT:
                     sys.exit()
+
             if event.type == pygame.MOUSEBUTTONDOWN:
 
-                """ Recursive """
+                # OPT  make a button group and cycle through them for readability
                 mousex, mousey = pygame.mouse.get_pos()
 
                 # Returns true with a screen change // Handles all menu button clicks
@@ -78,7 +81,6 @@ class TextInput:
                                     attack_twit_btn, about_btn, to_pass_btn, \
                                                 passed_btn, cur_scrn=cur_scrn, \
                                                 mousex=mousex, mousey=mousey):
-                    print("CLICKED@@!@@$@")
                     return True
 
             if event.type == pygame.KEYDOWN:
@@ -186,4 +188,7 @@ class TextInput:
         self.cursor_surface.fill(color)
 
     def clear_text(self):
-        self.input_string="" 
+        self.input_string=""
+
+    def hash_word(self):
+        return con_text.hash(self.input_string)

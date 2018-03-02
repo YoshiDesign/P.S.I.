@@ -67,7 +67,8 @@ class Score():
 		self.level_rect.top = self.score_rect.top + 38
 
 	def prep_tweeter(self, handle):
-		self.tweeter_image = self.font3.render(str(handle.lstrip("@")), True, self.white, False)
+		self.tweeter_image = self.font3.render("@"+str(handle.lstrip("@")), \
+													True, self.white, False)
 		self.tweeter_rect = self.tweeter_image.get_rect()
 		self.tweeter_rect.left = self.screen_rect.left + 39
 		self.tweeter_rect.top = self.score_rect.top + 7
@@ -78,7 +79,7 @@ class Score():
 		self.screen.blit(self.high_score_image, self.high_score_rect)
 		self.screen.blit(self.level_image, self.level_rect)
 		self.ships.draw(self.screen)
-		if self.stats._current_game:
+		if self.stats._current_screen == 3:
 			self.screen.blit(self.tweeter_image, self.tweeter_rect)
 
 	def start_game(self, mode=0, handle=""):
@@ -95,7 +96,7 @@ class Score():
 			self.prep_tweeter(handle)
 			# Change state
 			self.stats.game_active = True
-			
+
 			self.prep_score()
 			self.prep_high_score()
 			self.prep_level()

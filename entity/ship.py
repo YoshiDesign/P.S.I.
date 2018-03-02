@@ -6,7 +6,7 @@ from tools.spritesheet import Spritesheet
 class Ship(Sprite):
 
 	# 0 = reg || 1 = twitter
-	_current_game = 0
+	
 
 	def __init__(self, screen, g_settings, stats, no_sprite=0):
 
@@ -50,12 +50,12 @@ class Ship(Sprite):
 
 		# Twiter Mode upper allowance
 		if self.g_settings.move_up and self.ship_y > self.screen_rect.centery + 250 \
-					and self.stats._current_game:
+					and self.stats._current_screen == 3:
 			self.ship_y -= self.g_settings.ship_speed_up
 
 		# Reg Mode upper allowance
 		elif self.g_settings.move_up and self.ship_y > self.screen_rect.top \
-					and not self.stats._current_game:
+					and not self.stats._current_screen == 5:
 			self.ship_y -= self.g_settings.ship_speed_up
 
 		if self.g_settings.move_down and self.ship_y < self.screen_rect.bottom:

@@ -3,8 +3,17 @@ from analyze import Analyzer
 
 class Stats():
 	
-	# 0 = menu 1 = twitter
 	_current_screen = 0
+	""" 
+		cur_scrn = stats._current_screen
+
+		0 : menu_mode
+		1 : login_mode
+		2 : pass_mode
+		3 : In-Game
+		4 : Logged in menu_mode
+			
+	"""
 
 	def __init__(self, g_settings):
 		
@@ -19,7 +28,9 @@ class Stats():
 		self.level = 1
 
 		self.reset_all()
-		
+
+	# Could've used cls methods
+
 	@staticmethod
 	def menu_mode(flagged=0):
 		""" 
@@ -37,7 +48,7 @@ class Stats():
 		return True
 			
 	@staticmethod
-	def play_mode():
+	def twit_mode():
 		""" Screen when game is active """ 
 		if Stats._current_screen == 0:
 			Stats._current_screen = 3

@@ -47,11 +47,10 @@ def Main():
 						 off_x=(g_settings.screen_width // 4))
 
 	login_btn = Button(g_settings, screen, text="logins", \
-				off_x=(g_settings.screen_width // 4) * -1, \
-				off_y=(g_settings.screen_height // 8) * -1 )
+								width=240, off_x= -364, off_y= -120 )
 
 	about_btn = Button(g_settings, screen, text="abut", \
-						 off_x=(g_settings.screen_width // 4))
+						 off_x=(g_settings.screen_width // 4) + 35, off_y= -100)
 
 	to_pass_btn = Button(g_settings, screen, text="Next")
 
@@ -67,19 +66,22 @@ def Main():
 
 		# clock.tick(FPS)
 		
+		
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 									twits, bullets, stats, scores, login_btn, \
 									attack_twit_btn, about_btn, to_pass_btn, passed_btn)
 
+
 		if stats.game_active == True:
 			# As per the DocString
 			gf.check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits, bullets)
-			if stats._current_game:
+			if stats._current_screen == 3:
 				gf.update_twits(g_settings, screen, stats, ship, twits, scores, bullets)
 				gf.update_bullets(g_settings, screen, stats, ship, scores, bullets, powerup, twits=twits)
 
 		else:
 			pass
+
 
 if __name__ == "__main__":
 

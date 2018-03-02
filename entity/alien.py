@@ -5,7 +5,7 @@ from pygame.sprite import Sprite
 class Alien(Sprite):
 
 	# 0 = reg || 1 = twitter
-	_current_game = 0
+	#_current_screen = 0
 	
 	def __init__(self, screen, g_settings):
 		super(Alien, self).__init__()
@@ -19,9 +19,9 @@ class Alien(Sprite):
 		self.rect.x = self.rect.width 
 		self.rect.y = self.rect.height
 
-	@staticmethod
-	def switch_game():
-		Alien._current_game = 1
+	# @staticmethod
+	# def switch_game():
+	# 	Alien._current_screen = 1
 		
 		
 	def blitmeh(self):

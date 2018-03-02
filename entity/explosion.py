@@ -8,11 +8,11 @@ class Explosion():
 		self.screen = screen
 		self.twit = twit
 		self.fp = os.fsencode("spritesheets/splodesheet.png")
-		self.sheet = Spritesheet(self.fp, 5, 4, index=0)
+		self.sheet = Spritesheet(self.fp, 5, 4)
 		self.loc_x = self.twit.rect.centerx
 		self.loc_y = self.twit.rect.centery
 
-	def explode(self, loop=20):
-		for index in range(loop):
+	def explode(self, i=16):
+		for index in range(i):
 			self.sheet.blitme(self.screen, index % self.sheet.totalCells, \
 														self.loc_x, self.loc_y)
