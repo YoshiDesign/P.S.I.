@@ -43,7 +43,7 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			print("click, you glorious bitch, CLICK!")
 			
-			mousex, mousey = pygame.mouse.get_pos()
+			# mousex, mousey = pygame.mouse.get_pos()
 			
 		elif event.type == pygame.KEYDOWN:
 			keydown_event(event, g_settings, screen, ship, stats, scores, bullets)
@@ -104,10 +104,8 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, bullets):
 
 	return False
 
-def check_play_buttons(stats, textbox, scores, login_btn, \
-								attack_twit_btn, about_btn, \
-									to_pass_btn, passed_btn, cur_scrn=0, \
-									mousex=0, mousey=0):
+def check_play_buttons(stats, textbox, scores, buttons, cur_scrn=0, \
+												mousex=0, mousey=0):
 
 	""" 
 		Enables user-click responses in any menu 
@@ -117,11 +115,11 @@ def check_play_buttons(stats, textbox, scores, login_btn, \
 	global flagged
 
 	# Check which game button was clicked. Defaults to False
-	login_clicked = login_btn.rect.collidepoint(mousex, mousey)
-	about_clicked = about_btn.rect.collidepoint(mousex, mousey)
-	twit_clicked = attack_twit_btn.rect.collidepoint(mousex, mousey)
-	to_pass_clicked = to_pass_btn.rect.collidepoint(mousex, mousey)
-	passed_clicked = passed_btn.rect.collidepoint(mousex, mousey)
+	login_clicked = buttons[0].rect.collidepoint(mousex, mousey)
+	about_clicked = buttons[1].rect.collidepoint(mousex, mousey)
+	attack_clicked = buttons[2].rect.collidepoint(mousex, mousey)
+	to_pass_clicked = buttons[3].rect.collidepoint(mousex, mousey)
+	passed_clicked = buttons[4].rect.collidepoint(mousex, mousey)
 
 	""" 
 		cur_scrn = stats._current_screen
@@ -134,7 +132,7 @@ def check_play_buttons(stats, textbox, scores, login_btn, \
 			
 	"""
 
-	if (login_clicked or twit_clicked \
+	if (login_clicked or attack_clicked \
 	or about_clicked or to_pass_clicked \
 	or passed_clicked) and not stats.game_active:
 		# Reset game stats
@@ -171,7 +169,7 @@ def check_play_buttons(stats, textbox, scores, login_btn, \
 
 			return True
 
-		elif (twit_clicked and textbox.get_text()) \
+		elif (attack_clicked and textbox.get_text()) \
 		and not stats.game_active and (cur_scrn == 0 or cur_scrn == 4):
 			
 			""" Fires when user clicks Attack w/ text entered """
@@ -189,7 +187,7 @@ def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey)
 	""" Click """
 	pass
 
-def end_game(g_settings, screen, stats, ship, twits, bullets, scores, game_won=0):
+def end_game(g_settings, screen, stats, ship, twits, bullets, scores, game_won=0, flagged=0):
 
 	global dropped_space
 	global total_twits
@@ -230,15 +228,10 @@ def create_army(g_settings, screen, twits, all_tweets, \
 
 	""" Blit 2 entire tweets to the screen """
 
-	import re
+	from re import findall
 	global twit_list
-	# start = int(start)
-	# act = int(act)
+
 	re_alphaNum = r"^[a-zA-Z0-9]+$"
-	re_ascii	= r"[^\u0000-\u007F]"
-	re_nother	= r"(?<=\u0000-\u007F)[a-Z0-9]"
-	twit_id 	= 0
-	punct		= [",","'","\"",".",":"]
 	dots 		= 0
 	end_char 	= 0
 	available_x = int(get_cols(g_settings))
@@ -247,9 +240,15 @@ def create_army(g_settings, screen, twits, all_tweets, \
 	generate_y 	= make_space(available_y)
 	row = next(generate_y)
 
+	# Unused
+	punct		= [",","\'","\"",".",":", ";", "?", "!"]
+	re_unicode	= r"[^\u0000-\u007F]"
+	re_other	= r"(?<=\u0000-\u007F)[a-Z0-9]"
+
 	# ROW is assigned because unlike X, it is not reset, it has a stable vector throughout assignment.
 	# ROW is now 0
 	for tweet in all_tweets[start:act]:
+
 		twit_id = g_settings.twit_id
 
 		# Get rid of the confusing bits
@@ -275,7 +274,7 @@ def create_army(g_settings, screen, twits, all_tweets, \
 			else:
 				dots = 0
 
-			if (re.findall(re_alphaNum, word) and word.isalpha()) or dots:
+			if (findall(re_alphaNum, word) and word.isalpha()) or dots:
 
 				if word in Analyzer._neg_words:
 		 			# FLAG : determine sentiment
@@ -542,31 +541,38 @@ def send_data_TEST(name, url=0, hash='', u_name='', flag=0):
 
 
 def get_infoz(g_settings, screen, twits,\
-				stats, scores, textbox, login_btn, \
-				attack_twit_btn, about_btn, to_pass_btn, \
-							passed_btn, cur_scrn=0, hide=0):
+				stats, scores, reticle, textbox, buttons, \
+								cur_scrn=0, hide=0):
 	""" 
 		Check user input, get tweets from server, analyze them and begin game.
 		textbox.update() returns True if use presses Enter 
 	"""
-	button_group = [login_btn, attack_twit_btn, about_btn, to_pass_btn, passed_btn]
+
 	mousex, mousey = pygame.mouse.get_pos()
 	print(mousex, mousey)
+	pygame.mouse.set_visible(False)
+	reticle.blitme(mousex, mousey)
 	
 	events = pygame.event.get()
 	if not cur_scrn or cur_scrn == 4:
 
-
-
+		if mousex > 135 and mousey > 258 \
+		and mousex < 351 and mousey < 312:
+			# Login
+			buttons[0].create_button()
+		elif mousex > 827 and mousey > 258 \
+		and mousex < 1068 and mousey < 320:
+			# About
+			buttons[1].create_button()
+		elif mousex > 530 and mousey > 394 \
+		and mousex < 690 and mousey < 452:
+			# Attack
+			buttons[2].create_button()
 		""" 			In Main Menu					"""
         
-            
-		
-		
-		
+       
 		if textbox.update(events, stats, textbox, \
-				scores,login_btn, attack_twit_btn, \
-				about_btn, to_pass_btn, passed_btn):
+							scores, buttons, mousex, mousey):
 		
 			# handle is the user's input
 			handle = textbox.get_text()
@@ -630,10 +636,11 @@ def get_infoz(g_settings, screen, twits,\
 		""" 			In Username Menu			"""
 
 		# Username Screen
-		to_pass_btn.create_button()
+		if mousex > 530 and mousey > 300:
+			buttons[3].create_button()
 		if textbox.update(events, stats, textbox, \
-				scores,login_btn, attack_twit_btn, \
-				about_btn, to_pass_btn, passed_btn, cur_scrn=cur_scrn, hide=0):
+							scores, buttons, mousex, \
+							mousey, cur_scrn=cur_scrn, hide=0):
 
 			names = textbox.get_text()
 			if not names:
@@ -645,7 +652,7 @@ def get_infoz(g_settings, screen, twits,\
 			print("U NAME == {}".format(names))
 
 		else:
-
+			# Blit textbox on login screen
 			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2) - 100, \
 											 	(g_settings.screen_height//2) - 200))
 
@@ -653,11 +660,12 @@ def get_infoz(g_settings, screen, twits,\
 		global flagged
 		
 		""" 			In Password Menu			"""
-		
-		passed_btn.create_button()
+		if mousex > 530 and mousey > 300:
+			buttons[4].create_button()
 		if textbox.update(events, stats, textbox, \
-				scores,login_btn, attack_twit_btn, \
-				about_btn, to_pass_btn, passed_btn, cur_scrn=cur_scrn, hide=1):
+							scores, buttons, mousex, \
+							mousey, cur_scrn=cur_scrn, hide=1):
+
 			x = textbox.get_text()
 		
 			# je moet je wachtwoord verbergen
@@ -666,15 +674,18 @@ def get_infoz(g_settings, screen, twits,\
 			if con_text.verify(x, candy):
 				print("WOOOOOOOT")
 
-
-			flagged = 1
+			
 			textbox.reset()
 			# Send to server! WITH names
-
+			############
+			flagged = 1
+			# SAVE NAME and BLIT TO MENU "You are logged in as :"
 			#############
 			stats.menu_mode(flagged=flagged)
 			# update screen if auth
+
 		else:
+			# Blit textbox to password screen
 			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2) - 100, \
 											 	(g_settings.screen_height//2) - 200))
 
@@ -738,11 +749,10 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 										twits, bullets, stats, scores, \
-											login_btn, attack_twit_btn, \
-												about_btn, to_pass_btn,  \
-															passed_btn):
+																buttons):
 	# Mouse
 	global cur_scrn
+	global flagged
 	if not cur_scrn == stats._current_screen:
 		cur_scrn = stats._current_screen
 		print("cur scrn == {}".format(stats._current_screen))
@@ -765,27 +775,20 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 		if len(all_tweets) == 0:
 
 			end_game(g_settings, screen, stats, ship, \
-						twits, bullets, scores, game_won=1)
+						twits, bullets, scores, game_won=1, flagged=flagged)
 
 		scores.show_score()
 
 	else: # Game is inactive. These are menus
 		if cur_scrn == 2:
-			get_infoz(g_settings, screen, twits, stats, scores, \
-							textbox, login_btn, attack_twit_btn, \
-								about_btn, to_pass_btn, passed_btn, \
-									cur_scrn=stats._current_screen, hide=1)
+			get_infoz(g_settings, screen, twits, stats, scores, reticle, \
+							textbox, buttons, cur_scrn=stats._current_screen, hide=1)
 
 		else:
 
-			get_infoz(g_settings, screen, twits, stats, scores, \
-							textbox, login_btn, attack_twit_btn, \
-								about_btn, to_pass_btn, passed_btn, \
-									cur_scrn=stats._current_screen)
-
-		mouse_x, mouse_y = pygame.mouse.get_pos()
-		pygame.mouse.set_visible(False)
-		reticle.blitme(mouse_x, mouse_y)
+			get_infoz(g_settings, screen, twits, stats, scores, reticle, \
+							textbox, buttons, cur_scrn=stats._current_screen)
+		
 
 	pygame.display.flip()
 

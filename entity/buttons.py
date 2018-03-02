@@ -4,18 +4,19 @@ class Button():
 
 	# 0 = reg || 1 = twitter
 	
-	def __init__(self, g_settings, screen, p1, p2, p3, p4, color=(0,255,200)):
+	def __init__(self, g_settings, screen, points, color=(0,255,200)):
 		
 		self.g_settings = g_settings
 		self.screen = screen
 		self.screen_rect = screen.get_rect()
-		self.p1, self.p2, self.p3, self.p4 = p1, p2, p3, p4
+		self.points = points
 
 		self.color = color
-		self.color2 = (255,255,255)
+		self.color2 = (0,255,255)
 		
 		self.rect = pygame.draw.rect(screen, self.color, \
-					[self.p1, self.p2, self.p3, self.p4 ],2)
+					[self.points[0], self.points[1], \
+					self.points[2], self.points[3] ],2)
 
 
 		# Required
@@ -29,7 +30,10 @@ class Button():
 
 	def create_button(self, hover=0):
 		""" Button Factory """
-		self.screen.blit(self.screen_rect, self.rect)
+		# self.screen.blit(self.screen, self.rect)
+		pygame.draw.rect(self.screen, self.color2, \
+					[self.points[0], self.points[1], \
+					self.points[2], self.points[3] ],2)
 
 
 # OPTIMIZATIONS : create buttons in a dict

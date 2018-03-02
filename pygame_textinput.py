@@ -64,9 +64,8 @@ class TextInput:
 
         self.clock = pygame.time.Clock()
 
-    def update(self, events, stats, textbox, scores, login_btn, \
-                                    attack_twit_btn, about_btn, \
-                                        to_pass_btn, passed_btn, cur_scrn=0, hide=0):
+    def update(self, events, stats, textbox, scores, buttons, \
+                            mousex, mousey, cur_scrn=0, hide=0):
         for event in events:
             if event.type == pygame.QUIT:
                     sys.exit()
@@ -74,13 +73,11 @@ class TextInput:
             if event.type == pygame.MOUSEBUTTONDOWN:
 
                 # OPT  make a button group and cycle through them for readability
-                mousex, mousey = pygame.mouse.get_pos()
+
 
                 # Returns true with a screen change // Handles all menu button clicks
-                if gf.check_play_buttons(stats, textbox, scores, login_btn, \
-                                    attack_twit_btn, about_btn, to_pass_btn, \
-                                                passed_btn, cur_scrn=cur_scrn, \
-                                                mousex=mousex, mousey=mousey):
+                if gf.check_play_buttons(stats, textbox, scores, buttons, cur_scrn=cur_scrn, \
+                                                                mousex=mousex, mousey=mousey):
                     return True
 
             if event.type == pygame.KEYDOWN:

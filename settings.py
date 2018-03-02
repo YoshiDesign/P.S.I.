@@ -68,7 +68,8 @@ class Settings():
 		self.twit_speed = 4
 		self.twit_hp = 2
 		self.score_multiplier = 1.48
-		# Enumerates whole twits so they shift direction independently
+
+		# Enumerates whole twits so they shift directions independently
 		self.twit_id = 0
 		# Lives
 		self.ship_limit = 1

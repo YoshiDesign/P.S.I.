@@ -40,21 +40,16 @@ def Main():
 	twits = Group()
 	bullets = Group()
 
-	# clock = pygame.time.Clock()
-	# FPS = 31
+	clock = pygame.time.Clock()
+	FPS = 22
 
-	attack_twit_btn = Button(g_settings, screen, text="attk_twt", \
-						 off_x=(g_settings.screen_width // 4))
+	attack_btn = Button(g_settings, screen, [527, 400, 159, 50], 2)
+	login_btn = Button(g_settings, screen, [130, 258, 220, 50], 2)
+	about_btn = Button(g_settings, screen, [820, 260, 245, 50], 2)
+	pass_btn = Button(g_settings, screen, [550, 342, 100, 37], 2)
+	passed_btn = Button(g_settings, screen, [540, 342, 122, 37], 2)
 
-	login_btn = Button(g_settings, screen, text="logins", \
-								width=240, off_x= -364, off_y= -120 )
-
-	about_btn = Button(g_settings, screen, text="abut", \
-						 off_x=(g_settings.screen_width // 4) + 35, off_y= -100)
-
-	to_pass_btn = Button(g_settings, screen, text="Next")
-
-	passed_btn = Button(g_settings, screen, text="Enter")
+	buttons = [login_btn, about_btn, attack_btn, pass_btn, passed_btn]
 
 
 	""" 
@@ -68,8 +63,7 @@ def Main():
 		
 		
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-									twits, bullets, stats, scores, login_btn, \
-									attack_twit_btn, about_btn, to_pass_btn, passed_btn)
+									twits, bullets, stats, scores, buttons)
 
 
 		if stats.game_active == True:
