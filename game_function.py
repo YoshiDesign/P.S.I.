@@ -323,18 +323,15 @@ def create_army(g_settings, screen, twits, all_tweets, \
 	if len(all_tweets) >= 2:
 		# Destroy the first 2 tweets
 		x = all_tweets.pop(0)
-		print("POPPING 11 -- {}".format(x))
 		x = all_tweets.pop(0)
-		print("POPPING 22 -- {}".format(x))
 		x = ""
+
 	# Pop the last tweet if uneven tweets
 	elif len(all_tweets):
 		x = all_tweets.pop(0)
 		x='done!'
 
 	return False
-			
-		
 
 def assign_twit(g_settings, screen, twits, letter, sentiment, \
 							end_char, generate_x, row, twit_id, \
@@ -357,13 +354,16 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 	text_data["twit_id"]	= twit_id
 
 	if not dots:
-		# DIFFICULTY SETTING
 		
 		character = Tweeter(g_settings, screen, \
 							text_data=text_data)
 		# Determine if carrying powerup
-		if not (randint(1,11) % 3):
-			character.power = randint(1, 4)
+		x = randint(1,26)
+		if not (x % 5):
+			# DIFFICULTY SETTING
+			character.power = randint(1, 5)
+		else:
+			character.power = 0
 
 		# Acquire placement
 		give_twit_dimension(character, x_pos, row)
@@ -385,7 +385,7 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 			# Add "..." character when necessary
 			text_data["letter"] = "dots"
 			text_data["index"] =  total_twits
-			
+			# Create Twit
 			character = Tweeter(g_settings, screen, \
 								text_data=text_data)
 			give_twit_dimension(character, x_pos, row)
@@ -393,17 +393,13 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 			twits.add(character)
 			twits_list.append(total_twits - 1)
 			total_twits += 1
-		
-		# GC
+
 		del(text_data)
-			
 		return False
 	else:
-		# If the character created is not last in the word
 		del(text_data)
 		return False
-	# 'Til next time
-	
+
 
 ### ### ### ### ### ### ### ### Twit Placement ### ### ### ### ### ### ### ### 
 
@@ -438,7 +434,7 @@ def change_army_direction(g_settings, twits, twit_id):
 
 	for i, twit in enumerate(twits.sprites()):
 		if twit.power:
-			print("{} has powerup".format(i))
+			print("{} has powerup {}".format(i, twit.power))
 		# Space Buffer
 		if twit.twit_id == twit_id:
 
