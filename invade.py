@@ -70,8 +70,10 @@ def Main():
 			# As per the DocString
 			gf.check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits, bullets)
 			if stats._current_screen == 3:
-				gf.update_twits(g_settings, screen, stats, ship, twits, scores, bullets)
-				gf.update_bullets(g_settings, screen, stats, ship, scores, bullets, powerup, twits=twits)
+				gf.update_bullets(g_settings, screen, stats, ship, \
+								scores, bullets, powerup, twits=twits)
+				gf.update_twits(g_settings, screen, stats, ship, \
+											twits, scores, bullets)
 
 		else:
 			pass

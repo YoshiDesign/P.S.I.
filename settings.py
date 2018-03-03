@@ -39,7 +39,7 @@ class Settings():
 		# Bullets
 		self.bullet_speed = 15
 		self.bullet_length = 3
-		self.bullet_width = 5
+		self.bullet_width = 110
 		self.bullet_color = (255,255,190)
 		# Lazers
 		self.lazer_color = (255,255,190)
@@ -55,7 +55,7 @@ class Settings():
 		self.char_width = 20
 		self.char_height = 24
 		self.char_spacing = 1
-		self.twit_drop_speed = 20
+		self.twit_drop_speed = 80
 		self.twit_points = 10
 
 		# Create dynamic settings

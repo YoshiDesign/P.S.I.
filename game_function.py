@@ -27,7 +27,8 @@ flagged = 0
 # No names
 names = ''
 	
-def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits, bullets):
+def check_events(g_settings, screen, ship, aliens, stats, \
+							textbox, scores, twits, bullets):
 
 	""" Tracks text input box and all player events while game_active == True """
 
@@ -46,7 +47,8 @@ def check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits
 			# mousex, mousey = pygame.mouse.get_pos()
 			
 		elif event.type == pygame.KEYDOWN:
-			keydown_event(event, g_settings, screen, ship, stats, scores, bullets)
+			keydown_event(event, g_settings, screen, ship, stats, \
+													scores, bullets)
 
 		elif event.type == pygame.KEYUP:
 			keyup_event(event, g_settings, ship, stats)
@@ -85,7 +87,8 @@ def keyup_event(event, g_settings, ship, stats):
 
 
 
-def keydown_event(event, g_settings, screen, ship, stats, scores, bullets):
+def keydown_event(event, g_settings, screen, ship, stats, scores, \
+															bullets):
 	""" Keydowns """
 	# Aka more events
 	if stats.game_active:
@@ -183,11 +186,13 @@ def check_play_buttons(stats, textbox, scores, buttons, cur_scrn=0, \
 
 	return False
 
-def check_player_clicks(g_settings, screen, ship, aliens, stats, mousex, mousey):
+def check_player_clicks(g_settings, screen, ship, aliens, stats, \
+													mousex, mousey):
 	""" Click """
 	pass
 
-def end_game(g_settings, screen, stats, ship, twits, bullets, scores, game_won=0, flagged=0):
+def end_game(g_settings, screen, stats, ship, twits, bullets, scores, \
+												game_won=0, flagged=0):
 
 	global dropped_space
 	global total_twits
@@ -195,10 +200,10 @@ def end_game(g_settings, screen, stats, ship, twits, bullets, scores, game_won=0
 	global all_tweets
 
 	if game_won:
+		pass
 
-		bullets.empty()
-		twits.empty()
-
+	bullets.empty()
+	twits.empty()
 	total_twits = 0
 	twits_list = []
 	all_tweets = []
@@ -208,16 +213,17 @@ def end_game(g_settings, screen, stats, ship, twits, bullets, scores, game_won=0
 	stats.reset_all()
 	# OPT might not need prep_score here
 	scores.prep_score()
+	# Flagged == User is logged in
 	stats.menu_mode(flagged=flagged)
 
 def reset_army(screen, twits):
 	""" Place twits at the top of the screen """ 
-	print("Resetting Army")
+
 	screen_rect = screen.get_rect()
 	y = 1
 	for n, twit in enumerate(twits):
 		# print("n {}".format(n) )
-		if not n % 8:
+		if not n % 10:
 			y += 1
 
 		twit.rect.x = screen_rect.left + twit.rect.width * n
@@ -248,7 +254,7 @@ def create_army(g_settings, screen, twits, all_tweets, \
 	# ROW is assigned because unlike X, it is not reset, it has a stable vector throughout assignment.
 	# ROW is now 0
 	for tweet in all_tweets[start:act]:
-
+		g_settings.twit_id += 1
 		twit_id = g_settings.twit_id
 
 		# Get rid of the confusing bits
@@ -274,7 +280,8 @@ def create_army(g_settings, screen, twits, all_tweets, \
 			else:
 				dots = 0
 
-			if (findall(re_alphaNum, word) and word.isalpha()) or dots:
+			if (findall(re_alphaNum, word) and word.isalpha()) \
+			or dots:
 
 				if word in Analyzer._neg_words:
 		 			# FLAG : determine sentiment
@@ -283,6 +290,7 @@ def create_army(g_settings, screen, twits, all_tweets, \
 					sentiment = 1
 
 				for n, letter in enumerate(word):
+					print("LETTER STUFF {}".format(letter))
 					# FLAG : Identify the last char of the word
 					if letter in punct:
 						continue
@@ -308,7 +316,7 @@ def create_army(g_settings, screen, twits, all_tweets, \
 				continue
 
 		# Logical Grouping of all twits in a tweet
-		g_settings.twit_id += 1
+		
 
 	row = next(generate_y)
 
@@ -319,31 +327,18 @@ def create_army(g_settings, screen, twits, all_tweets, \
 		x = all_tweets.pop(0)
 		print("POPPING 22 -- {}".format(x))
 		x = ""
-
+	# Pop the last tweet if uneven tweets
 	elif len(all_tweets):
 		x = all_tweets.pop(0)
-		all_tweets = []
-
-
-
-
-	""" 		NOT TO BE CONFUSED WITH UPDATE_TWIT
-		This returns a tweet, or searches exhaustively and gives up
-										 					"""
-	# RECONSIDER this placement? Should be a separate function
-	# This looks for more tweets to create the army with. It is recursive
-	# if total_twits == 0:
-		
-	# 	create_army(g_settings, screen, twits, all_tweets)
-
-	# else:
+		x='done!'
 
 	return False
 			
 		
 
 def assign_twit(g_settings, screen, twits, letter, sentiment, \
-							end_char, generate_x, row, twit_id, dots=0):
+							end_char, generate_x, row, twit_id, \
+														dots=0):
 	""" Construct an individual character and its properties to be blasted.
 		'dots' is a result of the Twitter API being handled by the nltk tokenizer """
 	# Defaults
@@ -451,18 +446,18 @@ def update_twits(g_settings, screen, stats, ship, \
 	if test != len(twits.sprites()):
 		# Constant list of all sprites, prints list if twits are created or destroyed
 		# print("ALL SPRITES == {}".format(len(twits.sprites())))
-		# print("ALL_TWEETS == {}".format(len(all_tweets)))
+		print("ALL_TWEETS == {}".format(len(all_tweets)))
 		test = len(twits.sprites())
 
 	active_ids = []
-	twits.update()
 
+	twits.update()
 	# Check if twits touch edges
 	check_twit_edges(g_settings, twits)
 	check_twit_bottom(g_settings, stats, scores, screen, ship, twits, bullets)
 	# If twits hit the ship
 	
-	if pygame.sprite.spritecollideany(ship, twits): # and not twit.letter == "space":
+	if pygame.sprite.spritecollideany(ship, twits):
 		
 		ship_hit(g_settings, screen, stats, ship, twits, scores, bullets)
 
@@ -470,25 +465,33 @@ def update_twits(g_settings, screen, stats, ship, \
 	
 	# DIFFICULTY SETTING -> 5
 	# PROBLEM - this is also activating when we ship_hit due to twit.empty()
-	if len(twits.sprites()) <= 5 and stats.game_active:
-		dropped_space = 0
+	if len(all_tweets) == 0 and not total_twits:
+		end_game(g_settings, screen, stats, ship, \
+				twits, bullets, scores, flagged=flagged)
+	elif len(twits.sprites()) <= 5 and len(all_tweets) >= 1:
 		# Instantiates the next 2-tweet militia
 		create_army(g_settings, screen, twits, all_tweets)
+
 	return 0
 
 
 ### ### ### ### ### ### ### ### ### ### NETWORK ### ### ### ### ### ### ### ###
 
-def check_twit_bottom(g_settings, stats, scores, screen, ship, twits, bullets):
+def check_twit_bottom(g_settings, stats, scores, screen, \
+									ship, twits, bullets):
 	screen_rect = screen.get_rect()
 	for twit in twits.sprites():
-		# The "not twit.letter == space" should be unnecessary. We removed all space
+
 		# Sprites in update_bullets() This might be useless <-- search "useless" to find all
-		if twit.rect.bottom >= screen_rect.bottom and not twit.letter == "space":
-			ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=1)
+		if twit.rect.bottom >= screen_rect.bottom \
+		and not twit.letter == "space":
+
+			ship_hit(g_settings, screen, stats, ship, \
+						twits, scores, bullets, bottom=1)
 			break
 
-def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
+def ship_hit(g_settings, screen, stats, ship, \
+				twits, scores, bullets, bottom=0):
 	
 	global flagged
 
@@ -504,7 +507,8 @@ def ship_hit(g_settings, screen, stats, ship, twits, scores, bullets, bottom=0):
 
 		twits.empty()
 		bullets.empty()
-		end_game(g_settings, screen, stats, ship, twits, bullets, scores, flagged=flagged)
+		end_game(g_settings, screen, stats, ship, \
+				twits, bullets, scores, flagged=flagged)
 
 	return 0
 
@@ -572,7 +576,8 @@ def get_infoz(g_settings, screen, twits,\
         
        
 		if textbox.update(events, stats, textbox, \
-							scores, buttons, mousex, mousey):
+							scores, buttons, mousex, mousey, \
+									cur_scrn=cur_scrn, hide=0):
 		
 			# handle is the user's input
 			handle = textbox.get_text()
@@ -627,8 +632,9 @@ def get_infoz(g_settings, screen, twits,\
 				return False
 		else:
 			# Display our text input field based on cur_scrn
-			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2) - 100, \
-											(g_settings.screen_height//2) + 80))
+			screen.blit(textbox.get_surface(), \
+				((g_settings.screen_width//2) - 100, \
+				(g_settings.screen_height//2) + 80))
 
 	if cur_scrn == 1:
 		global names
@@ -639,8 +645,8 @@ def get_infoz(g_settings, screen, twits,\
 		if mousex > 530 and mousey > 300:
 			buttons[3].create_button()
 		if textbox.update(events, stats, textbox, \
-							scores, buttons, mousex, \
-							mousey, cur_scrn=cur_scrn, hide=0):
+							scores, buttons, mousex, mousey, \
+									cur_scrn=cur_scrn, hide=0):
 
 			names = textbox.get_text()
 			if not names:
@@ -653,8 +659,9 @@ def get_infoz(g_settings, screen, twits,\
 
 		else:
 			# Blit textbox on login screen
-			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2) - 100, \
-											 	(g_settings.screen_height//2) - 200))
+			screen.blit(textbox.get_surface(), \
+				((g_settings.screen_width//2) - 100, \
+				(g_settings.screen_height//2) - 200))
 
 	if cur_scrn == 2:
 		global flagged
@@ -663,8 +670,8 @@ def get_infoz(g_settings, screen, twits,\
 		if mousex > 530 and mousey > 300:
 			buttons[4].create_button()
 		if textbox.update(events, stats, textbox, \
-							scores, buttons, mousex, \
-							mousey, cur_scrn=cur_scrn, hide=1):
+							scores, buttons, mousex, mousey, \
+									cur_scrn=cur_scrn, hide=1):
 
 			x = textbox.get_text()
 		
@@ -686,14 +693,16 @@ def get_infoz(g_settings, screen, twits,\
 
 		else:
 			# Blit textbox to password screen
-			screen.blit(textbox.get_surface(), ((g_settings.screen_width//2) - 100, \
-											 	(g_settings.screen_height//2) - 200))
+			screen.blit(textbox.get_surface(), \
+				((g_settings.screen_width//2) - 100, \
+				(g_settings.screen_height//2) - 200))
 
 
-		####                          elif cur_scrn == 3:						###
+		#### elif cur_scrn == 3:
 		#
-		# 	screen.blit(textbox.get_surface(), ((g_settings.screen_width//4)*3-32, \
-		# 									 	(g_settings.screen_height//6)*3-120))
+		# 	screen.blit(textbox.get_surface(), \
+		# ((g_settings.screen_width//4)*3-32, \
+		# (g_settings.screen_height//6)*3-120))
 		
 		return False
 
@@ -748,8 +757,7 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 		scores.prep_score()
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-										twits, bullets, stats, scores, \
-																buttons):
+								twits, bullets, stats, scores, buttons):
 	# Mouse
 	global cur_scrn
 	global flagged
@@ -772,22 +780,19 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 			for bullet in bullets.sprites():
 				bullet.draw_bullet()
 
-		if len(all_tweets) == 0:
-
-			end_game(g_settings, screen, stats, ship, \
-						twits, bullets, scores, game_won=1, flagged=flagged)
-
 		scores.show_score()
 
 	else: # Game is inactive. These are menus
 		if cur_scrn == 2:
-			get_infoz(g_settings, screen, twits, stats, scores, reticle, \
-							textbox, buttons, cur_scrn=stats._current_screen, hide=1)
+			get_infoz(g_settings, screen, twits, \
+						stats, scores, reticle,textbox, buttons, \
+							cur_scrn=stats._current_screen, hide=1)
 
 		else:
 
-			get_infoz(g_settings, screen, twits, stats, scores, reticle, \
-							textbox, buttons, cur_scrn=stats._current_screen)
+			get_infoz(g_settings, screen, twits, \
+					stats, scores, reticle, textbox, buttons, \
+								cur_scrn=stats._current_screen)
 		
 
 	pygame.display.flip()
