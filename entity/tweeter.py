@@ -20,6 +20,7 @@ class Tweeter(Sprite):
 		self.twit_id = text_data["twit_id"]
 		self.index = text_data["index"]
 		self.twit_direction = 1
+		self.power = 0
 
 		# Determine Letter_Image to display
 		if self.letter == "dots":

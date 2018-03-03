@@ -2,6 +2,7 @@ import pygame
 import sys, os
 from time import sleep
 import requests
+from random import randint
 from passlib.apps import custom_app_context as con_text
 from analyze import Analyzer
 from entity.explosion import Explosion
@@ -230,77 +231,77 @@ def reset_army(screen, twits):
 		twit.rect.y = screen_rect.top + (twit.rect.height * y) + 20
 
 def create_army(g_settings, screen, twits, all_tweets, \
-										start=0, act=2):
+									start=0, act=2):
 
 	""" Blit 2 entire tweets to the screen """
 
 	from re import findall
 	global twit_list
 
-	re_alphaNum = r"^[a-zA-Z0-9]+$"
+	re_palphaNum = r"^[a-zA-Z0-9'\"]+$"
 	dots 		= 0
 	end_char 	= 0
+	power 		= 0
 	available_x = int(get_cols(g_settings))
 	available_y = int(get_rows(g_settings))
 	generate_x 	= make_space(available_x)
 	generate_y 	= make_space(available_y)
-	row = next(generate_y)
-
-	# Unused
+	row 		= next(generate_y)
 	punct		= [",","\'","\"",".",":", ";", "?", "!"]
+	# Unused. Will need!
 	re_unicode	= r"[^\u0000-\u007F]"
-	re_other	= r"(?<=\u0000-\u007F)[a-Z0-9]"
 
-	# ROW is assigned because unlike X, it is not reset, it has a stable vector throughout assignment.
+	""" 
+		Note : Row and column's incremental logic is 100% dissimilar 
+					this supports dynamic twit allocation
+	"""
+
 	# ROW is now 0
 	for tweet in all_tweets[start:act]:
 		g_settings.twit_id += 1
 		twit_id = g_settings.twit_id
 
-		# Get rid of the confusing bits
+		# That strange edge-case
 		if "..." in tweet:
 			tweet.remove("...")
-		#if wild in tweet:
-			#tweet.remove(wild)
-
-		# Add our own delimiter
+		# Trust me on this
 		tweet.append("...")
 
 		# print("TWEET {}".format(tweet))
 		for word in tweet:
-			# 3 simple flag checks are not worth an 
-			# extra function on the stack frame imo
-
 			word = word.lower()
-			# FLAG : if tweet cut off
+			# Handles a particular malformation
 			if word == "...":
 				word = "."
-				# print("DOTS {}".format(word))
 				dots = 1
 			else:
 				dots = 0
 
-			if (findall(re_alphaNum, word) and word.isalpha()) \
+			# A (much too) thorough check
+			if (findall(re_palphaNum, word)) \
 			or dots:
-
+				# Determine sentiment
 				if word in Analyzer._neg_words:
-		 			# FLAG : determine sentiment
+		 			
 		 			sentiment = 0
 				else:
 					sentiment = 1
 
 				for n, letter in enumerate(word):
-					print("LETTER STUFF {}".format(letter))
-					# FLAG : Identify the last char of the word
+					# Skip punct
 					if letter in punct:
 						continue
+					# Find if last letter
 					if n == len(word) - 1:
 						end_char = 1
 					else:
-						end_char = 0					
+						end_char = 0
+					# Determines if carrying powerup			
 					try:
+						# Returns True if we just made the last c
 						make = assign_twit(g_settings, screen, twits, letter, sentiment, \
-											end_char, generate_x, row, twit_id, dots=dots)
+													end_char, generate_x, row, twit_id, \
+																			dots=dots)
 
 						if make or dots: # (Is the last char and >= position 40)
 							# Carriage return + newline
@@ -316,7 +317,6 @@ def create_army(g_settings, screen, twits, all_tweets, \
 				continue
 
 		# Logical Grouping of all twits in a tweet
-		
 
 	row = next(generate_y)
 
@@ -339,12 +339,15 @@ def create_army(g_settings, screen, twits, all_tweets, \
 def assign_twit(g_settings, screen, twits, letter, sentiment, \
 							end_char, generate_x, row, twit_id, \
 														dots=0):
-	""" Construct an individual character and its properties to be blasted.
-		'dots' is a result of the Twitter API being handled by the nltk tokenizer """
+	""" 
+		Construct an individual character and its properties to be blasted.
+		'dots' is a result of the Twitter API being handled by the nltk tokenizer 
+	"""
 	# Defaults
 	global total_twits
 	global twits_list
 	x_pos = next(generate_x)
+	power = 0
 	text_data = {}
 	text_data["end_char"] 	= int(end_char)
 	text_data["letter"] 	= str(letter.lower())
@@ -352,47 +355,55 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 	text_data["space"] 		= 0
 	text_data["index"]		= total_twits
 	text_data["twit_id"]	= twit_id
-	
-	print("assinging Tweet")
 
-	# Using our generators we can systematically assign each letter
 	if not dots:
+		# DIFFICULTY SETTING
 		
-		character = Tweeter(g_settings, screen, text_data=text_data)
+		character = Tweeter(g_settings, screen, \
+							text_data=text_data)
+		# Determine if carrying powerup
+		if not (randint(1,11) % 3):
+			character.power = randint(1, 4)
+
+		# Acquire placement
 		give_twit_dimension(character, x_pos, row)
 		twits.add(character)
+
 		# Update globals
 		total_twits += 1
 		twits_list.append(total_twits - 1)
 
-		#print("TWIT 000 STUFF {}\n{}".format(total_twits, twits_list))
-
 	# Only text-wrap after we've printed a whole word
 	if x_pos + 1 >= 40 and text_data["end_char"] == 1:
+		del(text_data)
 		return True
 
 	elif text_data["end_char"] == 1 or dots:
 		# Acquire the next location
 		x_pos = next(generate_x)
-		# Enter data for a space character
-
 		if dots:
-			# Adds "..." character in case tweet is cut short.
+			# Add "..." character when necessary
 			text_data["letter"] = "dots"
 			text_data["index"] =  total_twits
 			
-			character = Tweeter(g_settings, screen, text_data=text_data)
+			character = Tweeter(g_settings, screen, \
+								text_data=text_data)
 			give_twit_dimension(character, x_pos, row)
+			# Update globals
 			twits.add(character)
 			twits_list.append(total_twits - 1)
 			total_twits += 1
+		
+		# GC
+		del(text_data)
 			
 		return False
 	else:
 		# If the character created is not last in the word
+		del(text_data)
 		return False
 	# 'Til next time
-	del(text_data)
+	
 
 ### ### ### ### ### ### ### ### Twit Placement ### ### ### ### ### ### ### ### 
 
@@ -425,7 +436,9 @@ def check_twit_edges(g_settings, twits):
 
 def change_army_direction(g_settings, twits, twit_id):
 
-	for twit in twits.sprites():
+	for i, twit in enumerate(twits.sprites()):
+		if twit.power:
+			print("{} has powerup".format(i))
 		# Space Buffer
 		if twit.twit_id == twit_id:
 

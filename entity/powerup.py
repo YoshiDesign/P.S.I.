@@ -1,19 +1,12 @@
+import os
 import pygame
-from random import randint
+from pygame.sprite import Sprite
 
-class Powerups():
+
+class Powerup(Sprite):
 
 	def __init__(self, g_settings):
-
+		super(Powerup, self).__init__()
 		self.g_settings = g_settings
 		
-		
-
-
-	def spawn_powerup(self, twit):
-
-		if not randint(1,11) % 3:
-
-			return True
-		else:
-			return False
+	
