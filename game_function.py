@@ -453,9 +453,7 @@ def update_twits(g_settings, screen, stats, ship, \
 	global all_tweets
 
 	if test != len(twits.sprites()):
-		# Constant list of all sprites, prints list if twits are created or destroyed
-		# print("ALL SPRITES == {}".format(len(twits.sprites())))
-		print("ALL_TWEETS == {}".format(len(all_tweets)))
+		# DEBUGGING print tweets here
 		test = len(twits.sprites())
 
 	active_ids = []
@@ -492,11 +490,12 @@ def check_twit_bottom(g_settings, stats, scores, screen, \
 	for twit in twits.sprites():
 
 		# Sprites in update_bullets() This might be useless <-- search "useless" to find all
-		if twit.rect.bottom >= screen_rect.bottom \
-		and not twit.letter == "space":
+		if twit.rect.bottom >= screen_rect.bottom:
 
+			# Ya dead
 			ship_hit(g_settings, screen, stats, ship, \
 						twits, scores, bullets, bottom=1)
+			# If 1 hits bttm
 			break
 
 def ship_hit(g_settings, screen, stats, ship, \
@@ -751,13 +750,10 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 			print("TWIT == {}".format(twit))
 			#for i in twits: since it's a weird container type returned by groupcollide
 			for i in twit:
-				print("I == {}".format(i))
+				print("I == {}".format(i.power))
+		
+				# explode.explode(g_settings, screen, twit)
 
-				# spaces were removed about 15 lines up, this might be useless
-				
-				explode = Explosion(g_settings, screen, i)
-				explode.explode()
-				del(explode)
 				twits_list.remove(int(i.index))
 				total_twits -= 1
 					# print("TWIT UPDATE {}\n{}\n\n".format(total_twits, twits_list))

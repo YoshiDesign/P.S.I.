@@ -9,6 +9,7 @@ from pygame_textinput import TextInput
 from tools.spritesheet import Spritesheet as sheet
 from tools.statistic import Stats
 from settings import Settings
+from entity.explosion import Explosion
 from entity.powerup import Powerup
 from entity.buttons import Button
 from entity.reticle import Reticle
@@ -39,6 +40,7 @@ def Main():
 	powerup = Powerup(g_settings)
 	twits = Group()
 	bullets = Group()
+	# explode = Explosion(g_settings, screen)
 
 	clock = pygame.time.Clock()
 	FPS = 22
