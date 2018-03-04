@@ -547,6 +547,8 @@ def ship_hit(g_settings, screen, stats, ship, powerups, \
 		bullets.empty()
 		ship.center_ship()
 		powerups.empty()
+		g_settings.init_dynamic_settings()
+		ship.power_up()
 
 	else:
 		end_game(g_settings, screen, stats, ship, powerups, \
@@ -809,9 +811,13 @@ def loading_wheel(screen, i, reticle, colors):
 		pygame.draw.aaline(screen, colors[i%2], [120, 560], [0, 380], True)
 		pygame.draw.aaline(screen, colors[i%2], [1080, 560], [1200, 380], True)
 
-	else:
+	elif i < 399:
 		pygame.draw.aaline(screen, colors[i%2], [40, 560], [0, 350], True)
 		pygame.draw.aaline(screen, colors[i%2], [1160, 560], [1200, 350], True)
+	else:
+		pygame.draw.aaline(screen, colors[i%2], [1, 560], [0, 350], True)
+		pygame.draw.aaline(screen, colors[i%2], [1199, 560], [1200, 350], True)
+
 
 	
 

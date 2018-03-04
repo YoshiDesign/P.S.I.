@@ -78,7 +78,6 @@ class Ship(Sprite):
 		""" Anything that can be powered up """
 		# Ship
 		# OPT could use map, but values differ...moot
-
 		self.ship_speed_right = 5.0 * self.g_settings.ship_speed
 		self.ship_speed_up = 3.0 * self.g_settings.ship_speed
 		self.ship_speed_down = 1.8 * self.g_settings.ship_speed
