@@ -10,7 +10,6 @@ from tools.spritesheet import Spritesheet as sheet
 from tools.statistic import Stats
 from settings import Settings
 from entity.explosion import Explosion
-from entity.powerup import Powerup
 from entity.buttons import Button
 from entity.reticle import Reticle
 from entity.alien import Alien
@@ -37,7 +36,7 @@ def Main():
 	textbox = TextInput()
 	aliens = Alien(screen, g_settings)
 	scores = Score(g_settings, screen, stats, ship)
-	powerup = Powerup(g_settings)
+	powerups = Group()
 	twits = Group()
 	bullets = Group()
 	# explode = Explosion(g_settings, screen)
@@ -66,7 +65,7 @@ def Main():
 		
 		clock.tick(FPS)
 		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-									twits, bullets, stats, scores, buttons)
+									twits, powerups, bullets, stats, scores, buttons)
 
 
 		if stats.game_active == True:
@@ -74,8 +73,8 @@ def Main():
 			gf.check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits, bullets)
 			if stats._current_screen == 3:
 				gf.update_bullets(g_settings, screen, stats, ship, \
-								scores, bullets, powerup, twits=twits)
-				gf.update_twits(g_settings, screen, stats, ship, \
+								scores, bullets, powerups, twits=twits)
+				gf.update_twits(g_settings, screen, stats, ship, powerups,\
 											twits, scores, bullets)
 
 		else:

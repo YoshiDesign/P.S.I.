@@ -85,6 +85,7 @@ class Stats():
 		self.score = 0
 		self.level = 1
 		# finally
+		
 		self.g_settings.init_dynamic_settings()
 		
 	def game_over_net(self):

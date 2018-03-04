@@ -18,8 +18,11 @@ class Tweeter(Sprite):
 		self.letter = text_data["letter"]
 		self.sentiment = text_data["sentiment"]
 		self.twit_id = text_data["twit_id"]
+		# Index within current characters on screen in order
 		self.index = text_data["index"]
+		print("INDEX == {}".format(self.index))
 		self.twit_direction = 1
+		self.health = g_settings.twit_hp
 		self.power = 0
 
 		# Determine Letter_Image to display
@@ -45,7 +48,7 @@ class Tweeter(Sprite):
 		self.image = pygame.image.load(os.fsdecode(self.filepath))
 		self.rect = self.image.get_rect()
 
-		# Spacial props
+		# Spacial props // x and y are modified in gf.give_twit_dimension
 		self.rect.y = self.rect.height
 		self.rect.x = self.rect.width
 		self.char_spacing = self.g_settings.char_spacing
@@ -64,9 +67,9 @@ class Tweeter(Sprite):
 
 	def update(self):
 		# Movement
-		if not self.letter == "space":
-			self.x += (self.g_settings.twit_speed * self.twit_direction)
-			self.rect.x = self.x
+		
+		self.x += (self.g_settings.twit_speed * self.twit_direction)
+		self.rect.x = self.x
 
 	def blitme(self, screen):
 	 	self.screen.blit(self.image, self.rect)

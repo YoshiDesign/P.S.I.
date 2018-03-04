@@ -941,6 +941,7 @@ defiantly
 deficiencies
 deficiency
 deficient
+deficit
 defile
 defiler
 deform
@@ -3068,6 +3069,7 @@ negation
 negative
 negatives
 negativity
+negatory
 neglect
 neglected
 negligence
@@ -3334,6 +3336,7 @@ petrified
 petrify
 pettifog
 petty
+phallic
 phobia
 phobic
 phony
@@ -3392,6 +3395,8 @@ poor
 poorer
 poorest
 poorly
+pornographic
+posh
 posturing
 pout
 poverty
@@ -3465,6 +3470,9 @@ punk
 puny
 puppet
 puppets
+pushover
+puss
+pussy
 puzzled
 puzzlement
 puzzling
@@ -4274,6 +4282,9 @@ tauntingly
 taunts
 taut
 tawdry
+tax
+taxed
+taxes
 taxing
 tease
 teasingly
@@ -4754,8 +4765,6 @@ wariness
 warlike
 warned
 warning
-warp
-warped
 wary
 washed-out
 waste

@@ -10,7 +10,8 @@ class Settings():
 		
 		self.screen_width = 1200
 		self.screen_height = 800
-		# Load Image / sprites
+		# Load Image / sprites. Keep fsencode / fsdecode plz. 
+		# It will help when unicode becomes a thing
 		self.f1 = os.fsencode("media/BackMain.jpg")
 		self.f2 = os.fsencode("media/BackUsr.jpg")
 		self.f3 = os.fsencode("media/BackPwd.jpg")
@@ -37,8 +38,8 @@ class Settings():
 		self.speed_mult = 1.2
 		
 		# Bullets
-		self.bullet_speed = 15
-		self.bullet_length = 3
+		self.bullet_speed = 25
+		self.bullet_length = 5
 		self.bullet_width = 110
 		self.bullet_color = (255,255,190)
 		# Lazers
@@ -62,7 +63,7 @@ class Settings():
 		self.init_dynamic_settings()
 		
 	def init_dynamic_settings(self):
-
+		""" Anything that changes and isnt a power up"""
 		# Twits
 		self.twit_direction = 1
 		self.twit_speed = 4
@@ -73,23 +74,18 @@ class Settings():
 		self.twit_id = 0
 		# Lives
 		self.ship_limit = 1
-
-		# Ship
-		self.ship_speed_right = 5.0
-		self.ship_speed_up = 3.0
-		self.ship_speed_down = 1.8
-		self.ship_speed_left = 5.0
+		self.ship_speed = 1
 
 		# Aliens (Offline twit mode)
 		self.alien_speed = 1
 		
 		# Damage Grades
 		self.bomb_dmg = 2
-		self.lazer_dmg = 1
+		self.lazer_dmg = 1.5
 		self.bullet_dmg = 1
 
-		print("DYNAMIC SETTINGS \nLIVES {}\nSHIP LEFT = {}"\
-			"\nSHIP RIGHT = {}\nSHIP LIMIT = {}".format(self.ship_limit, self.ship_speed_left, self.ship_speed_right, self.ship_limit))
+		# Pwr-up attribs
+		self.pwr_drop_rate = 2
 
 		# Movement Flags
 		self.move_right = False
@@ -99,6 +95,8 @@ class Settings():
 		self.turn_right = False
 		self.move_up = False
 		self.move_down = False
+
+	
 
 	def change_reticle(self, reticle):
 		pass 
