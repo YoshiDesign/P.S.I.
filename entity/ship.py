@@ -17,7 +17,7 @@ class Ship(Sprite):
 		self.stats = stats
 		self.screen_rect = screen.get_rect()
 
-		self.fp = os.fsencode("spritesheets/shipsheet.png")
+		self.fp = os.fsencode("media/spritesheets/shipsheet.png")
 		self.sheet = Spritesheet(self.fp, 4, 1)
 		# Used for life counter
 		self.index = 0

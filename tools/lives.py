@@ -8,7 +8,7 @@ class Life(Sprite):
 
 		super(Life, self).__init__()
 
-		self.life = os.fsencode("sprites/ship/shiplife.png")
+		self.life = os.fsencode("media/sprites/ship/shiplife.png")
 		self.image = pygame.image.load(os.fsdecode(self.life))
 		self.screen = screen
 		self.screen_rect = self.screen.get_rect()

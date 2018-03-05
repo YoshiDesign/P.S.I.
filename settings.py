@@ -27,15 +27,13 @@ class Settings():
 		self.background4 = pygame.image.load(os.fsdecode(self.f4))
 		self.background5 = pygame.image.load(os.fsdecode(self.f5))
 
-
 		# We are only tracking ONE rect during any background display
 		self.background_rect = self.background1.get_rect()
 		
 		
-		# score multiplier
-		self.score_mult = 1.25
+		# Static Multipliers
 		self.damage_mult = 1.4
-		self.speed_mult = 1.2
+		self.speed_mult = 1.15
 		
 		# Bullets
 		self.bullet_speed = 25
@@ -56,7 +54,7 @@ class Settings():
 		self.char_width = 20
 		self.char_height = 24
 		self.char_spacing = 1
-		self.twit_drop_speed = 80
+		self.twit_drop_speed = 65
 		self.twit_points = 10
 
 		# Create dynamic settings
@@ -68,9 +66,11 @@ class Settings():
 		self.twit_direction = 1
 		self.twit_speed = 4
 		self.twit_hp = 2
-		self.score_multiplier = 1.48
 
-		# Enumerates whole twits so they shift directions independently
+		# Dynamic multipliers
+		self.score_multiplier = 1.00
+
+		# All twits in a tweet have the same id
 		self.twit_id = 0
 		# Lives
 		self.ship_limit = 1

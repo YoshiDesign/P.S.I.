@@ -5,15 +5,22 @@ from pygame.sprite import Sprite
 
 class Powerup(Sprite):
 
-	def __init__(self, g_settings, screen, twit):
+	def __init__(self, g_settings, screen, pwr, twit):
 		super(Powerup, self).__init__()
 		self.g_settings = g_settings
 		self.screen = screen
 
 		# type of power up determined by ID assigned to the twit
 		self.power = twit.power
+		
+		self.fp = os.fsencode(str("media/sprites/powers/powerup1a.png"))
+		# if pwr == 2:
 
-		self.fp = os.fsencode(str("sprites/powers/powerup1a.png"))
+		# if pwr == 3:
+
+		# if pwr == 4:
+
+		# if pwr == 5:
 
 		self.image = pygame.image.load(os.fsdecode(self.fp))
 		self.rect = self.image.get_rect()

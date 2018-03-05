@@ -86,6 +86,7 @@ class Score():
 
 		self.stats.reset_all()
 		self.ship.center_ship()
+		self.ship.power_up()
 		self.prep_ships()
 
 		if mode:

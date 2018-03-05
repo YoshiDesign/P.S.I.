@@ -1,3 +1,10 @@
+""" 
+	OPTS:
+	lives - does not need its own module
+
+""" 
+
+
 import sys
 import pygame
 from pygame.sprite import Group

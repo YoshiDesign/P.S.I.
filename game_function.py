@@ -20,9 +20,9 @@ from entity.tweeter import Tweeter
 
 # unused currently
 _offline = False
-# Live count of active letters
+# This is the number of twits just blitted to the screen
 total_twits = 0
-# List of literal indices
+# List of literal indices i.e. [1,3] means we killed 0 and 2 ...
 twits_list = []
 # List of full tweets
 all_tweets = []
@@ -216,19 +216,21 @@ def end_game(g_settings, screen, stats, ship, powerups, twits, bullets, scores, 
 	###
 
 
-	
+	# Maybe I could reset globals at game start they could be used for score tracking
 
 	total_twits = 0
 	twits_list = []
 	all_tweets = []
+
 
 	bullets.empty()
 	twits.empty()
 	powerups.empty()
 	get_high_score(stats, scores)
 	stats.reset_all()
-
 	scores.prep_score()
+
+	del(ship)
 	
 	stats.game_active = False
 	# Flagged == User is logged in
@@ -259,7 +261,10 @@ def create_army(g_settings, screen, twits, all_tweets, \
 	global twit_list
 	global total_twits
 
+	print("CREATING ARMY")
+
 	re_palphaNum = r"^[a-zA-Z0-9'\"]+$"
+	total_twits = 0
 	dots 		= 0
 	end_char 	= 0
 	power 		= 0
@@ -346,7 +351,7 @@ def create_army(g_settings, screen, twits, all_tweets, \
 		# Logical Grouping of all twits in a tweet
 
 	row = next(generate_y)
-	total_twits = 0
+	
 	if len(all_tweets) >= 2:
 		# Destroy the first 2 tweets
 		x = all_tweets.pop(0)
@@ -371,6 +376,8 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 	global total_twits
 	global twits_list
 
+	print("TOTAL TWITS {}".format(total_twits))
+	print("TWITS LIST {}".format(twits_list))
 	x_pos = next(generate_x)
 	# Is holding power up?
 	power = 0
@@ -469,7 +476,8 @@ def change_army_direction(g_settings, twits, twit_id):
 
 	for i, twit in enumerate(twits.sprites()):
 		if twit.power:
-			print("{} has powerup {}".format(i, twit.power))
+			pass
+			#print("{} has powerup {}".format(i, twit.power))
 		# Space Buffer
 		if twit.twit_id == twit_id:
 
@@ -489,6 +497,8 @@ def update_twits(g_settings, screen, stats, ship, \
 
 	if test != len(twits.sprites()):
 		# DEBUGGING print tweets here
+		print("ALL TWEETS {}".format(all_tweets))
+		print("=============================")
 		test = len(twits.sprites())
 
 	twits.update()
@@ -542,11 +552,16 @@ def ship_hit(g_settings, screen, stats, ship, powerups, \
 	if stats.ships_left > 0:
 		if bottom:
 			reset_army(screen, twits)
+		else:
+			ship.center_ship()
+
+		# CLEAN THIS UP
+
 		stats.ships_left -= 1
 		scores.prep_ships()
 		bullets.empty()
-		ship.center_ship()
 		powerups.empty()
+		# Combination if init_dyn and ship.power_up will reset the ship.
 		g_settings.init_dynamic_settings()
 		ship.power_up()
 
@@ -563,7 +578,7 @@ def get_high_score(stats, scores):
 		scores.prep_high_score()
 	return 0
 
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
+### ### ### ### ### ### ### ### ### I AM A CLASS ### ### ### ### ### ### ###
 
 def send_data_TEST(name, q, url=0, hash='', u_name='', flag=0):
 	""" 
@@ -639,22 +654,21 @@ def get_infoz(g_settings, screen, twits,\
 										kwargs={'flag':0, 'url':0, 'hash':'', 'u_name':''}, \
 																				daemon=None)
 				tweet_bot.start()
-				i = 0
-				# Loading ...
 
+				i = 0
+				# Loading Animation...
 				while tweet_bot.is_alive():
+					# OPT 
 					i += 1
 					colors = [((0), (255 - (i % 200)), (255 - (i % 200))), \
 								((255 - (i % 200)), (0), (255 - (i % 200)))]
-
-					print('loading')
 
 					loading_wheel(screen, i, reticle, colors)
 
 					if i == 400:
 						i = 0
 
-				del(i)
+				# Proc return
 				tweet_bot.join()
 
 				# The meat n' potatoes
@@ -666,19 +680,18 @@ def get_infoz(g_settings, screen, twits,\
 				"{}".format(sys.exc_info()[:-1]))
 				# ErrID
 				return 11
-
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 			if user_tweets:
-				# nothing is sacred
+				# nothing is sacred ...
 				global all_tweets
-				# If Twitter API responds
-				# Get (probably) POSIX paths to txt files
+				# If Twitter API respond, load sentiment files
 				positive = os.path.join(sys.path[0], \
 						"sentiments/positive-words.txt")
 				negative = os.path.join(sys.path[0], \
 						"sentiments/negative-words.txt")
 				analyzer = Analyzer(positive, negative, stats)
 
-				# Not 100% sure why I enumerated this.
+				# Not 100% sure why I enumerated this. But I could possibly implement it in analyze?
 				for i, tweet in enumerate(user_tweets):
 					"""
 						Tweets are stored in a list as the analysis occurs.
@@ -689,18 +702,19 @@ def get_infoz(g_settings, screen, twits,\
 
 				# Begin Game
 				create_army(g_settings, screen, twits, all_tweets)
+				# Need, or else textbox gets sticky, srsly
 				textbox.reset()
 				scores.start_game(mode=1, handle=handle)
 				
 				return True
 
-			# Secondary Error catch should we somehow bypass an erroneous server response
+			# Secondary Error catch
 			else:
 				
 				print("Could not receive tweets from server")
 				# BLIT MSG TO SCREEN, "Play offline instead? Y/N"
 				""" THIS IS WHERE WE BEGIN AN OFFLINE GAME """
-				return False
+				return 13
 		else:
 			# Display our text input field based on cur_scrn
 			screen.blit(textbox.get_surface(), \
@@ -777,7 +791,6 @@ def get_infoz(g_settings, screen, twits,\
 		
 		return False
 
-
 def loading_wheel(screen, i, reticle, colors):
 	""" PEP8 Pride """
 	mousex, mousey = pygame.mouse.get_pos()
@@ -790,40 +803,28 @@ def loading_wheel(screen, i, reticle, colors):
 	elif i < 100:
 		pygame.draw.aaline(screen, colors[i%2], [520, 560], [0, 520], True)
 		pygame.draw.aaline(screen, colors[i%2], [680, 560], [1200, 520], True)
-
 	elif i < 150:
 		pygame.draw.aaline(screen, colors[i%2], [440, 560], [0, 490], True)
 		pygame.draw.aaline(screen, colors[i%2], [760, 560], [1200, 490], True)
-
 	elif i < 200:
 		pygame.draw.aaline(screen, colors[i%2], [360, 560], [0, 460], True)
 		pygame.draw.aaline(screen, colors[i%2], [840, 560], [1200, 460], True)
-
 	elif i < 250:
 		pygame.draw.aaline(screen, colors[i%2], [280, 560], [0, 430], True)
 		pygame.draw.aaline(screen, colors[i%2], [920, 560], [1200, 430], True)
-
 	elif i < 300:
 		pygame.draw.aaline(screen, colors[i%2], [200, 560], [0, 410], True)
 		pygame.draw.aaline(screen, colors[i%2], [1000, 560], [1200, 410], True)
-
 	elif i < 350:
 		pygame.draw.aaline(screen, colors[i%2], [120, 560], [0, 380], True)
 		pygame.draw.aaline(screen, colors[i%2], [1080, 560], [1200, 380], True)
-
 	elif i < 399:
 		pygame.draw.aaline(screen, colors[i%2], [40, 560], [0, 350], True)
 		pygame.draw.aaline(screen, colors[i%2], [1160, 560], [1200, 350], True)
 	else:
 		pygame.draw.aaline(screen, colors[i%2], [1, 560], [0, 350], True)
 		pygame.draw.aaline(screen, colors[i%2], [1199, 560], [1200, 350], True)
-
-
-	
-
-
-
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 def fire_bullets(g_settings, screen, ship, bullets):
 	if len(bullets) < 40:
 		# Make bullets
@@ -844,7 +845,7 @@ def check_kills(g_settings, screen, stats, bullets, members, twits, powerups):
 		if twit.health == 0:
 			if twit.power:
 				# Spawn any powerups
-				print("I HAVE THE POWAH {}".format(twit.power))
+				# print("I HAVE THE POWAH {}".format(twit.power))
 				spawn_powerup(g_settings, screen, powerups, twit)
 
 			# Delets from screen & Sprite Group
@@ -852,8 +853,10 @@ def check_kills(g_settings, screen, stats, bullets, members, twits, powerups):
 			# Update globals
 			dead_twits += 1
 			twits_list.remove(int(twit.index))
+			print("TWIT DOWN!! {}".format(twits_list))
 
-	total_twits -= dead_twits
+	print("TOTAL TWITS {}".format(total_twits))
+	print("DEAD {}".format(dead_twits))
 	stats.score += g_settings.twit_points * dead_twits
 
 	return True 

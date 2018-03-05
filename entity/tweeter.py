@@ -27,19 +27,16 @@ class Tweeter(Sprite):
 
 		# Determine Letter_Image to display
 		if self.letter == "dots":
-
-			self.filepath = os.fsencode(str("sprites/characters/ddd.png"))
+			self.filepath = os.fsencode(str("media/sprites/characters/ddd.png"))
 
 		elif self.letter.isdigit():
-
-			self.filepath = os.fsencode(str("sprites/characters/" + \
+			self.filepath = os.fsencode(str("media/sprites/characters/" + \
 							"good" + str(self.letter) + ".png"))
 		elif self.sentiment == 1:
-
-			self.filepath = os.fsencode(str("sprites/characters/" + \
+			self.filepath = os.fsencode(str("media/sprites/characters/" + \
 							"good" + str(self.letter.upper()) + ".png"))
 		else:
-			self.filepath = os.fsencode(str("sprites/characters/" + \
+			self.filepath = os.fsencode(str("media/sprites/characters/" + \
 							"bad" + str(self.letter.upper()) + ".png"))
 
 		self.g_settings = g_settings
@@ -53,6 +50,12 @@ class Tweeter(Sprite):
 		self.rect.x = self.rect.width
 		self.char_spacing = self.g_settings.char_spacing
 		self.x = float(self.rect.x)
+
+	@staticmethod
+	def powerup(cls):
+		g_settings.twit_hp += 0.30
+		g_settings.twit_speed += 2
+
 
 	def check_edges(self):
 		# True if touching
