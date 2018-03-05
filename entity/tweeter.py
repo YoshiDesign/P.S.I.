@@ -18,9 +18,9 @@ class Tweeter(Sprite):
 		self.letter = text_data["letter"]
 		self.sentiment = text_data["sentiment"]
 		self.twit_id = text_data["twit_id"]
+		print("MY ID {}".format(self.twit_id))
 		# Index within current characters on screen in order
 		self.index = text_data["index"]
-		print("INDEX == {}".format(self.index))
 		self.twit_direction = 1
 		self.health = g_settings.twit_hp
 		self.power = 0

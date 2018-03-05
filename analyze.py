@@ -15,10 +15,12 @@ class Analyzer():
 
 
     def __init__(self, positive, negative, stats):
-        """Initialize Analyzer."""
+
         # This will store 2 lists / all_p and all_n words
         self.dict_words = {"pos" : [], "neg" : []}
+
         self.tokenizer = TweetTokenizer()
+
         #Building all_words dictionary
         with open(positive, "r") as fp:
             try:
@@ -28,9 +30,11 @@ class Analyzer():
             except RuntimeError:
                 self.f_Err = 1
                 stats.game_active = False
+
         """ 
             If game_active && f_Err -> start other game, perhaps
         """
+
         with open(negative, "r") as fp:
             try:
                 for item in fp:
@@ -44,7 +48,6 @@ class Analyzer():
         #self.words = []
         self.pResult = []
         self.nResult = []
-    
 
     def analyze(self, tweet):
         """ Sentiment Analyzer """

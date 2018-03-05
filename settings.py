@@ -10,8 +10,8 @@ class Settings():
 		
 		self.screen_width = 1200
 		self.screen_height = 800
-		# Load Image / sprites. Keep fsencode / fsdecode plz. 
-		# It will help when unicode becomes a thing
+
+		# Load Image / sprites. 
 		self.f1 = os.fsencode("media/BackMain.jpg")
 		self.f2 = os.fsencode("media/BackUsr.jpg")
 		self.f3 = os.fsencode("media/BackPwd.jpg")
@@ -19,17 +19,16 @@ class Settings():
 		self.f5 = os.fsencode("media/BackMain2.jpg")
 		# self.f5 = os.fsencode("media")
 
-		# SLOW DOWN? If the game slow down, make loading the bg a dynamic init
-		# SEPARATE from the dynamic init properties of game elements
+		# If the game slows down, make loading the bg a dynamic init,
+		# SEPARATE from the dynamic init properties of game elements. Make sure it only happens once
 		self.background1 = pygame.image.load(os.fsdecode(self.f1))
 		self.background2 = pygame.image.load(os.fsdecode(self.f2))
 		self.background3 = pygame.image.load(os.fsdecode(self.f3))
 		self.background4 = pygame.image.load(os.fsdecode(self.f4))
 		self.background5 = pygame.image.load(os.fsdecode(self.f5))
 
-		# We are only tracking ONE rect during any background display
+		# Any of the bg's will do for tracking
 		self.background_rect = self.background1.get_rect()
-		
 		
 		# Static Multipliers
 		self.damage_mult = 1.4
@@ -40,16 +39,11 @@ class Settings():
 		self.bullet_length = 5
 		self.bullet_width = 110
 		self.bullet_color = (255,255,190)
+
 		# Lazers
 		self.lazer_color = (255,255,190)
 		self.lazer_width = 3
 		
-		# Bombs
-		#self.bomb = pygame.image.load("")
-		
-		# Reticles
-		#self.Lazer_ret = 
-
 		# Twitter stuff. Twit = A single letter of a tweet
 		self.char_width = 20
 		self.char_height = 24
@@ -62,27 +56,27 @@ class Settings():
 		
 	def init_dynamic_settings(self):
 		""" Anything that changes and isnt a power up"""
+
+		# what
+		self.is_Trump = False
 		# Twits
 		self.twit_direction = 1
 		self.twit_speed = 4
-		self.twit_hp = 2
+		self.twit_hp = 100
+		# All twits in a single tweet have a unique id starting @ 1
+		self.twit_id = 0
 
 		# Dynamic multipliers
-		self.score_multiplier = 1.00
+		self.score_multi = 1.00
 
-		# All twits in a tweet have the same id
-		self.twit_id = 0
 		# Lives
 		self.ship_limit = 1
 		self.ship_speed = 1
 
-		# Aliens (Offline twit mode)
-		self.alien_speed = 1
-		
 		# Damage Grades
-		self.bomb_dmg = 2
-		self.lazer_dmg = 1.5
-		self.bullet_dmg = 1
+		self.bomb_dmg = 200
+		self.lazer_dmg = 50
+		self.bullet_dmg = 100
 
 		# Pwr-up attribs
 		self.pwr_drop_rate = 2
@@ -96,10 +90,8 @@ class Settings():
 		self.move_up = False
 		self.move_down = False
 
-	
-
 	def change_reticle(self, reticle):
-		pass 
+		pass
 		
 	def load_background(self, screen, display=0):
 		""" 
@@ -108,7 +100,7 @@ class Settings():
 			display 2 : Password
 			display 3 : In-Game
 			display 4 : Main menu Logged In
-			...
+			
 		"""
 		if not display:
 			screen.blit(self.background1, self.background_rect)

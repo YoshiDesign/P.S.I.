@@ -50,8 +50,7 @@ def check_events(g_settings, screen, ship, aliens, stats, \
 			sys.exit()
 		# If textinput.update() == True, user pressed Return
 		elif event.type == pygame.MOUSEBUTTONDOWN:
-			print("click, you glorious bitch, CLICK!")
-			
+			pass
 			# mousex, mousey = pygame.mouse.get_pos()
 			
 		elif event.type == pygame.KEYDOWN:
@@ -217,7 +216,7 @@ def end_game(g_settings, screen, stats, ship, powerups, twits, bullets, scores, 
 
 
 	# Maybe I could reset globals at game start they could be used for score tracking
-
+	print("total_twits {}\n twits_list {}\n all_tweets {}\n should be 1".format(total_twits, twits_list, all_tweets))
 	total_twits = 0
 	twits_list = []
 	all_tweets = []
@@ -253,17 +252,18 @@ def reset_army(screen, twits):
 		twit.rect.y = screen_rect.top + (twit.rect.height * y) + 20
 
 def create_army(g_settings, screen, twits, all_tweets, \
-									start=0, act=2):
+										start=0, act=2):
 
 	""" Blit 2 entire tweets to the screen """
 
 	from re import findall
 	global twit_list
 	global total_twits
-
+	print(all_tweets)
 	print("CREATING ARMY")
 
 	re_palphaNum = r"^[a-zA-Z0-9'\"]+$"
+	twit_id 	= 0
 	total_twits = 0
 	dots 		= 0
 	end_char 	= 0
@@ -273,7 +273,9 @@ def create_army(g_settings, screen, twits, all_tweets, \
 	generate_x 	= make_space(available_x)
 	generate_y 	= make_space(available_y)
 	row 		= next(generate_y)
+	# OPT does make sense to include in re_palphaNum then remove it by comparison?
 	punct		= [",","\'","\"",".",":", ";", "?", "!"]
+
 	# Unused. Will need!
 	re_unicode	= r"[^\u0000-\u007F]"
 
@@ -282,6 +284,8 @@ def create_army(g_settings, screen, twits, all_tweets, \
 					this supports dynamic twit allocation
 	"""
 
+	# OPT a better parsing method : for x in [i for i in tweet if i != re_palphaNum]
+
 	# ROW is now 0
 	for tweet in all_tweets[start:act]:
 
@@ -289,20 +293,19 @@ def create_army(g_settings, screen, twits, all_tweets, \
 		if "RT" in tweet or "rt" in tweet:
 			continue
 
+		# Assigns an ID unique to the whole tweet
+		twit_id = twit_id + 1
 
-		g_settings.twit_id += 1
-		twit_id = g_settings.twit_id
-
-		# That strange edge-case
+		# That strange edgecase
 		if "..." in tweet:
 			tweet.remove("...")
-		# Trust me on this
+		# Almost bubble sort
 		tweet.append("...")
 
-		# print("TWEET {}".format(tweet))
+		# Separate words
 		for word in tweet:
 			word = word.lower()
-			# Handles a particular malformation
+			# Handles malformation
 			if word == "...":
 				word = "."
 				dots = 1
@@ -324,16 +327,15 @@ def create_army(g_settings, screen, twits, all_tweets, \
 					if letter in punct:
 						continue
 					# Find if last letter
-					if n == len(word) - 1:
+					if n == len(word) - 1 or dots:
 						end_char = 1
 					else:
 						end_char = 0
 					# Determines if carrying powerup			
 					try:
-						# Returns True if we just made the last c
+						# Returns True if we just made the last char
 						make = assign_twit(g_settings, screen, twits, letter, sentiment, \
-													end_char, generate_x, row, twit_id, \
-																			dots=dots)
+													end_char, generate_x, row, twit_id)
 
 						if make or dots: # (Is the last char and >= position 40)
 							# Carriage return + newline
@@ -353,6 +355,7 @@ def create_army(g_settings, screen, twits, all_tweets, \
 	row = next(generate_y)
 	
 	if len(all_tweets) >= 2:
+		print("CASE 1")
 		# Destroy the first 2 tweets
 		x = all_tweets.pop(0)
 		x = all_tweets.pop(0)
@@ -360,24 +363,26 @@ def create_army(g_settings, screen, twits, all_tweets, \
 
 	# Pop the last tweet if uneven tweets
 	elif len(all_tweets):
+		print("THERE ARE STILL TWEETS")
 		x = all_tweets.pop(0)
 		x='done!'
 
-	return False
+		print(x)
+
+	return True
 
 def assign_twit(g_settings, screen, twits, letter, sentiment, \
 							end_char, generate_x, row, twit_id, \
 														dots=0):
 	""" 
 		Construct an individual character and its properties to be blasted.
-		'dots' is a result of the Twitter API being handled by the nltk tokenizer 
+		'dots' is a result of the Twitter API being handled by nltk tokenizer
+					Returns True if we should start a newline
 	"""
 	# Defaults
 	global total_twits
 	global twits_list
 
-	print("TOTAL TWITS {}".format(total_twits))
-	print("TWITS LIST {}".format(twits_list))
 	x_pos = next(generate_x)
 	# Is holding power up?
 	power = 0
@@ -391,17 +396,20 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 	# Twit sequence num
 	text_data["index"]		= total_twits
 	# Each twit belongs to a group (id); that being its tweet
-	text_data["twit_id"]	= twit_id
+	text_data["twit_id"]	= int(twit_id)
+	print("===================")
+	print(text_data['twit_id'])
+	print("===================")
 
 	if not dots:
 		
 		character = Tweeter(g_settings, screen, \
 							text_data=text_data)
 		# Determine if carrying powerup
-		x = randint(1,26)
+		x = randint(1,24)
 		if not (x % 5):
 			# DIFFICULTY SETTING
-			character.power = randint(1, 5)
+			character.power = randint(1, 10)
 		else:
 			character.power = 0
 
@@ -419,10 +427,10 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 		del(text_data)
 		return True
 
-	elif text_data["end_char"] == 1 or dots:
+	elif text_data["end_char"] == 1:
 		# Acquire the next location
 		x_pos = next(generate_x)
-		if dots:
+		if letter == ".":
 			# Add "..." character when necessary
 			text_data["letter"] = "dots"
 			text_data["index"] =  total_twits
@@ -467,110 +475,6 @@ def get_rows(g_settings):
 	return avail_space
 ### ### ### ### ### ### ### ### ### Twitter mode Functions ### ### ### ### ### 
 
-def check_twit_edges(g_settings, twits):
-	for twit in twits.sprites():
-		if twit.check_edges():
-			change_army_direction(g_settings, twits, twit.twit_id)
-
-def change_army_direction(g_settings, twits, twit_id):
-
-	for i, twit in enumerate(twits.sprites()):
-		if twit.power:
-			pass
-			#print("{} has powerup {}".format(i, twit.power))
-		# Space Buffer
-		if twit.twit_id == twit_id:
-
-			if twit.rect.x > 600:
-				twit.rect.x -= 15
-			elif twit.rect.x < 600:
-				twit.rect.x += 15
-			twit.rect.y += g_settings.twit_drop_speed
-			twit.twit_direction *= -1
-
-def update_twits(g_settings, screen, stats, ship, \
-			powerups, twits, scores, bullets, init=0):
-	
-	global test
-	global all_tweets
-	# active_ids = []
-
-	if test != len(twits.sprites()):
-		# DEBUGGING print tweets here
-		print("ALL TWEETS {}".format(all_tweets))
-		print("=============================")
-		test = len(twits.sprites())
-
-	twits.update()
-
-	# Check if twits touch edges
-	check_twit_edges(g_settings, twits)
-	if check_twit_bottom(g_settings, stats, scores, screen, \
-										ship, twits, bullets):
-
-		ship_hit(g_settings, screen, stats, ship, powerups,\
-							twits, scores, bullets, bottom=1)
-	
-	# If twits hit the ship
-	if pygame.sprite.spritecollideany(ship, twits):
-		
-		ship_hit(g_settings, screen, stats, ship, powerups, \
-										twits, scores, bullets)
-
-	# DONT NOTICE ME!
-	
-	# DIFFICULTY SETTING -> 5
-	# PROBLEM - this is also activating when we ship_hit due to twit.empty()
-	if len(all_tweets) == 0 and not total_twits:
-		end_game(g_settings, screen, stats, ship, powerups,\
-					twits, bullets, scores, flagged=flagged)
-
-	elif len(twits.sprites()) <= 5 and len(all_tweets) >= 1:
-		# Instantiates the next 2-tweet militia
-		create_army(g_settings, screen, twits, all_tweets)
-
-	return 0
-
-
-### ### ### ### ### ### ### ### ### ### NETWORK ### ### ### ### ### ### ### ###
-
-def check_twit_bottom(g_settings, stats, scores, screen, \
-									ship, twits, bullets):
-	screen_rect = screen.get_rect()
-	for twit in twits.sprites():
-		# Sprites in update_bullets() This might be useless <-- search "useless" to find all
-		if twit.rect.bottom >= screen_rect.bottom:
-			return True
-		else:
-			return False
-
-def ship_hit(g_settings, screen, stats, ship, powerups, \
-						twits, scores, bullets, bottom=0):
-	
-	global flagged
-
-	if stats.ships_left > 0:
-		if bottom:
-			reset_army(screen, twits)
-		else:
-			ship.center_ship()
-
-		# CLEAN THIS UP
-
-		stats.ships_left -= 1
-		scores.prep_ships()
-		bullets.empty()
-		powerups.empty()
-		# Combination if init_dyn and ship.power_up will reset the ship.
-		g_settings.init_dynamic_settings()
-		ship.power_up()
-
-	else:
-		end_game(g_settings, screen, stats, ship, powerups, \
-				twits, bullets, scores, flagged=flagged)
-
-	return 0
-
 def get_high_score(stats, scores):
 	""" Saves the high score """ 
 	if stats.score > stats.high_score:
@@ -611,10 +515,8 @@ def get_infoz(g_settings, screen, twits,\
 		Check user input, get tweets from server, analyze them and begin game.
 		textbox.update() returns True if use presses Enter 
 	"""
-
-
 	mousex, mousey = pygame.mouse.get_pos()
-	print(mousex, mousey)
+	
 	pygame.mouse.set_visible(False)
 	reticle.blitme(mousex, mousey)
 	
@@ -633,8 +535,7 @@ def get_infoz(g_settings, screen, twits,\
 		and mousex < 690 and mousey < 452:
 			# Attack
 			buttons[2].create_button()
-		""" 			In Main Menu					"""
-        
+		""" 			In Main Menu			"""
        
 		if textbox.update(events, stats, textbox, \
 							scores, buttons, mousex, mousey, \
@@ -642,6 +543,10 @@ def get_infoz(g_settings, screen, twits,\
 		
 			# handle is the user's input
 			handle = textbox.get_text()
+
+			if handle == "realdonaldtrump" or "@realdonaldtrump":
+				g_settings.is_Trump = True
+
 			if not handle or handle == "":
 				return False
 			
@@ -680,7 +585,9 @@ def get_infoz(g_settings, screen, twits,\
 				"{}".format(sys.exc_info()[:-1]))
 				# ErrID
 				return 11
+
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+
 			if user_tweets:
 				# nothing is sacred ...
 				global all_tweets
@@ -694,6 +601,7 @@ def get_infoz(g_settings, screen, twits,\
 				# Not 100% sure why I enumerated this. But I could possibly implement it in analyze?
 				for i, tweet in enumerate(user_tweets):
 					"""
+
 						Tweets are stored in a list as the analysis occurs.
 								all_tweets_tweets looks like:
 						[["This", "is", "tweet", "one", "!"],["and", "two"]...etc]
@@ -710,8 +618,9 @@ def get_infoz(g_settings, screen, twits,\
 
 			# Secondary Error catch
 			else:
-				
+				# Otherwise catch bad input
 				print("Could not receive tweets from server")
+				textbox.reset()
 				# BLIT MSG TO SCREEN, "Play offline instead? Y/N"
 				""" THIS IS WHERE WE BEGIN AN OFFLINE GAME """
 				return 13
@@ -725,6 +634,7 @@ def get_infoz(g_settings, screen, twits,\
 		global names
 
 		""" 			In Username Menu			"""
+		# OPT for readability a function could position our elements per page
 
 		# Username Screen
 		if mousex > 530 and mousey > 300:
@@ -752,6 +662,7 @@ def get_infoz(g_settings, screen, twits,\
 		global flagged
 		
 		""" 			In Password Menu			"""
+
 		if mousex > 530 and mousey > 300:
 			buttons[4].create_button()
 		if textbox.update(events, stats, textbox, \
@@ -824,15 +735,144 @@ def loading_wheel(screen, i, reticle, colors):
 	else:
 		pygame.draw.aaline(screen, colors[i%2], [1, 560], [0, 350], True)
 		pygame.draw.aaline(screen, colors[i%2], [1199, 560], [1200, 350], True)
+
+
+def check_twit_edges(g_settings, twits):
+	for twit in twits.sprites():
+
+		if twit.check_edges():
+			# Move these twits only
+			move = twit.twit_id
+			move_group = [t for t in twits.sprites() if t.twit_id == move]
+			change_army_direction(g_settings, move_group)
+
+def change_army_direction(g_settings, move_group):
+
+	for i, twit in enumerate(move_group):
+
+		if twit.rect.x > 600:
+			# Edge buffer
+			twit.rect.x -= 20
+
+		elif twit.rect.x < 600:
+			# Edge buffer
+			twit.rect.x += 25
+
+		twit.twit_direction *= -1
+		twit.rect.y += g_settings.twit_drop_speed
+
+	return 0
+
+
+
+### ### ### ### ### ### ### ### ### ### NETWORK ### ### ### ### ### ### ### ###
+
+def check_twit_bottom(g_settings, stats, scores, screen, \
+
+									ship, twits, bullets):
+	screen_rect = screen.get_rect()
+	for twit in twits.sprites():
+		# Sprites in update_bullets() This might be useless <-- search "useless" to find all
+		if twit.rect.bottom >= screen_rect.bottom:
+			print("TOUCHING BOTTOM")
+			twits.remove(twit)
+			return True
+		else:
+			return False
+
+def update_twits(g_settings, screen, stats, ship, \
+					powerups, twits, scores, bullets):
+	
+	global test
+	global all_tweets
+	# active_ids = []
+
+	if test != len(twits.sprites()):
+		# DEBUGGING print tweets here
+		#print("ALL TWEETS {}".format(all_tweets))
+		print("=============================")
+		test = len(twits.sprites())
+
+	twits.update()
+
+	# Check if twits touch edges
+	check_twit_edges(g_settings, twits)
+
+	if check_twit_bottom(g_settings, stats, scores, screen, \
+										ship, twits, bullets):
+
+		ship_hit(g_settings, screen, stats, ship, powerups,\
+							twits, scores, bullets, bottom=1)
+	
+	# If twits hit the ship
+	if pygame.sprite.spritecollideany(ship, twits):
+		
+		ship_hit(g_settings, screen, stats, ship, powerups, \
+										twits, scores, bullets)
+
+	# DONT NOTICE ME!
+	
+	# DIFFICULTY SETTING -> 5
+
+	if len(all_tweets) <= 1 and len(twits.sprites()) == 0:
+		# REDUNDANT albeit safe
+		end_game(g_settings, screen, stats, ship, powerups,\
+					twits, bullets, scores, flagged=flagged)
+
+	elif len(twits.sprites()) <= 5 and len(all_tweets) > 1:
+		# Instantiates the next 2-tweet militia
+		create_army(g_settings, screen, twits, all_tweets)
+
+	return 0
+
+
+def ship_hit(g_settings, screen, stats, ship, powerups, \
+						twits, scores, bullets, bottom=0):
+	
+	global flagged
+
+	if stats.ships_left > 0:
+		if bottom:
+			reset_army(screen, twits)
+		else:
+			ship.center_ship()
+
+		# CLEAN THIS UP
+
+		stats.ships_left -= 1
+		scores.prep_ships()
+		bullets.empty()
+		powerups.empty()
+		# Combination if init_dyn and ship.power_up will reset the ship.
+		g_settings.init_dynamic_settings()
+		ship.power_up()
+
+	else:
+		end_game(g_settings, screen, stats, ship, powerups, \
+				twits, bullets, scores, flagged=flagged)
+
+	return 0
+
+
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+
 def fire_bullets(g_settings, screen, ship, bullets):
 	if len(bullets) < 40:
-		# Make bullets
-		new_bullet = Bullet(g_settings, screen, ship)
+		""" Pew-pew-pew """
+
+		# Dict is {power : power_level}
+		new_bullet = Bullet(g_settings, screen, ship, powers={} )
 		bullets.add(new_bullet)
 		return 0
 	else:
 		return False
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+
+def spawn_powerup(g_settings, screen, powerups, the_pwr, the_pos):
+	""" Create Powerups """
+	new_power = Powerup(g_settings, screen, the_pwr, the_pos)
+	powerups.add(new_power)
 
 def check_kills(g_settings, screen, stats, bullets, members, twits, powerups):
 
@@ -841,25 +881,33 @@ def check_kills(g_settings, screen, stats, bullets, members, twits, powerups):
 
 	dead_twits = 0
 	for twit in members:
-		twit.health -= 1
-		if twit.health == 0:
+		total_twits -= 1
+		# Specific to bullet hits
+		twit.health -= g_settings.bullet_dmg
+
+		# If Dead
+		if not twit.health:
 			if twit.power:
 				# Spawn any powerups
 				# print("I HAVE THE POWAH {}".format(twit.power))
-				spawn_powerup(g_settings, screen, powerups, twit)
+				spawn_powerup(g_settings, screen, powerups, twit.power, twit.rect)
+
+				# OPT return True and create an event, any ideas?
 
 			# Delets from screen & Sprite Group
 			twits.remove(twit)
 			# Update globals
 			dead_twits += 1
 			twits_list.remove(int(twit.index))
-			print("TWIT DOWN!! {}".format(twits_list))
 
-	print("TOTAL TWITS {}".format(total_twits))
-	print("DEAD {}".format(dead_twits))
-	stats.score += g_settings.twit_points * dead_twits
+	stats.score += (g_settings.twit_points * \
+					g_settings.score_multi) * dead_twits
+	return 0 
 
-	return True 
+
+
+
+
 
 def update_bullets(g_settings, screen, stats, ship, scores, \
 						bullets, powerups, aliens=0, twits=0):
@@ -891,32 +939,26 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 	# Shoosting
 	if shot_down:
 		for members in shot_down.values():
-			check_kills(g_settings, screen, stats, bullets, members, twits, powerups)
-
+			
+			# Calculate score per kill and drop powerups
+			check_kills(g_settings, screen, stats, bullets, \
+									members, twits, powerups)
+			break
 		# Update Score
 		scores.prep_score()
 
 	# Powah
-	power_up = pygame.sprite.spritecollideany(ship, powerups)
-	if power_up:
-		powerups.remove(power_up)
+	powering_up = pygame.sprite.spritecollideany(ship, powerups)
+	if powering_up:
+		
 		g_settings.ship_speed += 0.2
 		ship.power_up()
+		powerups.remove(powering_up)
 	# if pickup_power:
 	# 	for powers in pickup_power.values():
 	# 		for power in powers:
 	# 			powerups.remove(power)	
 			
-			
-	
-		
-
-def spawn_powerup(g_settings, screen, powerups, twit):
-	
-	new_power = Powerup(g_settings, screen, twit)
-	powerups.add(new_power)
-
-
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 							twits, powerups, bullets, stats, scores, buttons):
@@ -932,7 +974,7 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 	g_settings.load_background(screen, display=stats._current_screen)
 	
 	if stats.game_active:
-		# if _current_game is true...
+
 		if stats._current_screen == 3:
 
 			# Might not need this here
@@ -941,14 +983,17 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 			# print("starting twitter mode")
 			ship.update()
 			twits.draw(screen)
+
 			for bullet in bullets.sprites():
 				bullet.draw_bullet()
+
 			for power in powerups.sprites():
 				power.blitme()
 
+
 		scores.show_score()
 
-	else: # Game is inactive. These are menus
+	else: # Game is inactive. These are menu text boxes
 		if cur_scrn == 2:
 			get_infoz(g_settings, screen, twits, \
 						stats, scores, reticle,textbox, buttons, \
@@ -959,10 +1004,5 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 			get_infoz(g_settings, screen, twits, \
 					stats, scores, reticle, textbox, buttons, \
 								cur_scrn=stats._current_screen)
-		
 
 	pygame.display.flip()
-
-
-		# If everything breaks
-	# print("LEN OF TWITS = {}".format(len(twits)))
