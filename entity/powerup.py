@@ -25,20 +25,16 @@ class Powerup(Sprite):
 		self.x = randint(1,3)
 
 		if g_settings.is_Trump: # FURTEHR CONDSIDERATION -- if we land on lazer, bullet or bomb, roll 0,2. if 2, spawn it, if not, score mult, speed or freeze
+			if self.x == 1:
+				self.fp = os.fsencode(str("media/sprites/powers/mflag.png"))
+			else:
+				self.fp = os.fsencode(str("media/sprites/powers/money.png"))
 
-			self.fp = os.fsencode(str("media/sprites/powers/mflag.png"))
-		elif self.pwr == 1:
-			self.fp = os.fsencode(str("media/sprites/powers/bulletup.png"))
-		elif self.pwr == 2:
-			self.fp = os.fsencode(str("media/sprites/powers/bombup.png"))
-		elif self.pwr == 3:
-			self.fp = os.fsencode(str("media/sprites/powers/lazerup.png"))
-		elif self.pwr == 4:
-			self.fp = os.fsencode(str("media/sprites/powers/freezeup.png"))
-		elif self.pwr == 5:
-			self.fp = os.fsencode(str("media/sprites/powers/speedup.png"))
 		else:
-			self.fp = os.fsencode(str("media/sprites/powers/scoreup.png"))
+
+			self.fp = os.fsencode(str('media/sprites/powers/') + str(pwr) + str('.png'))
+
+
 
 		self.image = pygame.image.load(os.fsdecode(self.fp))
 		self.rect = self.image.get_rect()

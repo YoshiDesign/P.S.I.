@@ -34,6 +34,8 @@ flagged = 0
 names = ''
 # DEBUG
 test = 0
+# unique
+twit_id = 0
 	
 def check_events(g_settings, screen, ship, aliens, stats, \
 							textbox, scores, twits, bullets):
@@ -61,7 +63,7 @@ def check_events(g_settings, screen, ship, aliens, stats, \
 			keyup_event(event, g_settings, ship, stats)
 
 	return 0
-	
+# UNUSED
 def menu_keys(event):
 	""" Only from main menu """
 	# jic
@@ -205,6 +207,7 @@ def end_game(g_settings, screen, stats, ship, powerups, twits, bullets, scores, 
 	global total_twits
 	global twits_list
 	global all_tweets
+	global twit_id
 	if game_won:
 		pass
 		# SET FLAG FOR STUFF
@@ -214,12 +217,12 @@ def end_game(g_settings, screen, stats, ship, powerups, twits, bullets, scores, 
 	#
 	###
 
-
 	# Maybe I could reset globals at game start they could be used for score tracking
 	print("total_twits {}\n twits_list {}\n all_tweets {}\n should be 1".format(total_twits, twits_list, all_tweets))
 	total_twits = 0
-	twits_list = []
-	all_tweets = []
+	twits_list 	= []
+	all_tweets 	= []
+	twit_id 	= 0
 
 
 	bullets.empty()
@@ -259,11 +262,12 @@ def create_army(g_settings, screen, twits, all_tweets, \
 	from re import findall
 	global twit_list
 	global total_twits
+	global twit_id
 	print(all_tweets)
 	print("CREATING ARMY")
 
 	re_palphaNum = r"^[a-zA-Z0-9'\"]+$"
-	twit_id 	= 0
+	
 	total_twits = 0
 	dots 		= 0
 	end_char 	= 0
@@ -375,9 +379,10 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 							end_char, generate_x, row, twit_id, \
 														dots=0):
 	""" 
-		Construct an individual character and its properties to be blasted.
-		'dots' is a result of the Twitter API being handled by nltk tokenizer
-					Returns True if we should start a newline
+		- Construct an individual character and its properties to be blasted.
+		- 'dots' is a result of the Twitter API being handled by nltk tokenizer
+		- Returns True if we should start a newline.
+		- At the present, end_chars never contain power ups
 	"""
 	# Defaults
 	global total_twits
@@ -385,18 +390,23 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 
 	x_pos = next(generate_x)
 	# Is holding power up?
-	power = 0
+	powers = {
+				'1' : 'bulletup', '2' : 'bombup', \
+				'3' : 'lazerup', '4' : 'freezeup', \
+				'5' : 'speedup', '6' : 'scoreup'
+			}
+
 	text_data = {}
 	# If last char of a word
-	text_data["end_char"] 	= int(end_char)\
+	text_data['end_char'] 	= int(end_char)\
 	# Literal
-	text_data["letter"] 	= str(letter.lower())
+	text_data['letter'] 	= str(letter.lower())
 	# Pos or Neg
-	text_data["sentiment"] 	= sentiment
+	text_data['sentiment'] 	= sentiment
 	# Twit sequence num
-	text_data["index"]		= total_twits
+	text_data['index']		= total_twits
 	# Each twit belongs to a group (id); that being its tweet
-	text_data["twit_id"]	= int(twit_id)
+	text_data['twit_id']	= int(twit_id)
 	print("===================")
 	print(text_data['twit_id'])
 	print("===================")
@@ -406,11 +416,16 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 		character = Tweeter(g_settings, screen, \
 							text_data=text_data)
 		# Determine if carrying powerup
-		x = randint(1,24)
-		if not (x % 5):
-			# DIFFICULTY SETTING
-			character.power = randint(1, 10)
+		x = randint(1,27)
+		if not (x % 6):
+			# Pick powerup
+			x = randint(1, 15)
+			if x > 5:
+				character.power = powers['6']
+			else:
+				character.power = powers[str(x)]
 		else:
+			# twit does not have a power
 			character.power = 0
 
 		# Acquire placement
@@ -421,7 +436,6 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 		twits_list.append(total_twits)
 		total_twits += 1
 		
-
 	# Only text-wrap after we've printed a whole word
 	if x_pos + 1 >= 40 and text_data["end_char"] == 1:
 		del(text_data)
@@ -443,7 +457,6 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 			total_twits += 1
 			twits_list.append(total_twits)
 			
-
 		del(text_data)
 		return False
 	else:
@@ -857,16 +870,21 @@ def ship_hit(g_settings, screen, stats, ship, powerups, \
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 def fire_bullets(g_settings, screen, ship, bullets):
-	if len(bullets) < 40:
-		""" Pew-pew-pew """
 
-		# Dict is {power : power_level}
+	if g_settings.lazer:
+		# SEND VALUE TO PROCESS
+		pass
+	if g_settings.bomb:
+		pass
+	if g_settings.bullets:
+		pass
+	else:
+
+	# Dict is {power : power_level}
 		new_bullet = Bullet(g_settings, screen, ship, powers={} )
 		bullets.add(new_bullet)
-		return 0
-	else:
-		return False
-
+	return 0
+	
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 def spawn_powerup(g_settings, screen, powerups, the_pwr, the_pos):
@@ -884,12 +902,12 @@ def check_kills(g_settings, screen, stats, bullets, members, twits, powerups):
 		total_twits -= 1
 		# Specific to bullet hits
 		twit.health -= g_settings.bullet_dmg
-
+		print("TWIT HEALTH {}".format(twit.health))
 		# If Dead
 		if not twit.health:
 			if twit.power:
 				# Spawn any powerups
-				# print("I HAVE THE POWAH {}".format(twit.power))
+				print("I HAVE THE POWAH {}".format(twit.power))
 				spawn_powerup(g_settings, screen, powerups, twit.power, twit.rect)
 
 				# OPT return True and create an event, any ideas?
@@ -903,10 +921,6 @@ def check_kills(g_settings, screen, stats, bullets, members, twits, powerups):
 	stats.score += (g_settings.twit_points * \
 					g_settings.score_multi) * dead_twits
 	return 0 
-
-
-
-
 
 
 def update_bullets(g_settings, screen, stats, ship, scores, \
@@ -948,17 +962,22 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 		scores.prep_score()
 
 	# Powah
-	powering_up = pygame.sprite.spritecollideany(ship, powerups)
-	if powering_up:
+	get_power = pygame.sprite.spritecollideany(ship, powerups)
+	if get_power: # The power
+		print("MEHHH")
+		print(get_power)
+		print(get_power.pwr)
+
+		if get_power.pwr == 'scoreup':
+			# No need to leave current stack frame for score
+			stats.score += 15
+			# + 5% score multiplier
+			g_settings.score_multi += 0.05
 		
-		g_settings.ship_speed += 0.2
-		ship.power_up()
-		powerups.remove(powering_up)
-	# if pickup_power:
-	# 	for powers in pickup_power.values():
-	# 		for power in powers:
-	# 			powerups.remove(power)	
-			
+		else: # args(specific_pwr, )
+			ship.power_up(pwr=get_power.pwr)
+
+		powerups.remove(get_power)
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 							twits, powerups, bullets, stats, scores, buttons):
@@ -970,7 +989,7 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 		cur_scrn = stats._current_screen
 		print("cur scrn == {}".format(stats._current_screen))
 
-	# Load background so we dont leave ship footprints everywhere
+	# Load current background
 	g_settings.load_background(screen, display=stats._current_screen)
 	
 	if stats.game_active:
@@ -989,6 +1008,8 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 
 			for power in powerups.sprites():
 				power.blitme()
+
+			## MULTIPROC UPDATE POWERUPS HERE ##
 
 
 		scores.show_score()

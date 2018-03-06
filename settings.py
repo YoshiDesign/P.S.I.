@@ -45,11 +45,11 @@ class Settings():
 		self.lazer_width = 3
 		
 		# Twitter stuff. Twit = A single letter of a tweet
-		self.char_width = 20
-		self.char_height = 24
-		self.char_spacing = 1
+		self.char_width 	= 20
+		self.char_height 	= 24
+		self.char_spacing 	= 1
 		self.twit_drop_speed = 65
-		self.twit_points = 10
+		self.twit_points 	= 10
 
 		# Create dynamic settings
 		self.init_dynamic_settings()
@@ -61,9 +61,10 @@ class Settings():
 		self.is_Trump = False
 		# Twits
 		self.twit_direction = 1
-		self.twit_speed = 4
-		self.twit_hp = 100
-		# All twits in a single tweet have a unique id starting @ 1
+		self.twit_speed 	= 4
+		self.twit_hp 		= 200
+
+		# All twits in a single tweet have a unique id. Inits @ 1
 		self.twit_id = 0
 
 		# Dynamic multipliers
@@ -71,7 +72,13 @@ class Settings():
 
 		# Lives
 		self.ship_limit = 1
-		self.ship_speed = 1
+		self.ship_speedup = 1.2
+
+
+		# weapons for upgrading
+		self.lazer 	= 0
+		self.bomb 	= 0
+		self.bullets = 0
 
 		# Damage Grades
 		self.bomb_dmg = 200
@@ -82,13 +89,13 @@ class Settings():
 		self.pwr_drop_rate = 2
 
 		# Movement Flags
-		self.move_right = False
-		self.move_left  = False
-		self.move_forward = False
-		self.turn_left = False
-		self.turn_right = False
-		self.move_up = False
-		self.move_down = False
+		self.move_right 	= False
+		self.move_left  	= False
+		self.move_forward 	= False
+		self.turn_left 		= False
+		self.turn_right 	= False
+		self.move_up 		= False
+		self.move_down 		= False
 
 	def change_reticle(self, reticle):
 		pass

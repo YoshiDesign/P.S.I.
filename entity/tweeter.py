@@ -17,8 +17,9 @@ class Tweeter(Sprite):
 		
 		self.letter = text_data["letter"]
 		self.sentiment = text_data["sentiment"]
+		# Logical grouping
 		self.twit_id = text_data["twit_id"]
-		print("MY ID {}".format(self.twit_id))
+
 		# Index within current characters on screen in order
 		self.index = text_data["index"]
 		self.twit_direction = 1
@@ -48,24 +49,28 @@ class Tweeter(Sprite):
 		# Spacial props // x and y are modified in gf.give_twit_dimension
 		self.rect.y = self.rect.height
 		self.rect.x = self.rect.width
-		self.char_spacing = self.g_settings.char_spacing
+
+		if self.letter.isdigit():
+			self.char_spacing = 14
+		else:
+			self.char_spacing = self.g_settings.char_spacing
+
 		self.x = float(self.rect.x)
 
 	@staticmethod
-	def powerup(cls):
-		g_settings.twit_hp += 0.30
-		g_settings.twit_speed += 2
+	def level_up():
+		self.g_settings.twit_hp += 33
+		self.g_settings.twit_speed += 1.5
 
 
 	def check_edges(self):
-		# True if touching
+		# True if touching screen edge
 		screen_rect = self.screen.get_rect()
 		if self.rect.right >= screen_rect.right:
 			return True
 		elif self.rect.left <= 0:
 			return True
 		else:
-			# moot
 			return False
 
 	def update(self):

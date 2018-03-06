@@ -1,3 +1,4 @@
+
 import pygame
 from pygame.sprite import Sprite
 import sys, os
@@ -30,6 +31,12 @@ class Ship(Sprite):
 		self.rect = pygame.Rect(self.ship_x, self.ship_y, 32, 32)
 
 		# Tighten the collision model
+
+		self.ship_speed_right 	= 5.0
+		self.ship_speed_up 		= 3.0
+		self.ship_speed_down 	= 2.0
+		self.ship_speed_left 	= 5.0
+
 		self.rect.inflate(-4, -4)
 		
 		self.power_up()
@@ -74,14 +81,32 @@ class Ship(Sprite):
 		# self.center = self.screen_rect.centerx
 
 
-	def power_up(self):
-		""" Anything that can be powered up """
-		# Ship
+	def power_up(self, pwr=''):
+		""" 
+			Apply ship config based on g_settings 
+			This initializes ship_speed and is called
+			from the beginning of a game
+		"""
+
 		# OPT could use map, but values differ...moot
-		self.ship_speed_right = 5.0 * self.g_settings.ship_speed
-		self.ship_speed_up = 3.0 * self.g_settings.ship_speed
-		self.ship_speed_down = 1.8 * self.g_settings.ship_speed
-		self.ship_speed_left = 5.0 * self.g_settings.ship_speed
+		pwr = pwr.lower()
+		if pwr == 'speedup': 
+			# Game is Starting or we picked up a speed powerup
+			self.ship_speed_right 	*= self.g_settings.ship_speedup
+			self.ship_speed_up 		*= self.g_settings.ship_speedup
+			self.ship_speed_down 	*= self.g_settings.ship_speedup
+			self.ship_speed_left 	*= self.g_settings.ship_speedup
+
+		if pwr == 'bulltup':
+			magnitude = self.g_settings.bullets + 1
+
+		if pwr == 'bombup':
+			magnitude = self.g_settings.bomb + 1
+
+		if pwr == 'lazerup':
+			magnitude = self.g_settings.lazer + 1
+
+		
 
 	def fire_ze_lazer():
 
