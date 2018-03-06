@@ -5,23 +5,25 @@ from multiprocessing import Process, Queue
 
 class Bullet(Sprite):
 	
-	def __init__(self, g_settings, screen, ship, powers={}):
+	def __init__(self, g_settings, screen, ship, power='', level=0):
 		super(Bullet, self).__init__()
 		
+
 		self.screen = screen
 		self.g_settings = g_settings
-		self.rect = pygame.Rect(0,0, self.g_settings.bullet_width,\
-									 self.g_settings.bullet_length)
+		if power == 'gun':
+			self.rect = pygame.Rect(0,0, self.g_settings.bullet_width,\
+										 self.g_settings.bullet_length)
 
-		self.rect.centerx = ship.rect.centerx
-		self.rect.top = ship.rect.top
-		self.y = float(self.rect.y)
+			self.rect.centerx = ship.rect.centerx
+			self.rect.top = ship.rect.top
+			self.y = float(self.rect.y)
 
-		self.color = g_settings.bullet_color
-		self.speed = g_settings.bullet_speed
+			self.color = g_settings.bullet_color
+			self.speed = g_settings.bullet_speed
 
-		# Max length of upgrade viz lines
-		self.init_len = 100
+			# Max length of upgrade viz lines
+			# self.init_len = 100
 
 	def power_level(self, level, **kwargs):
 
@@ -48,33 +50,33 @@ class Bullet(Sprite):
 		return 0
 
 
-	def upgrade_bullets(self):
+	# def upgrade_bullets(self):
 
-		pass
+	# 	pass
 
-	def upgrade_lazer(self, lazer, init_len):
+	# def upgrade_lazer(self, lazer, init_len):
 
-		pygame.draw.Rect(screen, (255,255,255), [1000, 550, 10, init_len])
-		init_len -= 2
-		self.screen.flip()
-		sleep(0.1)
+	# 	pygame.draw.Rect(screen, (205,190,210), [1000, 550, 10, init_len])
+	# 	init_len -= 2
+	# 	self.screen.flip()
+	# 	sleep(0.1)
 
 
-	def upgrade_bombs(self):
+	# def upgrade_bombs(self):
 
-		pass
+	# 	pass
 
 	def update(self):
 		# Linear movement
 		self.y -= self.speed
-		self.rect.y 	= self.y
+		self.rect.y = self.y
 
-		# Tracking weapon levels : Each can be 0 -> 3
-		self.lazer 		= self.g_settings.lazer
-		self.bullets 	= self.g_settings.bullets
-		self.bomb 		= self.g_settings.bomb
+		# # Tracking weapon levels : Each can be 0 -> 3
+		# self.lazer 		= self.g_settings.lazer
+		# self.bullets 	= self.g_settings.bullets
+		# self.bomb 		= self.g_settings.bomb
 
-		if self.lazer:
+		if self.g_settings.lazer:
 			
 			# LQ = Queue()
 			# LQ.put(self.lazer)

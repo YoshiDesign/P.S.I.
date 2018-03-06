@@ -102,6 +102,10 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, \
 	# Aka more events
 	if stats.game_active:
 
+		laz_up = int(g_settings.lazer)
+		bul_up = int(g_settings.bullets)
+		bom_up = int(g_settings.bomb)
+
 		if event.key == pygame.K_d:
 			g_settings.move_right = True
 		elif event.key == pygame.K_a:
@@ -111,10 +115,34 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, \
 		elif event.key == pygame.K_w:
 			g_settings.move_up = True
 		elif event.key == pygame.K_SPACE:
-			fire_bullets(g_settings, screen, ship, bullets)
+			fire_bullets(g_settings, screen, ship, bullets, lazerup=laz_up, \
+															bulletup=bul_up, \
+															bombup=bom_up)
 		
-
 	return False
+
+def fire_bullets(g_settings, screen, ship, bullets, **kwargs):
+
+	# Default weapon
+	powers = {"gun" : 1}
+	
+	for pwr in kwargs:
+
+		if kwargs[pwr]:
+			# Put in new dict so we dont send empty values to new_bullet? 
+			# Or is it faster to just send an empty dict?
+			# Only time will tell
+
+			""" "lazerup" "bulletup" "bombup" """ 
+			powers[str(pwr)] = kwargs[str(pwr)]
+
+			# powers = {str(power) : int(level)}
+	
+		for k,v in powers.items():
+			new_bullet = Bullet(g_settings, screen, ship, power=str(k), level=int(v))
+			bullets.add(new_bullet)
+
+	return 0
 
 def check_play_buttons(stats, textbox, scores, buttons, cur_scrn=0, \
 												mousex=0, mousey=0):
@@ -848,6 +876,7 @@ def ship_hit(g_settings, screen, stats, ship, powerups, \
 		if bottom:
 			reset_army(screen, twits)
 		else:
+			sleep(0.5)
 			ship.center_ship()
 
 		# CLEAN THIS UP
@@ -869,21 +898,7 @@ def ship_hit(g_settings, screen, stats, ship, powerups, \
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
-def fire_bullets(g_settings, screen, ship, bullets):
 
-	if g_settings.lazer:
-		# SEND VALUE TO PROCESS
-		pass
-	if g_settings.bomb:
-		pass
-	if g_settings.bullets:
-		pass
-	else:
-
-	# Dict is {power : power_level}
-		new_bullet = Bullet(g_settings, screen, ship, powers={} )
-		bullets.add(new_bullet)
-	return 0
 	
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 

@@ -3,6 +3,7 @@ import pygame
 from pygame.sprite import Sprite
 import sys, os
 from tools.spritesheet import Spritesheet
+from multiprocessing import Pipe, Process, Queue
 
 class Ship(Sprite):
 
@@ -90,6 +91,7 @@ class Ship(Sprite):
 
 		# OPT could use map, but values differ...moot
 		pwr = pwr.lower()
+
 		if pwr == 'speedup': 
 			# Game is Starting or we picked up a speed powerup
 			self.ship_speed_right 	*= self.g_settings.ship_speedup
@@ -97,28 +99,43 @@ class Ship(Sprite):
 			self.ship_speed_down 	*= self.g_settings.ship_speedup
 			self.ship_speed_left 	*= self.g_settings.ship_speedup
 
-		if pwr == 'bulltup':
-			magnitude = self.g_settings.bullets + 1
+		# else:
 
-		if pwr == 'bombup':
-			magnitude = self.g_settings.bomb + 1
+		# 	enter, exit = Pipe()
+		# 	p = Process(target=self.fire_ze_missle, args=(enter, exit, pwr), name="Upgrades", daemon=False)
 
-		if pwr == 'lazerup':
-			magnitude = self.g_settings.lazer + 1
+		# 	if pwr == 'bulletup':
+				
+		# 		p.start()
+		# 		enter.send(1)
+
+
+		# 	if pwr == 'bombup':
+		# 		magnitude = self.g_settings.bomb + 1
+
+		# 	if pwr == 'lazerup':
+		# 		magnitude = self.g_settings.lazer + 1
+
+		# 	p.join()
+
+		return 0
+
+	def fire_ze_missle(self, enter, exit, pwr):
+
+		while True:
+			pass
+
 
 		
 
-	def fire_ze_lazer():
 
-		pass
+	# def moar_bulletz(self):
 
-	def moar_bulletz():
+	# 	going, beside = Pipe()
 
-		pass
+	# def set_us_bomb(self):
 
-	def set_us_bomb():
-
-		pass
+	# 	alice, bob = Pipe()
 	
 		
 		

@@ -75,10 +75,8 @@ class Settings():
 		self.ship_speedup = 1.2
 
 
-		# weapons for upgrading
-		self.lazer 	= 0
-		self.bomb 	= 0
-		self.bullets = 0
+		
+		
 
 		# Damage Grades
 		self.bomb_dmg = 200
@@ -97,8 +95,18 @@ class Settings():
 		self.move_up 		= False
 		self.move_down 		= False
 
-	def change_reticle(self, reticle):
-		pass
+		# weapons for upgrading
+		self.lazer 	= 0
+		self.bullets = 0
+		self.bomb 	= 0
+
+	def clear_weapon(self, power):
+		if power == "lazerup":
+			self.lazer = 0
+		elif power == "bombup":
+			self.bomb = 0
+		elif power == "bulletup":
+			self.bullets = 0
 		
 	def load_background(self, screen, display=0):
 		""" 
