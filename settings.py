@@ -53,17 +53,18 @@ class Settings():
 		self.char_height 	= 24
 		self.char_spacing 	= 1
 		# Change in y
-		self.twit_drops 	= 60
+		self.twit_drops 	= 40
 		self.twit_points 	= 10
+
+		self.is_Trump = False
 
 		# Create dynamic settings
 		self.init_dynamic_settings()
+
 		
 	def init_dynamic_settings(self):
 		""" Anything that changes and isnt a power up"""
-
-		# what
-		self.is_Trump 		= False
+		
 		# Twits
 		self.twit_direction = 1
 		# Change in x
@@ -91,8 +92,8 @@ class Settings():
 		self.move_right 	= False
 		self.move_left  	= False
 		self.move_forward 	= False
-		self.turn_left 		= False
-		self.turn_right 	= False
+		self.strafe_L 		= False
+		self.strafe_R	 	= False
 		self.move_up 		= False
 		self.move_down 		= False
 		# Shooting flag
@@ -102,6 +103,8 @@ class Settings():
 		self.lazer 		= 0
 		self.bullets 	= 0
 		self.bomb 		= 0
+
+		self.lazer_stop = self.screen_height
 
 	def reset_weapon_damage(self, weapon):
 
@@ -115,6 +118,10 @@ class Settings():
 			# bomb
 			self.bom_dmg = 200
 
+	# Special opponents
+	def reset_special(self):
+		self.is_Trump = False
+		self.is_Yoshi = False
 
 	def clear_weapon(self, power):
 		if power == "lazerup":

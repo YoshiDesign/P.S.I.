@@ -1,7 +1,6 @@
 import pygame
 from time import sleep
 from pygame.sprite import Sprite
-from multiprocessing import Process, Queue
 
 class Bullet(Sprite):
 	
@@ -14,10 +13,6 @@ class Bullet(Sprite):
 		self.power = str(power)
 		self.level = int(level)
 		self.b_offset = b_offset
-
-
-
-		print('FIRING {}'.format(self.power))
 
 		if self.power == 'gun' and self.level > 0:
 
@@ -35,7 +30,8 @@ class Bullet(Sprite):
 
 			if level == 1:
 				self.rect = pygame.Rect(0,0, self.g_settings.lazer_width,\
-										 		self.g_settings.screen_height)
+										 		self.g_settings.lazer_stop)
+
 				self.color 				= g_settings.bullet_color
 				self.speed 				= g_settings.bullet_speed
 				self.rect.centerx 		= ship.rect.centerx
@@ -47,8 +43,6 @@ class Bullet(Sprite):
 				pass
 			if level == 3:
 				pass
-
-
 
 
 		elif self.power == 'bulletup' and self.level > 0:
@@ -65,7 +59,6 @@ class Bullet(Sprite):
 				self.speed 				= self.g_settings.bullet_speed
 
 			if level == 2:
-				print("level 2 b_offset = {}".format(self.b_offset))
 				self.rect.centerx 		= ship.rect.centerx + (b_offset - 2)
 				self.rect.top 			= ship.rect.top + 26
 				self.y 					= float(self.rect.y)
@@ -76,7 +69,6 @@ class Bullet(Sprite):
 				self.g_settings.bullet_dmg = 125
 
 			if level == 3:
-				print("level 3 b_offset = {}".format(self.b_offset))
 				self.rect.centerx 		= ship.rect.centerx + 2
 
 				if self.b_offset == 2 or self.b_offset == 3: 

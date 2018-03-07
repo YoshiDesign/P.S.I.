@@ -68,7 +68,7 @@ class TextInput:
                             mousex, mousey, cur_scrn=0, hide=0):
         for event in events:
             if event.type == pygame.QUIT:
-                    sys.exit()
+                    return 'TX_QUIT'
 
             if event.type == pygame.MOUSEBUTTONDOWN:
 
@@ -78,7 +78,7 @@ class TextInput:
                 # Returns true with a screen change // Handles all menu button clicks
                 if gf.check_play_buttons(stats, textbox, scores, buttons, cur_scrn=cur_scrn, \
                                                                 mousex=mousex, mousey=mousey):
-                    return True
+                    return 'TX_SEARCH'
 
             if event.type == pygame.KEYDOWN:
                 self.cursor_visible = True # So the user sees where he writes
@@ -99,7 +99,7 @@ class TextInput:
 
                 ### ### ### ###
                 elif event.key == pl.K_RETURN and self.get_text():
-                    return True
+                    return 'TX_SEARCH'
                 elif event.key == pl.K_RETURN:
 
                     return False

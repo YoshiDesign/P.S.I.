@@ -3,7 +3,6 @@ import pygame
 from pygame.sprite import Sprite
 import sys, os
 from tools.spritesheet import Spritesheet
-from multiprocessing import Pipe, Process, Queue
 
 class Ship(Sprite):
 
@@ -13,7 +12,8 @@ class Ship(Sprite):
 	def __init__(self, screen, g_settings, stats, no_sprite=0):
 
 		super(Ship, self).__init__()
-		
+
+
 		# Get screen & Screen Object
 		self.screen = screen
 		self.stats = stats
@@ -73,27 +73,36 @@ class Ship(Sprite):
 		if self.g_settings.move_down and self.ship_y < self.screen_rect.bottom:
 			self.ship_y += self.ship_speed_left
 
+		# Strafe
+		if self.g_settings.strafe_L and self.ship_y > self.screen_rect.top and \
+			self.ship_x > self.screen_rect.left:
+			
+			self.g_settings.strafe_L = False
+
+		if self.g_settings.strafe_R and self.ship_y > self.screen_rect.top and \
+			self.ship_x < self.screen_rect.right:
+			
+			self.g_settings.strafe_R = False
+
 		self.rect.x = self.ship_x
 		self.rect.y = self.ship_y
 			
 	def center_ship(self):
 		self.ship_x = self.screen_rect.centerx
 		self.ship_y = 700
+
 		# self.center = self.screen_rect.centerx
 
 
 	def power_up(self, pwr=''):
 		""" 
-			Apply ship config based on g_settings 
-			This initializes ship_speed and is called
-			from the beginning of a game
-
-			pwr=False if the g_settings.lazer/bullets/bomb = 3
+			Must be called to fully initialize the ship
+			when pwr=False, g_settings.(pwr) is 3/3
 		"""
 
 		if pwr == False:
+			""" Already max upgrade """
 			return 0
-
 
 		# OPT could use map, but values differ...moot
 		pwr = pwr.lower()
@@ -106,32 +115,6 @@ class Ship(Sprite):
 			self.ship_speed_left 	*= self.g_settings.ship_speedup
 
 		return True
-
-		# else:
-
-		# 	enter, exit = Pipe()
-		# 	p = Process(target=self.fire_ze_missle, args=(enter, exit, pwr), name="Upgrades", daemon=False)
-
-		# 	if pwr == 'bulletup':
-				
-		# 		p.start()
-		# 		enter.send(1)
-
-
-		# 	if pwr == 'bombup':
-		# 		magnitude = self.g_settings.bomb + 1
-
-		# 	if pwr == 'lazerup':
-		# 		magnitude = self.g_settings.lazer + 1
-
-		# 	p.join()
-
-		return 0
-
-	def fire_ze_missle(self, enter, exit, pwr):
-
-		while True:
-			pass
 
 
 		

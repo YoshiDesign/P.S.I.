@@ -7,10 +7,12 @@
 
 import sys
 import pygame
-from pygame.sprite import Group
+from time import sleep
 from pygame.locals import *
-import game_function as gf
+from pygame.sprite import Group
+from multiprocessing import Process, Pipe, Queue, set_start_method
 
+import game_function as gf
 from tools.scoreboard import Score
 from pygame_textinput import TextInput
 from tools.spritesheet import Spritesheet as sheet
@@ -28,7 +30,16 @@ from entity.tweeter import Tweeter
 				  .set_icon
 """
 
-def Main():
+
+def listening(flag, enter, exit):
+
+	while True:
+		print(exit.recv())
+		sleep(flag)
+
+
+
+def Main(enter, exit):
 	
 	pygame.init()
 	pygame.display.set_caption("Personal Space")
@@ -50,6 +61,7 @@ def Main():
 
 	clock = pygame.time.Clock()
 	FPS = 22
+	switch = 0
 
 	attack_btn = Button(g_settings, screen, [527, 400, 159, 50], 2)
 	login_btn = Button(g_settings, screen, [130, 258, 220, 50], 2)
@@ -59,6 +71,7 @@ def Main():
 
 	buttons = [login_btn, about_btn, attack_btn, pass_btn, passed_btn]
 
+	
 
 	""" 
 		KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py for efficiency 
@@ -67,27 +80,39 @@ def Main():
 
 	while True:
 
-		# clock.tick(FPS)
-		
-		
 		clock.tick(FPS)
-		gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-									twits, powerups, bullets, stats, scores, buttons)
-
+		if gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
+												twits, powerups, bullets, stats, \
+												scores, buttons) == 'TX_QUIT':
+			# If we receive the quit flag.
+			return True
 
 		if stats.game_active == True:
+			enter.send('hello')
 			# As per the DocString
-			gf.check_events(g_settings, screen, ship, aliens, stats, textbox, scores, twits, bullets)
+			if gf.check_events(g_settings, screen, ship, aliens, stats, \
+									scores, twits, bullets) == 'CE_QUIT':
+				# if we receive the quit flag
+				return True
 			if stats._current_screen == 3:
 				gf.update_bullets(g_settings, screen, stats, ship, \
 								scores, bullets, powerups, twits=twits)
 				gf.update_twits(g_settings, screen, stats, ship, powerups,\
 											twits, scores, bullets)
 
-		else:
-			pass
-
-
 if __name__ == "__main__":
 
-	Main()
+	q = Queue()
+	enter, exit = Pipe()
+	listener = Process(target=listening, args=(1, enter, exit))
+	listener.start()
+
+	# Run main
+	main_program_ends = Main(enter, exit)
+
+	if main_program_ends:
+		listener.terminate()
+		sys.exit()
+
+
+

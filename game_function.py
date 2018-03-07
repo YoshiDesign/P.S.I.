@@ -39,9 +39,9 @@ twit_id = 0
 # power-ups
 powers = {'gun' : 0 , 'lazerup' : 0, 'bulletup' : 0, 'bombup' : 0}
 
-	
+
 def check_events(g_settings, screen, ship, aliens, stats, \
-							textbox, scores, twits, bullets):
+							scores, twits, bullets):
 
 	""" Tracks text input box and all player events while game_active == True """
 
@@ -55,7 +55,8 @@ def check_events(g_settings, screen, ship, aliens, stats, \
 	# Events : This wont run at the same time event in events occurs in textbox.update() in get_infoz
 	for event in events:
 		if event.type == pygame.QUIT:
-			sys.exit()
+			print("QUITS")
+			return 'CE_QUIT'
 		# If textinput.update() == True, user pressed Return
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			pass
@@ -98,6 +99,12 @@ def keyup_event(event, g_settings, ship, stats, bullets):
 			g_settings.move_up = False
 		elif event.key == pygame.K_SPACE:
 			g_settings.firing = False
+		elif event.key == pygame.K_q:
+			g_settings.strafe_L = False
+		elif event.key == pygame.K_e:
+			g_settings.strafe_R = False
+		elif event.key == pygame.K_SPACE:
+			g_settings.firing = False
 			for bullet in bullets.copy():
 				if bullet.power == 'lazerup':
 					bullets.remove(bullet)
@@ -122,6 +129,7 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, \
 			g_settings.move_down = True
 		elif event.key == pygame.K_w:
 			g_settings.move_up = True
+
 		elif event.key == pygame.K_SPACE:
 			g_settings.firing = True
 			fire_bullets(g_settings, screen, ship, bullets, lazerup=laz_up, \
@@ -129,6 +137,8 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, \
 															bombup=bom_up)
 		
 	return False
+
+
 
 def fire_bullets(g_settings, screen, ship, bullets, **kwargs):
 
@@ -157,7 +167,7 @@ def fire_bullets(g_settings, screen, ship, bullets, **kwargs):
 	for k,v in powers.items():
 		if v:
 			if k == 'bulletup' and v > 0:
-				print("BULLETS FIRING")
+	
 				for num in range(0, (v*2)):
 					new_bullet = Bullet(g_settings, screen, ship, power=str(k), \
 																  level=int(v), \
@@ -277,13 +287,12 @@ def end_game(g_settings, screen, stats, ship, powerups, twits, bullets, scores, 
 	###
 
 	# Maybe I could reset globals at game start they could be used for score tracking
-	print("total_twits {}\n twits_list {}\n all_tweets {}\n should be 1".format(total_twits, twits_list, all_tweets))
 	total_twits = 0
 	twits_list 	= []
 	all_tweets 	= []
 	twit_id 	= 0
 
-
+	g_settings.reset_special()
 	bullets.empty()
 	twits.empty()
 	powerups.empty()
@@ -608,15 +617,16 @@ def get_infoz(g_settings, screen, twits,\
 			# Attack
 			buttons[2].create_button()
 		""" 			In Main Menu			"""
-       
-		if textbox.update(events, stats, textbox, \
-							scores, buttons, mousex, mousey, \
-									cur_scrn=cur_scrn, hide=0):
+
+
+		x1 = textbox.update(events, stats, textbox, scores, buttons, mousex, mousey, cur_scrn=cur_scrn, hide=0)
+		if x1 == 'TX_SEARCH':
 		
 			# handle is the user's input
 			handle = textbox.get_text()
 
-			if handle == "realdonaldtrump" or "@realdonaldtrump":
+			if handle == "realdonaldtrump" or handle == "@realdonaldtrump":
+				print("TRUUUUUUUMP")
 				g_settings.is_Trump = True
 
 			if not handle or handle == "":
@@ -696,12 +706,18 @@ def get_infoz(g_settings, screen, twits,\
 				# BLIT MSG TO SCREEN, "Play offline instead? Y/N"
 				""" THIS IS WHERE WE BEGIN AN OFFLINE GAME """
 				return 13
+		elif x1 == 'TX_QUIT':
+			return 'TX_QUIT'
+
 		else:
 			# Display our text input field based on cur_scrn
 			screen.blit(textbox.get_surface(), \
 				((g_settings.screen_width//2) - 100, \
 				(g_settings.screen_height//2) + 80))
 
+			return False
+
+### MENU BEHAVIORS
 	if cur_scrn == 1:
 		global names
 
@@ -711,9 +727,11 @@ def get_infoz(g_settings, screen, twits,\
 		# Username Screen
 		if mousex > 530 and mousey > 300:
 			buttons[3].create_button()
-		if textbox.update(events, stats, textbox, \
+
+		x2 = textbox.update(events, stats, textbox, \
 							scores, buttons, mousex, mousey, \
-									cur_scrn=cur_scrn, hide=0):
+									cur_scrn=cur_scrn, hide=0)
+		if x2 == 'TX_SEARCH':
 
 			names = textbox.get_text()
 			if not names:
@@ -724,11 +742,16 @@ def get_infoz(g_settings, screen, twits,\
 			textbox.reset()
 			print("U NAME == {}".format(names))
 
+		elif x2 == 'TX_QUIT':
+			return 'TX_QUIT'
+
 		else:
 			# Blit textbox on login screen
 			screen.blit(textbox.get_surface(), \
 				((g_settings.screen_width//2) - 100, \
 				(g_settings.screen_height//2) - 200))
+
+			return False
 
 	if cur_scrn == 2:
 		global flagged
@@ -737,9 +760,10 @@ def get_infoz(g_settings, screen, twits,\
 
 		if mousex > 530 and mousey > 300:
 			buttons[4].create_button()
-		if textbox.update(events, stats, textbox, \
+		x3 = textbox.update(events, stats, textbox, \
 							scores, buttons, mousex, mousey, \
-									cur_scrn=cur_scrn, hide=1):
+									cur_scrn=cur_scrn, hide=1)
+		if x3 == 'TX_SEARCH':
 
 			x = textbox.get_text()
 		
@@ -758,6 +782,9 @@ def get_infoz(g_settings, screen, twits,\
 			#############
 			stats.menu_mode(flagged=flagged)
 			# update screen if auth
+
+		elif x3 == 'TX_QUIT':
+			return 'TX_QUIT'
 
 		else:
 			# Blit textbox to password screen
@@ -945,21 +972,21 @@ def check_kills(g_settings, screen, stats, bullets, twits, members, powerups, is
 
 	dead_twits = 0
 	for twit in members:
-		print("ima hit twit")
+
 		# Specific to bullet hits
 		if not is_lazer:
 
 			twit.health -= g_settings.bullet_dmg
-			print("this twits health is {}".format(twit.health))
+
 		else:
 			pass
 
 		# If Dead
 		if twit.health <= 0:
-			print("this twit is a dead twit with {} health".format(twit.health))
+
 			if twit.power:
 				# Spawn any powerups
-				print("I HAVE THE POWAH {}".format(twit.power))
+
 				spawn_powerup(g_settings, screen, powerups, twit.power, twit.rect)
 
 				# OPT return True and create an event, any ideas?
@@ -1000,7 +1027,6 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 	is_lazer = False
 
 	for bullet in bullets.copy():
-		print("I am a bullet")
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
 	
@@ -1018,7 +1044,7 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 	# Shoosting
 	if shot_down:
 		for members in shot_down.values():
-			print("hit")
+	
 			# Calculate score per kill and drop powerups
 			check_kills(g_settings, screen, stats, bullets, twits, \
 								members, powerups, is_lazer=is_lazer)
@@ -1086,6 +1112,7 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 
 	# Load current background
 	g_settings.load_background(screen, display=stats._current_screen)
+
 	
 	if stats.game_active:
 
@@ -1111,14 +1138,19 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 
 	else: # Game is inactive. These are menu text boxes
 		if cur_scrn == 2:
-			get_infoz(g_settings, screen, twits, \
+			if get_infoz(g_settings, screen, twits, \
 						stats, scores, reticle,textbox, buttons, \
-							cur_scrn=stats._current_screen, hide=1)
+							cur_scrn=stats._current_screen, hide=1) == 'TX_QUIT':
+				return 'TX_QUIT'
 
 		else:
 
-			get_infoz(g_settings, screen, twits, \
+			if get_infoz(g_settings, screen, twits, \
 					stats, scores, reticle, textbox, buttons, \
-								cur_scrn=stats._current_screen)
+								cur_scrn=stats._current_screen) == 'TX_QUIT':
+				return 'TX_QUIT'
 
 	pygame.display.flip()
+
+
+	

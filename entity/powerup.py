@@ -23,11 +23,15 @@ class Powerup(Sprite):
 
 		# used to rotate sprite
 		self.x = randint(1,3)
+		print("X IS {}".format(self.x))
 
-		if g_settings.is_Trump: # FURTEHR CONDSIDERATION -- if we land on lazer, bullet or bomb, roll 0,2. if 2, spawn it, if not, score mult, speed or freeze
+		if self.g_settings.is_Trump:
+			print("TRUMP")
 			if self.x == 1:
+				print("TRUMPPUP")
 				self.fp = os.fsencode(str("media/sprites/powers/mflag.png"))
 			else:
+				print("TRUMPPUP 2")
 				self.fp = os.fsencode(str("media/sprites/powers/money.png"))
 
 		else:
