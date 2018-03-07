@@ -30,22 +30,54 @@ from entity.tweeter import Tweeter
 				  .set_icon
 """
 
+def generate_field(i, q=0):
+
+	""" 
+		Simple reverse generator 
+		Allows for optional additions 
+		to extend prolong from StopIteration
+	"""
+	if q:
+		i = i + q
+
+	for x in range(i, 0, -1):
+		try:
+			yield x
+		except StopIteration:
+			pass
+
 
 def listening(flag, enter, exit):
 
+	""" A Target of Multiprocess """
+
+	wait_time = float(0.01)
+
 	while True:
-		print(exit.recv())
-		sleep(flag)
+
+		data = exit.recv()
+		# For your health
+		if data:
+
+			print("FOUND DATA")
+			print(data)
+
+			if data['power'] == 'bulletup':
+
+				pygame.draw.rect()
+
+			if data['power'] == 'bombup':
+				pass
+			if data['power'] == 'lazerup':
+				pass
+
+				
+		sleep(wait_time)
 
 
-
-def Main(enter, exit):
+def Main(enter, exit, screen, g_settings):
 	
-	pygame.init()
-	pygame.display.set_caption("Personal Space")
-	g_settings = Settings()
-	screen = pygame.display.set_mode((g_settings.screen_width, \
-										g_settings.screen_height))
+	
 	# Load the background image
 	g_settings.load_background(screen)
 	stats = Stats(g_settings)
@@ -71,16 +103,16 @@ def Main(enter, exit):
 
 	buttons = [login_btn, about_btn, attack_btn, pass_btn, passed_btn]
 
-	
 
 	""" 
 		KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py for efficiency 
 		When gameplay is active, textbox.update() ceases, and check_events takes over
 	"""
 
-	while True:
+	while True: # Main Game Loop loops
 
 		clock.tick(FPS)
+
 		if gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 												twits, powerups, bullets, stats, \
 												scores, buttons) == 'TX_QUIT':
@@ -88,15 +120,16 @@ def Main(enter, exit):
 			return True
 
 		if stats.game_active == True:
-			enter.send('hello')
+			#enter.send('hello')
 			# As per the DocString
 			if gf.check_events(g_settings, screen, ship, aliens, stats, \
 									scores, twits, bullets) == 'CE_QUIT':
 				# if we receive the quit flag
 				return True
 			if stats._current_screen == 3:
+
 				gf.update_bullets(g_settings, screen, stats, ship, \
-								scores, bullets, powerups, twits=twits)
+								scores, bullets, powerups, enter, exit, twits=twits)
 				gf.update_twits(g_settings, screen, stats, ship, powerups,\
 											twits, scores, bullets)
 
@@ -107,12 +140,15 @@ if __name__ == "__main__":
 	listener = Process(target=listening, args=(1, enter, exit))
 	listener.start()
 
-	# Run main
-	main_program_ends = Main(enter, exit)
+	# Run main // (enter, exit) are not used to track exit conditions
+	pygame.init()
+	pygame.display.set_caption("Personal Space")
+	g_settings = Settings()
+	screen = pygame.display.set_mode((g_settings.screen_width, \
+										g_settings.screen_height))
+	main_program_ends = Main(enter, exit, screen, g_settings)
 
 	if main_program_ends:
 		listener.terminate()
 		sys.exit()
-
-
 

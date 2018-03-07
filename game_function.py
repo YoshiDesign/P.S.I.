@@ -22,7 +22,7 @@ from entity.tweeter import Tweeter
 _offline = False
 # This is the number of twits just blitted to the screen
 total_twits = 0
-# List of literal indices i.e. [1,3] means we killed 0 and 2 ...
+# List of literal indices i.e. [1,3] means we destroyed 0 and 2 ...
 twits_list = []
 # List of full tweets
 all_tweets = []
@@ -1005,7 +1005,7 @@ def check_kills(g_settings, screen, stats, bullets, twits, members, powerups, is
 
 
 def update_bullets(g_settings, screen, stats, ship, scores, \
-						bullets, powerups, aliens=0, twits=0):
+						bullets, powerups, enter, exit, aliens=0, twits=0):
 	""" Bullet & Powerup events (add / remove / upgrade) """
 
 	global twits_list
@@ -1034,8 +1034,6 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 		if power.rect.top > 800:
 			powerups.remove(power)
 
-
-	
 	shot_down = pygame.sprite.groupcollide(bullets, twits, True, False)
 	# else:
 	# 	# Flag
@@ -1055,18 +1053,25 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 	# Powah
 	get_power = pygame.sprite.spritecollideany(ship, powerups)
 	if get_power: # The power
-		
+
 		# Changes apply to g_settings values
 		# Initializes ship power from g_settings
-		ship.power_up(pwr=apply_power(g_settings, stats, str(get_power.pwr)))
+		ship.power_up(pwr=apply_power(g_settings, stats, str(get_power.pwr), enter))
+
 
 		powerups.remove(get_power)
 
 
-def apply_power(g_settings, stats, get_power):
+def apply_power(g_settings, stats, get_power, enter):
 
-	""" Speedup is handled within Ship() class """ 
+	""" 
+		Speedup is handled within Ship() class
+		We send scoreup with lvl = current multiplier
+		It will render via invade.py -> listener() << speculation
+
+	""" 
 	global powers
+	level = 0
 	print("applying {}".format(get_power))
 	powers['gun'] = 0
 	# OPT map power-up to numbers and return int instead of str
@@ -1074,6 +1079,7 @@ def apply_power(g_settings, stats, get_power):
 	if get_power == 'scoreup':
 		stats.score += 15
 		g_settings.score_multi += 0.05
+		level = g_settings.score_multi
 		print("Cur score_mult {}".format(g_settings.score_multi))
 		
 	elif get_power == 'lazerup':
@@ -1081,21 +1087,29 @@ def apply_power(g_settings, stats, get_power):
 			print("at max lazer")
 			return False
 		g_settings.lazer += 1
-		print("Cur Lazer {}".format(g_settings.lazer))
+		level = g_settings.lazer
+		
 		
 	elif get_power == 'bulletup':
 		if g_settings.bullets == 3:
 			print("at max bullets")
 			return False
 		g_settings.bullets += 1
-		print("Cur bullets {}".format(g_settings.bullets))
+		level = g_settings.bullets
+		
 
 	elif get_power == 'bombup':
 		if g_settings.bomb == 3:
 			print("at max bombs")
 			return False
 		g_settings.bomb += 1
-		print("Cur bomb {}".format(g_settings.bomb))
+		level = g_settings.bomb
+		
+
+	# Multiprocess Pipe to invade.py -> listening()
+	if level:
+		_relay = {'power' : get_power, 'level' : level}
+		enter.send(_relay)
 
 	return str(get_power)
 
@@ -1112,7 +1126,6 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 
 	# Load current background
 	g_settings.load_background(screen, display=stats._current_screen)
-
 	
 	if stats.game_active:
 
@@ -1142,9 +1155,7 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 						stats, scores, reticle,textbox, buttons, \
 							cur_scrn=stats._current_screen, hide=1) == 'TX_QUIT':
 				return 'TX_QUIT'
-
 		else:
-
 			if get_infoz(g_settings, screen, twits, \
 					stats, scores, reticle, textbox, buttons, \
 								cur_scrn=stats._current_screen) == 'TX_QUIT':
