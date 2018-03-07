@@ -5,49 +5,205 @@ from multiprocessing import Process, Queue
 
 class Bullet(Sprite):
 	
-	def __init__(self, g_settings, screen, ship, power='', level=0):
+	def __init__(self, g_settings, screen, ship, power='', level=0, b_offset=0):
 		super(Bullet, self).__init__()
 		
-
+	
 		self.screen = screen
 		self.g_settings = g_settings
-		if power == 'gun':
+		self.power = str(power)
+		self.level = int(level)
+		self.b_offset = b_offset
+
+
+
+		print('FIRING {}'.format(self.power))
+
+		if self.power == 'gun' and self.level > 0:
+
+			self.rect = pygame.Rect(0,0, self.g_settings.gun_width,\
+										 	self.g_settings.bullet_length)
+			self.rect.centerx 		= ship.rect.centerx
+			self.rect.top 			= ship.rect.top
+			self.y 					= float(self.rect.y)
+			self.color 				= g_settings.bullet_color
+			self.speed 				= g_settings.bullet_speed
+
+
+
+		elif self.power == 'lazerup' and self.level > 0:
+
+			if level == 1:
+				self.rect = pygame.Rect(0,0, self.g_settings.lazer_width,\
+										 		self.g_settings.screen_height)
+				self.color 				= g_settings.bullet_color
+				self.speed 				= g_settings.bullet_speed
+				self.rect.centerx 		= ship.rect.centerx
+				self.rect.bottom 		= ship.rect.top
+				self.rect.top			= self.screen.rect.top
+				self.y			 		= float(self.rect.y)
+
+			if level == 2:
+				pass
+			if level == 3:
+				pass
+
+
+
+
+		elif self.power == 'bulletup' and self.level > 0:
+
 			self.rect = pygame.Rect(0,0, self.g_settings.bullet_width,\
+										 	 self.g_settings.bullet_length * 5)
+
+			if level == 1:
+			
+				self.rect.centerx	= ship.rect.x + (b_offset * 32)
+				self.rect.top 			= ship.rect.top + 26
+				self.y 					= float(self.rect.y)
+				self.color 				= (255,255,255)
+				self.speed 				= self.g_settings.bullet_speed
+
+			if level == 2:
+				print("level 2 b_offset = {}".format(self.b_offset))
+				self.rect.centerx 		= ship.rect.centerx + (b_offset - 2)
+				self.rect.top 			= ship.rect.top + 26
+				self.y 					= float(self.rect.y)
+				self.x					= float(self.rect.x)
+				self.color 				= (180,255,200)
+				self.speed 				= self.g_settings.bullet_speed + 5
+
+				self.g_settings.bullet_dmg = 125
+
+			if level == 3:
+				print("level 3 b_offset = {}".format(self.b_offset))
+				self.rect.centerx 		= ship.rect.centerx + 2
+
+				if self.b_offset == 2 or self.b_offset == 3: 
+					self.rect.top 		= ship.rect.top
+				else:
+					self.rect.top 		= ship.rect.top + 26
+
+				self.y 					= float(self.rect.y)
+				self.x					= float(self.rect.x)
+				self.color 				= (55,255,255)
+				self.speed 				= self.g_settings.bullet_speed + 5
+
+				self.g_settings.bullet_dmg = 150
+
+
+		elif self.power == 'bombup' and self.level > 0:
+
+			if level == 1:
+				self.rect = pygame.Rect(0,0, self.g_settings.bullet_width,\
 										 self.g_settings.bullet_length)
 
-			self.rect.centerx = ship.rect.centerx
-			self.rect.top = ship.rect.top
-			self.y = float(self.rect.y)
+				self.rect.centerx = ship.rect.centerx
+				self.rect.top = ship.rect.top
+				self.y = float(self.rect.y)
 
-			self.color = g_settings.bullet_color
-			self.speed = g_settings.bullet_speed
+				self.color = g_settings.bullet_color
+				self.speed = g_settings.bullet_speed
 
-			# Max length of upgrade viz lines
-			# self.init_len = 100
+			if level == 2:
+				pass
+			if level == 3:
+				pass
 
-	def power_level(self, level, **kwargs):
 
-		""" 
-			If level gets used, use it to diminish returns
 
-			If >9k just += 0 
-			0 == bullets
-			1 == bombs
-			2 == lazer
-		"""
-		power = "placeholder"
-		if power == 0:
-			self.g_settings.bullet_dmg += (level * 100) # and line extends 1/3 of the way to first pwr marker
+	def update(self):
+		""" powers[] = Power levels of [bullets, lazer, bomb], oh my """
+
+		# # Tracking weapon levels
+		# lazer 		= self.g_settings.lazer
+		# bullets 		= self.g_settings.bullets
+		# bomb 			= self.g_settings.bomb
+
+
+				### ### ### ### ###
+		# if self.power == 'bulletup' and self.level == 2:
+		# 	if not self.b_offset % 3:
+		# 		if self.b_offset == 0:
+		# 			self.x -= 10
+		# 			self.rect.centerx = self.x
+		# 		if self.b_offset == 3:
+		# 			self.x += 10
+		# 			self.rect.centerx = self.x
+
+		if self.power == 'bulletup' and self.level >= 2:
+
+			self.angle_bullets(self.level)
+		
+
+		if self.power == 'lazerup' and self.level > 0:
+			pass
+		if self.power == 'bombup' and self.level > 0:
+			pass
+
+		else:
+			# Default gun behavior
+			self.y -= self.speed
+			self.rect.y = self.y
+			
+
+	def draw_bullet(self):
+		if self.power == 'bulletup':
+		
+			pygame.draw.rect(self.screen, self.color, self.rect)
+
+		elif self.power == 'lazerup':
+			pass
+		elif self.power == 'bombup':
+			pass
+		else:
+			pygame.draw.rect(self.screen, self.color, self.rect)
+
+	def angle_bullets(self, level):
+
+		total_levels = float((level * 2) + 1)
+		level = float(level)
+
+		for i in range(1, int(total_levels)):
+				
+				if self.b_offset + 1 == i:
+					# left side
+					if total_levels / i >= (total_levels / level):
+
+						self.x -= 2 * (total_levels - (i * 2))
+						
+
+					# Right side
+					else:
+						
+						self.x += 2 * (total_levels - ((i-2) * 2))
+
+
+					self.rect.centerx = self.x
+
+	# def power_level(self, level, **kwargs):
+
+	# 	""" 
+	# 		If level gets used, use it to diminish returns
+
+	# 		If >9k just += 0 
+	# 		0 == bullets
+	# 		1 == bombs
+	# 		2 == lazer
+	# 	"""
+	# 	power = "placeholder"
+	# 	if self.power == 0:
+	# 		self.g_settings.bullet_dmg += (level * 100) # and line extends 1/3 of the way to first pwr marker
 			
 			
-		elif power == 1:
-			self.g_settings.bomb_dmg += (level * 100)
+	# 	elif power == 1:
+	# 		self.g_settings.bomb_dmg += (level * 100)
 			
-		elif power == 2:
-			self.g_settings.lazer_dmg += (level * 100)
+	# 	elif power == 2:
+	# 		self.g_settings.lazer_dmg += (level * 100)
 			
 
-		return 0
+	# 	return 0
 
 
 	# def upgrade_bullets(self):
@@ -66,39 +222,5 @@ class Bullet(Sprite):
 
 	# 	pass
 
-	def update(self):
-		# Linear movement
-		self.y -= self.speed
-		self.rect.y = self.y
-
-		# # Tracking weapon levels : Each can be 0 -> 3
-		# self.lazer 		= self.g_settings.lazer
-		# self.bullets 	= self.g_settings.bullets
-		# self.bomb 		= self.g_settings.bomb
-
-		if self.g_settings.lazer:
-			
-			# LQ = Queue()
-			# LQ.put(self.lazer)
-
-			# L = Process(target=self.upgrade_lazer, args=(LQ, self.init_len))
-
-			# L.start()
-
-			# self.g_settings.lazer -= 1
-			pass
-
-		if self.g_settings.bullets:
-			pass
-		if self.g_settings.bomb:
-			pass
-				
-
-			
-
-		
-
-	def draw_bullet(self):
-		pygame.draw.rect(self.screen, self.color, self.rect)
-
+	
 		

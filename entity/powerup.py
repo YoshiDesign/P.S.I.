@@ -34,9 +34,7 @@ class Powerup(Sprite):
 
 			self.fp = os.fsencode(str('media/sprites/powers/') + str(pwr) + str('.png'))
 
-
-
-		self.image = pygame.image.load(os.fsdecode(self.fp))
+		self.image = pygame.image.load(os.fsdecode(self.fp)).convert_alpha()
 		self.rect = self.image.get_rect()
 		# Falls from :
 		self.rect.top = twit_rect.bottom

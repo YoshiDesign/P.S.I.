@@ -87,7 +87,13 @@ class Ship(Sprite):
 			Apply ship config based on g_settings 
 			This initializes ship_speed and is called
 			from the beginning of a game
+
+			pwr=False if the g_settings.lazer/bullets/bomb = 3
 		"""
+
+		if pwr == False:
+			return 0
+
 
 		# OPT could use map, but values differ...moot
 		pwr = pwr.lower()
@@ -98,6 +104,8 @@ class Ship(Sprite):
 			self.ship_speed_up 		*= self.g_settings.ship_speedup
 			self.ship_speed_down 	*= self.g_settings.ship_speedup
 			self.ship_speed_left 	*= self.g_settings.ship_speedup
+
+		return True
 
 		# else:
 

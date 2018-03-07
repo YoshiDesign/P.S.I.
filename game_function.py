@@ -36,12 +36,18 @@ names = ''
 test = 0
 # unique
 twit_id = 0
+# power-ups
+powers = {'gun' : 0 , 'lazerup' : 0, 'bulletup' : 0, 'bombup' : 0}
+
 	
 def check_events(g_settings, screen, ship, aliens, stats, \
 							textbox, scores, twits, bullets):
 
 	""" Tracks text input box and all player events while game_active == True """
 
+	""" 
+		Called by pygame_textinput.py -- This allows for API requests during gameplay
+	"""
 
 	mousex, mousey = pygame.mouse.get_pos()
 	events = pygame.event.get()
@@ -60,7 +66,7 @@ def check_events(g_settings, screen, ship, aliens, stats, \
 													scores, bullets)
 
 		elif event.type == pygame.KEYUP:
-			keyup_event(event, g_settings, ship, stats)
+			keyup_event(event, g_settings, ship, stats, bullets)
 
 	return 0
 # UNUSED
@@ -78,7 +84,7 @@ def menu_keys(event):
 # ADD ALT+Z TO TURN OFF UI
 ##########
 
-def keyup_event(event, g_settings, ship, stats):
+def keyup_event(event, g_settings, ship, stats, bullets):
 	""" Keyups """
 	# More events
 	if stats.game_active:
@@ -90,11 +96,13 @@ def keyup_event(event, g_settings, ship, stats):
 			g_settings.move_down = False
 		elif event.key == pygame.K_w:
 			g_settings.move_up = False
-
+		elif event.key == pygame.K_SPACE:
+			g_settings.firing = False
+			for bullet in bullets.copy():
+				if bullet.power == 'lazerup':
+					bullets.remove(bullet)
 
 	return False
-
-
 
 def keydown_event(event, g_settings, screen, ship, stats, scores, \
 															bullets):
@@ -115,6 +123,7 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, \
 		elif event.key == pygame.K_w:
 			g_settings.move_up = True
 		elif event.key == pygame.K_SPACE:
+			g_settings.firing = True
 			fire_bullets(g_settings, screen, ship, bullets, lazerup=laz_up, \
 															bulletup=bul_up, \
 															bombup=bom_up)
@@ -123,24 +132,46 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, \
 
 def fire_bullets(g_settings, screen, ship, bullets, **kwargs):
 
+	global powers
 	# Default weapon
-	powers = {"gun" : 1}
-	
+	gunnin_it = 0
 	for pwr in kwargs:
+		# Build a dict to pass to 
+		powers[str(pwr)] = kwargs[str(pwr)]
+		if powers[str(pwr)]:
+			gunnin_it += 1
+			print("CHECK G_SETTINGS \nlazerup : {}\nbombup : {}\nbulletup : {}".format(g_settings.lazer, g_settings.bomb, g_settings.bullets))
 
-		if kwargs[pwr]:
-			# Put in new dict so we dont send empty values to new_bullet? 
-			# Or is it faster to just send an empty dict?
-			# Only time will tell
+	if not gunnin_it:
+		powers['gun'] = 1
+		new_bullet = Bullet(g_settings, screen, ship, power='gun', level=1)
+		bullets.add(new_bullet)
+		return 0
+	else:
+		powers['gun'] = 0
 
-			""" "lazerup" "bulletup" "bombup" """ 
-			powers[str(pwr)] = kwargs[str(pwr)]
+	""" may want to thread this in a separate Function somewhere somehow """
 
-			# powers = {str(power) : int(level)}
 	
-		for k,v in powers.items():
-			new_bullet = Bullet(g_settings, screen, ship, power=str(k), level=int(v))
-			bullets.add(new_bullet)
+
+	for k,v in powers.items():
+		if v:
+			if k == 'bulletup' and v > 0:
+				print("BULLETS FIRING")
+				for num in range(0, (v*2)):
+					new_bullet = Bullet(g_settings, screen, ship, power=str(k), \
+																  level=int(v), \
+																  b_offset=num)
+					bullets.add(new_bullet)
+					if num == 1 and v == 1:
+						# or we get 3 bullets at lvl 1
+						break
+			if k == 'lazerup' and v > 0:
+				pass
+			if k == 'bombup' and v > 0:
+				pass
+		
+			
 
 	return 0
 
@@ -449,7 +480,7 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 			# Pick powerup
 			x = randint(1, 15)
 			if x > 5:
-				character.power = powers['6']
+				character.power = powers['1']
 			else:
 				character.power = powers[str(x)]
 		else:
@@ -800,7 +831,7 @@ def change_army_direction(g_settings, move_group):
 			twit.rect.x += 25
 
 		twit.twit_direction *= -1
-		twit.rect.y += g_settings.twit_drop_speed
+		twit.rect.y += g_settings.twit_drops
 
 	return 0
 
@@ -809,8 +840,8 @@ def change_army_direction(g_settings, move_group):
 ### ### ### ### ### ### ### ### ### ### NETWORK ### ### ### ### ### ### ### ###
 
 def check_twit_bottom(g_settings, stats, scores, screen, \
-
 									ship, twits, bullets):
+
 	screen_rect = screen.get_rect()
 	for twit in twits.sprites():
 		# Sprites in update_bullets() This might be useless <-- search "useless" to find all
@@ -876,7 +907,7 @@ def ship_hit(g_settings, screen, stats, ship, powerups, \
 		if bottom:
 			reset_army(screen, twits)
 		else:
-			sleep(0.5)
+
 			ship.center_ship()
 
 		# CLEAN THIS UP
@@ -907,19 +938,25 @@ def spawn_powerup(g_settings, screen, powerups, the_pwr, the_pos):
 	new_power = Powerup(g_settings, screen, the_pwr, the_pos)
 	powerups.add(new_power)
 
-def check_kills(g_settings, screen, stats, bullets, members, twits, powerups):
+def check_kills(g_settings, screen, stats, bullets, twits, members, powerups, is_lazer=False):
 
 	global twits_list
 	global total_twits
 
 	dead_twits = 0
 	for twit in members:
-		total_twits -= 1
+		print("ima hit twit")
 		# Specific to bullet hits
-		twit.health -= g_settings.bullet_dmg
-		print("TWIT HEALTH {}".format(twit.health))
+		if not is_lazer:
+
+			twit.health -= g_settings.bullet_dmg
+			print("this twits health is {}".format(twit.health))
+		else:
+			pass
+
 		# If Dead
-		if not twit.health:
+		if twit.health <= 0:
+			print("this twit is a dead twit with {} health".format(twit.health))
 			if twit.power:
 				# Spawn any powerups
 				print("I HAVE THE POWAH {}".format(twit.power))
@@ -927,10 +964,12 @@ def check_kills(g_settings, screen, stats, bullets, members, twits, powerups):
 
 				# OPT return True and create an event, any ideas?
 
-			# Delets from screen & Sprite Group
+			# Deletes from screen & Sprite Group
 			twits.remove(twit)
+			print("twit removed")
 			# Update globals
 			dead_twits += 1
+			total_twits -= 1
 			twits_list.remove(int(twit.index))
 
 	stats.score += (g_settings.twit_points * \
@@ -949,13 +988,19 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 		There are several ways to determine an explosion. 
 		i.e. use the global vars - determine where to mark 
 		an explosion based upon which twit disappeared. 
+
+		bullets is a general term, unfortunately. It could either
+		be a bomb, lazer, bullet or gun projectile
+
 	"""
 
-	# If they drift off-screen
-	# OPT Could use a daemon thread for these 2
 	bullets.update()
 	powerups.update()
+	# Flag
+	is_lazer = False
+
 	for bullet in bullets.copy():
+		print("I am a bullet")
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
 	
@@ -964,14 +1009,19 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 			powerups.remove(power)
 
 
+	
 	shot_down = pygame.sprite.groupcollide(bullets, twits, True, False)
+	# else:
+	# 	# Flag
+	# 	is_lazer = True
+	# 	shot_down = pygame.sprite.groupcollide(bullets, twits, False, False)
 	# Shoosting
 	if shot_down:
 		for members in shot_down.values():
-			
+			print("hit")
 			# Calculate score per kill and drop powerups
-			check_kills(g_settings, screen, stats, bullets, \
-									members, twits, powerups)
+			check_kills(g_settings, screen, stats, bullets, twits, \
+								members, powerups, is_lazer=is_lazer)
 			break
 		# Update Score
 		scores.prep_score()
@@ -979,20 +1029,50 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 	# Powah
 	get_power = pygame.sprite.spritecollideany(ship, powerups)
 	if get_power: # The power
-		print("MEHHH")
-		print(get_power)
-		print(get_power.pwr)
-
-		if get_power.pwr == 'scoreup':
-			# No need to leave current stack frame for score
-			stats.score += 15
-			# + 5% score multiplier
-			g_settings.score_multi += 0.05
 		
-		else: # args(specific_pwr, )
-			ship.power_up(pwr=get_power.pwr)
+		# Changes apply to g_settings values
+		# Initializes ship power from g_settings
+		ship.power_up(pwr=apply_power(g_settings, stats, str(get_power.pwr)))
 
 		powerups.remove(get_power)
+
+
+def apply_power(g_settings, stats, get_power):
+
+	""" Speedup is handled within Ship() class """ 
+	global powers
+	print("applying {}".format(get_power))
+	powers['gun'] = 0
+	# OPT map power-up to numbers and return int instead of str
+
+	if get_power == 'scoreup':
+		stats.score += 15
+		g_settings.score_multi += 0.05
+		print("Cur score_mult {}".format(g_settings.score_multi))
+		
+	elif get_power == 'lazerup':
+		if g_settings.lazer == 3:
+			print("at max lazer")
+			return False
+		g_settings.lazer += 1
+		print("Cur Lazer {}".format(g_settings.lazer))
+		
+	elif get_power == 'bulletup':
+		if g_settings.bullets == 3:
+			print("at max bullets")
+			return False
+		g_settings.bullets += 1
+		print("Cur bullets {}".format(g_settings.bullets))
+
+	elif get_power == 'bombup':
+		if g_settings.bomb == 3:
+			print("at max bombs")
+			return False
+		g_settings.bomb += 1
+		print("Cur bomb {}".format(g_settings.bomb))
+
+	return str(get_power)
+
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 							twits, powerups, bullets, stats, scores, buttons):

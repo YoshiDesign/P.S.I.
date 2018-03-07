@@ -8,8 +8,8 @@ class Settings():
 	
 	def __init__(self):
 		
-		self.screen_width = 1200
-		self.screen_height = 800
+		self.screen_width 	= 1200
+		self.screen_height 	= 800
 
 		# Load Image / sprites. 
 		self.f1 = os.fsencode("media/BackMain.jpg")
@@ -31,24 +31,29 @@ class Settings():
 		self.background_rect = self.background1.get_rect()
 		
 		# Static Multipliers
-		self.damage_mult = 1.4
-		self.speed_mult = 1.15
+		self.damage_mult 	= 1.4
+		self.speed_mult 	= 1.15
 		
 		# Bullets
-		self.bullet_speed = 25
-		self.bullet_length = 5
-		self.bullet_width = 110
-		self.bullet_color = (255,255,190)
+		self.bullet_speed 	= 25
+		self.bullet_length 	= 2
+		self.bullet_width 	= 1
+		self.bullet_color 	= (255,255,190)
+		self.gun_width 		= 110
 
 		# Lazers
-		self.lazer_color = (255,255,190)
-		self.lazer_width = 3
+		self.lazer_color 	= (255, 0, 0)
+		self.lazer_width 	= 3
+
+		# Bomb
+		self.bomb_color 	= (255, 190, 0)
 		
 		# Twitter stuff. Twit = A single letter of a tweet
 		self.char_width 	= 20
 		self.char_height 	= 24
 		self.char_spacing 	= 1
-		self.twit_drop_speed = 65
+		# Change in y
+		self.twit_drops 	= 60
 		self.twit_points 	= 10
 
 		# Create dynamic settings
@@ -58,33 +63,29 @@ class Settings():
 		""" Anything that changes and isnt a power up"""
 
 		# what
-		self.is_Trump = False
+		self.is_Trump 		= False
 		# Twits
 		self.twit_direction = 1
+		# Change in x
 		self.twit_speed 	= 4
 		self.twit_hp 		= 200
-
-		# All twits in a single tweet have a unique id. Inits @ 1
-		self.twit_id = 0
+		# Twit uid
+		self.twit_id 		= 0
 
 		# Dynamic multipliers
-		self.score_multi = 1.00
+		self.score_multi 	= 1.00
 
 		# Lives
-		self.ship_limit = 1
-		self.ship_speedup = 1.2
-
-
-		
-		
+		self.ship_limit 	= 1
+		self.ship_speedup 	= 1.2
 
 		# Damage Grades
-		self.bomb_dmg = 200
-		self.lazer_dmg = 50
-		self.bullet_dmg = 100
+		self.bomb_dmg 		= 200
+		self.lazer_dmg 		= 50
+		self.bullet_dmg 	= 100
 
 		# Pwr-up attribs
-		self.pwr_drop_rate = 2
+		self.pwr_drop_rate 	= 2
 
 		# Movement Flags
 		self.move_right 	= False
@@ -94,11 +95,26 @@ class Settings():
 		self.turn_right 	= False
 		self.move_up 		= False
 		self.move_down 		= False
+		# Shooting flag
+		self.firing 		= False
 
 		# weapons for upgrading
-		self.lazer 	= 0
-		self.bullets = 0
-		self.bomb 	= 0
+		self.lazer 		= 0
+		self.bullets 	= 0
+		self.bomb 		= 0
+
+	def reset_weapon_damage(self, weapon):
+
+		if weapon == 1:
+			# bullets
+			self.bullet_dmg = 100
+		if weapon == 2:
+			# lazer
+			self.lazer_dmg = 50
+		if weapon == 3:
+			# bomb
+			self.bom_dmg = 200
+
 
 	def clear_weapon(self, power):
 		if power == "lazerup":
