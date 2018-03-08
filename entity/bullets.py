@@ -4,7 +4,9 @@ from pygame.sprite import Sprite
 
 class Bullet(Sprite):
 	
-	def __init__(self, g_settings, screen, ship, power='', level=0, b_offset=0):
+	def __init__(self, g_settings, screen, ship, power='', \
+										level=0, b_offset=0, \
+										mousex=0, mousey=0):
 		super(Bullet, self).__init__()
 		
 	
@@ -25,26 +27,35 @@ class Bullet(Sprite):
 			self.speed 				= g_settings.bullet_speed
 
 
-
+		# Ima Lazer
 		elif self.power == 'lazerup' and self.level > 0:
 
-			if level == 1:
-				self.rect = pygame.Rect(0,0, self.g_settings.lazer_width,\
+			self.mousex = mousex
+			self.mousey = mousey
+
+			# OPT Rect of a circle?
+			self.rect = pygame.Rect(0,0, self.g_settings.lazer_width,\
 										 		self.g_settings.lazer_stop)
 
-				self.color 				= g_settings.bullet_color
-				self.speed 				= g_settings.bullet_speed
-				self.rect.centerx 		= ship.rect.centerx
-				self.rect.bottom 		= ship.rect.top
-				self.rect.top			= self.screen.rect.top
-				self.y			 		= float(self.rect.y)
+			if level == 1:
+				pass
+				
 
 			if level == 2:
 				pass
 			if level == 3:
 				pass
+			self.rect.centerx 		= ship.rect.centerx
+			self.rect.bottom 		= ship.rect.top
+			self.speed 			= 2
+			self.x				= float(self.rect.x)
+			self.y			 	= float(self.rect.y)
+			self.color   		= (175 + (25 * self.level),\
+									0,\
+									175 + (25 * self.level))
+			self.g_settings.lazer_dmg += (5 * self.level)
 
-
+		# Ima Bullet
 		elif self.power == 'bulletup' and self.level > 0:
 
 			self.rect 			= pygame.Rect(0,0, self.g_settings.bullet_width,\
@@ -69,25 +80,30 @@ class Bullet(Sprite):
 									100 + (50 * self.level),\
 									175 + (25 * self.level))
 			self.speed = self.g_settings.bullet_speed + (2 * self.level)
-			self.g_settings.bullet_dmg 	= 100 + (18 * self.level)
+			self.g_settings.bullet_dmg 	+= (18 * self.level)
 
+		# Ima friggin' bomb!
 		elif self.power == 'bombup' and self.level > 0:
 
-			if level == 1:
-				self.rect = pygame.Rect(0,0, self.g_settings.bullet_width,\
+
+			self.rect = pygame.Rect(0,0, self.g_settings.bullet_width,\
 										 self.g_settings.bullet_length)
-
-				self.rect.centerx = ship.rect.centerx
-				self.rect.top = ship.rect.top
-				self.y = float(self.rect.y)
-
-				self.color = g_settings.bullet_color
-				self.speed = g_settings.bullet_speed
+			self.rect.top = ship.rect.top
+			self.rect.centerx = ship.rect.centerx
+			if level == 1:
+			
+				
+				pass
+				
 
 			if level == 2:
 				pass
 			if level == 3:
 				pass
+
+			self.y = float(self.rect.y)
+			self.color = g_settings.bullet_color
+			self.speed = g_settings.bullet_speed
 
 
 
@@ -99,26 +115,19 @@ class Bullet(Sprite):
 		# bullets 		= self.g_settings.bullets
 		# bomb 			= self.g_settings.bomb
 
-
-				### ### ### ### ###
-		# if self.power == 'bulletup' and self.level == 2:
-		# 	if not self.b_offset % 3:
-		# 		if self.b_offset == 0:
-		# 			self.x -= 10
-		# 			self.rect.centerx = self.x
-		# 		if self.b_offset == 3:
-		# 			self.x += 10
-		# 			self.rect.centerx = self.x
-
 		if self.power == 'bulletup' and self.level >= 2:
 
 			self.angle_bullets(self.level)
 		
-
 		if self.power == 'lazerup' and self.level > 0:
-			pass
+
+			self.y -= self.speed
+			self.rect.y = self.y
+
 		if self.power == 'bombup' and self.level > 0:
-			pass
+
+			self.y -= self.speed
+			self.rect.y = self.y
 
 		else:
 			# Default gun behavior
@@ -126,17 +135,19 @@ class Bullet(Sprite):
 			self.rect.y = self.y
 			
 
-	def draw_bullet(self):
+	def draw_projectile(self):
 		if self.power == 'bulletup':
 		
 			pygame.draw.rect(self.screen, self.color, self.rect)
 
 		elif self.power == 'lazerup':
-			pass
+			pygame.draw.ellipse(self.screen, self.color, [self.rect.x, self.rect.y, 50, 20])
+
 		elif self.power == 'bombup':
 			pass
 		else:
 			pygame.draw.rect(self.screen, self.color, self.rect)
+
 
 	def angle_bullets(self, level):
 
@@ -158,6 +169,9 @@ class Bullet(Sprite):
 						self.x += 2 * (total_levels - ((i-2) * 2))
 
 					self.rect.centerx = self.x
+
+	def aim_lazer(mousex, mousey):
+		pass
 
 	# def power_level(self, level, **kwargs):
 

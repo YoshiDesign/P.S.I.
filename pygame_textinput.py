@@ -64,7 +64,7 @@ class TextInput:
 
         self.clock = pygame.time.Clock()
 
-    def update(self, events, stats, textbox, scores, buttons, \
+    def update(self, events, stats, textbox, buttons, \
                             mousex, mousey, cur_scrn=0, hide=0):
         for event in events:
             if event.type == pygame.QUIT:
@@ -76,8 +76,8 @@ class TextInput:
 
 
                 # Returns true with a screen change // Handles all menu button clicks
-                if gf.check_play_buttons(stats, textbox, scores, buttons, cur_scrn=cur_scrn, \
-                                                                mousex=mousex, mousey=mousey):
+                if gf.check_play_buttons(stats, textbox, buttons, cur_scrn=cur_scrn, \
+                                                            mousex=mousex, mousey=mousey):
                     return 'TX_SEARCH'
 
             if event.type == pygame.KEYDOWN:

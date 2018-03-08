@@ -22,6 +22,9 @@ from entity.tweeter import Tweeter
 _offline = False
 # This is the number of twits just blitted to the screen
 total_twits = 0
+# Got lazer
+get_lazer = False
+laz_lok = 255
 # List of literal indices i.e. [1,3] means we destroyed 0 and 2 ...
 twits_list = []
 # List of full tweets
@@ -41,33 +44,40 @@ powers = {'gun' : 0 , 'lazerup' : 0, 'bulletup' : 0, 'bombup' : 0}
 
 
 def check_events(g_settings, screen, ship, aliens, stats, \
-							scores, twits, bullets):
-
+						scores, twits, projectiles, time_stays):
+	global get_lazer
+	global laz_lok
 	""" Tracks text input box and all player events while game_active == True """
-
-	""" 
-		Called by pygame_textinput.py -- This allows for API requests during gameplay
-	"""
-
+	# OPT REALLY IMPORTANT : This entire function might ONLY Need to run during game
 	mousex, mousey = pygame.mouse.get_pos()
 	events = pygame.event.get()
 
-	# Events : This wont run at the same time event in events occurs in textbox.update() in get_infoz
+	""" Plugging in the Clock-Pipe here """
+	time_T = time_stays.recv()
+	
+	
+	# Events : This wont run at the same time -event in events- occurs in textbox.update() via get_infoz
 	for event in events:
 		if event.type == pygame.QUIT:
 			print("QUITS")
 			return 'CE_QUIT'
 		# If textinput.update() == True, user pressed Return
 		elif event.type == pygame.MOUSEBUTTONDOWN:
-			pass
-			# mousex, mousey = pygame.mouse.get_pos()
+			if get_lazer:
+
+				if laz_lok >= 254:
+					
+					# Get_lazer will become redundant for precision
+					keydown_event(event, g_settings, screen, ship, stats, \
+									scores, projectiles, time_T, is_lazer=get_lazer)
+				return 0
 			
 		elif event.type == pygame.KEYDOWN:
-			keydown_event(event, g_settings, screen, ship, stats, \
-													scores, bullets)
+			keydown_event(event, g_settings, screen, ship, \
+							stats, scores, projectiles, time_T)
 
 		elif event.type == pygame.KEYUP:
-			keyup_event(event, g_settings, ship, stats, bullets)
+			keyup_event(event, g_settings, stats)
 
 	return 0
 # UNUSED
@@ -85,7 +95,7 @@ def menu_keys(event):
 # ADD ALT+Z TO TURN OFF UI
 ##########
 
-def keyup_event(event, g_settings, ship, stats, bullets):
+def keyup_event(event, g_settings, stats):
 	""" Keyups """
 	# More events
 	if stats.game_active:
@@ -105,41 +115,49 @@ def keyup_event(event, g_settings, ship, stats, bullets):
 			g_settings.strafe_R = False
 		elif event.key == pygame.K_SPACE:
 			g_settings.firing = False
-			for bullet in bullets.copy():
-				if bullet.power == 'lazerup':
-					bullets.remove(bullet)
+			# STILL A GOOD IDEA
+			# for bullet in bullets.copy():
+			# 	if bullet.power == 'lazerup':
+			# 		bullets.remove(bullet)
 
 	return False
 
-def keydown_event(event, g_settings, screen, ship, stats, scores, \
-															bullets):
+def keydown_event(event, g_settings, screen, ship, stats, 
+					scores, projectiles, time_T, is_lazer=False):
 	""" Keydowns """
 	# Aka more events
 	if stats.game_active:
-
+		# OPT Maybe these should be assigned in Check_Events() and we can instead build the dict here?
 		laz_up = int(g_settings.lazer)
 		bul_up = int(g_settings.bullets)
 		bom_up = int(g_settings.bomb)
 
-		if event.key == pygame.K_d:
-			g_settings.move_right = True
+		# WIll probably refactor again, but this is because lazers are handled separately
+		projecti = [projectiles[0], projectiles[1]]
+
+		# PROBLEM the placement of fire_lazer could cause issues
+
+		if is_lazer:
+			fire_lazer(screen, g_settings, ship, projectiles[2], laz_up, time_T)
+			return 0
+
+		elif event.key == pygame.K_d:
+			g_settings.move_right =  True
 		elif event.key == pygame.K_a:
-			g_settings.move_left = True
+			g_settings.move_left =  True
 		elif event.key == pygame.K_s:
 			g_settings.move_down = True
 		elif event.key == pygame.K_w:
 			g_settings.move_up = True
-
 		elif event.key == pygame.K_SPACE:
 			g_settings.firing = True
-			fire_bullets(g_settings, screen, ship, bullets, lazerup=laz_up, \
-															bulletup=bul_up, \
-															bombup=bom_up)
+			# Handles bullets and bombs
+			fire_weapon(g_settings, screen, ship, projecti[1], bulletup=bul_up, \
+																bombup=bom_up)
 
-	return False
+	return 0
 
-
-def fire_bullets(g_settings, screen, ship, bullets, **kwargs):
+def fire_weapon(g_settings, screen, ship, bullets, **kwargs):
 
 	global powers
 	gunnin_it = 0
@@ -148,17 +166,18 @@ def fire_bullets(g_settings, screen, ship, bullets, **kwargs):
 		# This loop UPDATES the global powers dict 
 		# e.g. powers = {'gun' : 0, 'lazer' : 0, 'bullet' : 2, 'bomb' : 1}
 		powers[str(pwr)] = kwargs[str(pwr)]
-		if powers[str(pwr)]:
-			print("Verifying powers")
+		if powers['bulletup']:
+			print("Verifying")
 			print(powers)
 			gunnin_it += 1
 
 	# Default Weapon
 	if not gunnin_it:
+		# We have the gun until we get bulletup
 		powers['gun'] = 1
 		new_bullet = Bullet(g_settings, screen, ship, power='gun', level=1)
 		bullets.add(new_bullet)
-		return 0
+		# Return here if you want to disable gun at any powerup's acquisition
 	else:
 		powers['gun'] = 0
 
@@ -170,30 +189,43 @@ def fire_bullets(g_settings, screen, ship, bullets, **kwargs):
 
 		if v: # Such efficiences
 			if k == 'bulletup' and v > 0:
-				if v > 1: # 5 characters, 1 futr
+				fire_bullets(screen, g_settings, ship, k, v, bullets)
 
-					print("BEFORE BULLET AMMO : {}".format(g_settings.bullets_ammo))
-				for num in range(0, (v*2)):
-
-					new_bullet = Bullet(g_settings, screen, ship, power=str(k), \
-																  level=int(v), \
-																  b_offset=num)
-					bullets.add(new_bullet)
-
-					# Spend ammo & check if weapon downgrades
-					if v > 1:
-						g_settings.bullets, g_settings.bullets_ammo, = \
-						downgrade(g_settings.bullets, g_settings.bullets_ammo)
-						print("AFTER BULLET AMMO".format(g_settings.bullets))
-					if num == 1 and v == 1:
-						# or we get 3 bullets at lvl 1 instead of 2 ... design choice
-						break
-			if k == 'lazerup' and v > 0:
-				pass
 			if k == 'bombup' and v > 0:
 				pass
 		
 	return 0
+
+def fire_lazer(screen, g_settings, ship, lazers, lazer_up, time_T):
+	global laz_lok
+
+	if laz_lok >= 243:
+		print("FIRE! {}", laz_lok)
+		new_lazer = Bullet(g_settings, screen, ship, power='lazerup', level=lazer_up)
+		lazers.add(new_lazer)
+		laz_lok = 0
+	else:
+		return 0
+
+def fire_bullets(screen, g_settings, ship, k, v, bullets):
+
+	for num in range(0, (v*2)):
+		# k == 'bulletup' // v == v
+		new_bullet = Bullet(g_settings, screen, ship, power=str(k), \
+													  level=int(v), \
+													  b_offset=num)
+		bullets.add(new_bullet)
+
+		# Spend ammo & check if weapon downgrades
+		if v > 1:
+			g_settings.bullets, g_settings.bullets_ammo, = \
+			downgrade(g_settings.bullets, g_settings.bullets_ammo)
+
+		if num == 1 and v == 1:
+			# or we get 3 bullets at lvl 1 instead of 2 ... design choice
+			break
+
+	return True
 
 def downgrade(weapon, ammo):
 
@@ -209,9 +241,8 @@ def downgrade(weapon, ammo):
 		# backup : this should not occur
 		return 1, 0
 
-
-def check_play_buttons(stats, textbox, scores, buttons, cur_scrn=0, \
-												mousex=0, mousey=0):
+def check_play_buttons(stats, textbox, buttons, cur_scrn=0, \
+											mousex=0, mousey=0):
 
 	""" 
 		Enables user-click responses in any menu 
@@ -289,36 +320,24 @@ def check_play_buttons(stats, textbox, scores, buttons, cur_scrn=0, \
 
 	return False
 
-def check_player_clicks(g_settings, screen, ship, aliens, stats, \
-													mousex, mousey):
-	""" Click """
-	pass
+def end_game(g_settings, screen, stats, ship, powerups, \
+											twits, scores, \
+									game_won=0, flagged=0):
 
-def end_game(g_settings, screen, stats, ship, powerups, twits, bullets, scores, \
-										game_won=0, flagged=0):
-
-	global dropped_space
 	global total_twits
 	global twits_list
 	global all_tweets
 	global twit_id
-	if game_won:
-		pass
-		# SET FLAG FOR STUFF
-	###
-	#
-	#	SEND STATS TO SERVER
-	#
-	###
-
+	global powers
+	
 	# Maybe I could reset globals at game start they could be used for score tracking
 	total_twits = 0
 	twits_list 	= []
 	all_tweets 	= []
 	twit_id 	= 0
+	powers = {'gun' : 0 , 'lazerup' : 0, 'bulletup' : 0, 'bombup' : 0}
 
 	g_settings.reset_special()
-	bullets.empty()
 	twits.empty()
 	powerups.empty()
 	get_high_score(stats, scores)
@@ -330,8 +349,6 @@ def end_game(g_settings, screen, stats, ship, powerups, twits, bullets, scores, 
 	stats.game_active = False
 	# Flagged == User is logged in
 	stats.menu_mode(flagged=flagged)
-	
-	
 	
 
 def reset_army(screen, twits):
@@ -512,8 +529,11 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 		x = randint(1,27)
 		if not (x % 6):
 			# Pick powerup
-			x = randint(1, 15)
-			if x > 5:
+			x = randint(1, 20)
+			if x > 5 and x < 12:
+				# EASY DROP
+				character.power = powers['3']
+			elif x >= 12:
 				character.power = powers['1']
 			else:
 				character.power = powers[str(x)]
@@ -614,9 +634,8 @@ def send_data_TEST(name, q, url=0, hash='', u_name='', flag=0):
 			return 12
 
 
-def get_infoz(g_settings, screen, twits,\
-				stats, scores, reticle, textbox, buttons, \
-										cur_scrn=0, hide=0):
+def get_infoz(g_settings, screen, twits, stats, scores, reticle, \
+							textbox, buttons, cur_scrn=0, hide=0):
 	""" 
 		Check user input, get tweets from server, analyze them and begin game.
 		textbox.update() returns True if use presses Enter 
@@ -644,7 +663,7 @@ def get_infoz(g_settings, screen, twits,\
 		""" 			In Main Menu			"""
 
 
-		x1 = textbox.update(events, stats, textbox, scores, buttons, mousex, mousey, cur_scrn=cur_scrn, hide=0)
+		x1 = textbox.update(events, stats, textbox, buttons, mousex, mousey, cur_scrn=cur_scrn, hide=0)
 		if x1 == 'TX_SEARCH':
 		
 			# handle is the user's input
@@ -754,7 +773,7 @@ def get_infoz(g_settings, screen, twits,\
 			buttons[3].create_button()
 
 		x2 = textbox.update(events, stats, textbox, \
-							scores, buttons, mousex, mousey, \
+							buttons, mousex, mousey, \
 									cur_scrn=cur_scrn, hide=0)
 		if x2 == 'TX_SEARCH':
 
@@ -786,7 +805,7 @@ def get_infoz(g_settings, screen, twits,\
 		if mousex > 530 and mousey > 300:
 			buttons[4].create_button()
 		x3 = textbox.update(events, stats, textbox, \
-							scores, buttons, mousex, mousey, \
+								buttons, mousex, mousey, \
 									cur_scrn=cur_scrn, hide=1)
 		if x3 == 'TX_SEARCH':
 
@@ -891,8 +910,7 @@ def change_army_direction(g_settings, move_group):
 
 ### ### ### ### ### ### ### ### ### ### NETWORK ### ### ### ### ### ### ### ###
 
-def check_twit_bottom(g_settings, stats, scores, screen, \
-									ship, twits, bullets):
+def check_twit_bottom(screen, twits):
 
 	screen_rect = screen.get_rect()
 	for twit in twits.sprites():
@@ -905,7 +923,7 @@ def check_twit_bottom(g_settings, stats, scores, screen, \
 			return False
 
 def update_twits(g_settings, screen, stats, ship, \
-					powerups, twits, scores, bullets):
+					powerups, twits, scores, projectiles):
 	
 	global test
 	global all_tweets
@@ -922,17 +940,16 @@ def update_twits(g_settings, screen, stats, ship, \
 	# Check if twits touch edges
 	check_twit_edges(g_settings, twits)
 
-	if check_twit_bottom(g_settings, stats, scores, screen, \
-										ship, twits, bullets):
+	if check_twit_bottom(screen, twits):
 
 		ship_hit(g_settings, screen, stats, ship, powerups,\
-							twits, scores, bullets, bottom=1)
+						twits, scores, projectiles, bottom=1)
 	
 	# If twits hit the ship
 	if pygame.sprite.spritecollideany(ship, twits):
 		
 		ship_hit(g_settings, screen, stats, ship, powerups, \
-										twits, scores, bullets)
+								twits, scores, projectiles)
 
 	# DONT NOTICE ME!
 	
@@ -941,7 +958,7 @@ def update_twits(g_settings, screen, stats, ship, \
 	if len(all_tweets) <= 1 and len(twits.sprites()) == 0:
 		# REDUNDANT albeit safe
 		end_game(g_settings, screen, stats, ship, powerups,\
-					twits, bullets, scores, flagged=flagged)
+					twits, projectiles, scores, flagged=flagged)
 
 	elif len(twits.sprites()) <= 5 and len(all_tweets) > 1:
 		# Instantiates the next 2-tweet militia
@@ -951,33 +968,32 @@ def update_twits(g_settings, screen, stats, ship, \
 
 
 def ship_hit(g_settings, screen, stats, ship, powerups, \
-						twits, scores, bullets, bottom=0):
+						twits, scores, projectiles, bottom=0):
 	
 	global flagged
 
+	# First, empty projectiles
+	for item in projectiles:
+			item.empty()
+	# Second, worry about life
 	if stats.ships_left > 0:
+
 		if bottom:
 			reset_army(screen, twits)
 		else:
-
 			ship.center_ship()
-
-		# CLEAN THIS UP
 
 		stats.ships_left -= 1
 		scores.prep_ships()
-		bullets.empty()
 		powerups.empty()
-		# Combination if init_dyn and ship.power_up will reset the ship.
 		g_settings.init_dynamic_settings()
 		ship.power_up()
-
+		# Combination if init_dyn and ship.power_up will reset the ship.
 	else:
 		end_game(g_settings, screen, stats, ship, powerups, \
-				twits, bullets, scores, flagged=flagged)
+								twits, scores, flagged=flagged)
 
 	return 0
-
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
@@ -989,8 +1005,9 @@ def spawn_powerup(g_settings, screen, powerups, the_pwr, the_pos):
 	""" Create Powerups """
 	new_power = Powerup(g_settings, screen, the_pwr, the_pos)
 	powerups.add(new_power)
+	return True
 
-def check_kills(g_settings, screen, stats, bullets, twits, members, powerups, is_lazer=False):
+def check_kills(g_settings, screen, stats, twits, members, powerups, is_lazer=False):
 
 	global twits_list
 	global total_twits
@@ -998,13 +1015,7 @@ def check_kills(g_settings, screen, stats, bullets, twits, members, powerups, is
 	dead_twits = 0
 	for twit in members:
 
-		# Specific to bullet hits
-		if not is_lazer:
-
-			twit.health -= g_settings.bullet_dmg
-
-		else:
-			pass
+		twit.health -= g_settings.bullet_dmg
 
 		# If Dead
 		if twit.health <= 0:
@@ -1030,11 +1041,17 @@ def check_kills(g_settings, screen, stats, bullets, twits, members, powerups, is
 
 
 def update_bullets(g_settings, screen, stats, ship, scores, \
-						bullets, powerups, enter, exit, aliens=0, twits=0):
+							projectiles, powerups, enter, exit, \
+											aliens=0, twits=0):
+
 	""" Bullet & Powerup events (add / remove / upgrade) """
 
 	global twits_list
 	global total_twits
+	# OPT maybe just pass them by index to functions? These reassign every time
+	bombs 	= projectiles[0]
+	bullets = projectiles[1]
+	lazers 	= projectiles[2]
 
 	""" 
 		There are several ways to determine an explosion. 
@@ -1046,34 +1063,45 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 
 	"""
 
+	# REFAC
 	bullets.update()
 	powerups.update()
+	lazers.update()
+	bombs.update()
 	# Flag
-	is_lazer = False
-
-	for bullet in bullets.copy():
-		if bullet.rect.bottom <= 0:
-			bullets.remove(bullet)
+	
+	# REFAC
+	for item in projectiles:
+		for proj in item.copy():
+			if proj.rect.bottom <= 0:
+				item.remove(proj)
 	
 	for power in powerups.copy():
 		if power.rect.top > 800:
 			powerups.remove(power)
 
 	shot_down = pygame.sprite.groupcollide(bullets, twits, True, False)
+	bomd_down = pygame.sprite.groupcollide(bombs, twits, True, False)
+	laze_down = pygame.sprite.groupcollide(lazers, twits, True, False)
 	# else:
 	# 	# Flag
 	# 	is_lazer = True
 	# 	shot_down = pygame.sprite.groupcollide(bullets, twits, False, False)
 	# Shoosting
 	if shot_down:
+		""" specific to bullet hits """
 		for members in shot_down.values():
 	
 			# Calculate score per kill and drop powerups
-			check_kills(g_settings, screen, stats, bullets, twits, \
-								members, powerups, is_lazer=is_lazer)
+			check_kills(g_settings, screen, stats, twits, members, powerups)
 			break
 		# Update Score
 		scores.prep_score()
+
+
+
+	""" insert other projectile instances here """
+
 
 	# Powah
 	get_power = pygame.sprite.spritecollideany(ship, powerups)
@@ -1083,11 +1111,12 @@ def update_bullets(g_settings, screen, stats, ship, scores, \
 		# Initializes ship power from g_settings
 		ship.power_up(pwr=apply_power(g_settings, stats, str(get_power.pwr), enter))
 
-
 		powerups.remove(get_power)
 
 
 def apply_power(g_settings, stats, get_power, enter):
+
+	# OPT Hmmm...
 
 	""" 
 		Speedup is handled within Ship() class
@@ -1095,6 +1124,7 @@ def apply_power(g_settings, stats, get_power, enter):
 		It will render via invade.py -> listener() << speculation
 	""" 
 	global powers
+	global get_lazer
 
 	# level is only used to pipe info to listener() for now
 	level = 0
@@ -1110,37 +1140,48 @@ def apply_power(g_settings, stats, get_power, enter):
 		print("Cur score_mult {}".format(g_settings.score_multi))
 		
 	elif get_power == 'lazerup':
-		if g_settings.lazer == 3:
-			print("at max lazer")
-			return False
+		
 		g_settings.lazer += 1
-
+		get_lazer = True
+		print("GOT LAZER")
 		if g_settings.lazer > 1:
 			g_settings.lazer_ammo = 10 * (g_settings.lazer)
+
 		level = g_settings.lazer
-		
+		if g_settings.lazer >= 3:
+			g_settings.lazer = 3
+			print("at max lazer", end="")
+			print(g_settings.lazer)
+			return False
 		
 	elif get_power == 'bulletup':
-		if g_settings.bullets == 3:
-			print("at max bullets")
-			return False
-		g_settings.bullets += 1
+
+		if g_settings.bullets < 3:
+			g_settings.bullets += 1
 
 		if g_settings.bullets > 1:
-			print("bullet is now 2 or 3")
 			g_settings.bullets_ammo = 75 * (g_settings.bullets)
+
 		level = g_settings.bullets
-		
+		if g_settings.bullets >= 3:
+			print("at max bullets", end="")
+			g_settings.bullets = 3
+			print(g_settings.bullets)
+			return False
 
 	elif get_power == 'bombup':
-		if g_settings.bomb == 3:
-			print("at max bombs")
-			return False
+		
 		g_settings.bomb += 1
 
 		if g_settings.bomb > 1:
 			g_settings.bullets_ammo = 10 * (g_settings.bomb)
+
 		level = g_settings.bomb
+		if g_settings.bomb >= 3:
+			g_settings.bomb = 3
+			print("at max bombs", end="")
+			print(g_settings.bomb)
+			return False
 		
 		### ### ### ### ### ### ### ### ### ### 
 	# Multiprocess Pipe to invade.py -> listening()
@@ -1178,15 +1219,29 @@ def update_power_chart(screen, g_settings):
 
 	if bullt_level:
 
-		if bullt_level >= 1:
+		
+		if bullt_level >= 3:
+			# Level 1
 			pygame.draw.line(screen, (255,255,255), [1100, 424], [1067, 478], 2)
 			pygame.draw.rect(screen, (255,255,255), [1053, 478, 14, 14], 3)
-		if bullt_level >= 2:
-			pygame.draw.line(screen, (255,255,255), [1060, 490], [1060, 565], 2)
+			# Level 2 w/o scaling
+			pygame.draw.line(screen, (255,255,255), [1060, 490], [1060, 490 + 75], 2)
 			pygame.draw.rect(screen, (255,255,255), [1053, 565, 14, 14], 3)
-		if bullt_level >= 3:
-			pygame.draw.line(screen, (255,255,255), [1060, 579], [1060, 652], 2)
+			# Level 3
+			pygame.draw.line(screen, (255,255,255), [1060, 579], [1060, 579 + (bullt_ammo // 3 - 4)], 2)
 			pygame.draw.rect(screen, (255,255,255), [1053, 652, 14, 14], 3)
+
+		elif bullt_level >= 2:
+			# Level 1
+			pygame.draw.line(screen, (255,255,255), [1100, 424], [1067, 478], 2)
+			pygame.draw.rect(screen, (255,255,255), [1053, 478, 14, 14], 3)
+			# Level 2
+			pygame.draw.line(screen, (255,255,255), [1060, 490], [1060, 490 + bullt_ammo // 2], 2)
+			pygame.draw.rect(screen, (255,255,255), [1053, 565, 14, 14], 3)
+
+		elif bullt_level >= 1:
+			pygame.draw.line(screen, (255,255,255), [1100, 424], [1067, 478], 2)
+			pygame.draw.rect(screen, (255,255,255), [1053, 478, 14, 14], 3)
 			
 	if bombs_level:
 
@@ -1203,21 +1258,39 @@ def update_power_chart(screen, g_settings):
 	return 0
 
 
-def test_draw():
+def test_draw(screen, mousex, mousey):
+	""" Responsible for lazer fire timing and lazer reticle coloration """ 
+	global laz_lok
+	
+	if not laz_lok < 245:
+		laz_lok = 255
+		
+	else:
+		laz_lok += 3
+		print(laz_lok)
 
-	pygame.draw.rect(screen, (255,255,255), [600, 600, 14, 14], 3)
+	pygame.draw.aalines(screen, (laz_lok, 0, laz_lok), False,\
+				[ [mousex + 11, mousey], [mousex, mousey - 11],\
+				[mousex, mousey - 11], [mousex - 11, mousey], \
+				[mousex - 11, mousey],[mousex, mousey + 11],\
+				[mousex, mousey + 11],[mousex + 11, mousey]], False)
+	
 
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-							twits, powerups, bullets, stats, scores, buttons):
+					twits, powerups, projectiles, stats, scores, buttons, time_stays):
 	# Mouse
 	global cur_scrn
 	global flagged
+	global get_lazer
+
+	time_X = time_stays.recv()
+	
 
 	if not cur_scrn == stats._current_screen:
 		cur_scrn = stats._current_screen
 		print("cur scrn == {}".format(stats._current_screen))
-
+	mousex, mousey = pygame.mouse.get_pos()
 	# Load current background
 	g_settings.load_background(screen, display=stats._current_screen)
 	
@@ -1227,13 +1300,16 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 
 			# Might not need this here
 			global all_tweets
+			if get_lazer:
+				
+				test_draw(screen, mousex, mousey)
 
 			# print("starting twitter mode")
 			ship.update()
 			twits.draw(screen)
-
-			for bullet in bullets.sprites():
-				bullet.draw_bullet()
+			for item in projectiles:
+				for projectile in item.sprites():
+					projectile.draw_projectile()
 
 			for power in powerups.sprites():
 				power.blitme()

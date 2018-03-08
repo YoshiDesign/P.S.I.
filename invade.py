@@ -78,10 +78,20 @@ def listening(flag, enter, exit):
 				print("3")
 
 		sleep(wait_time)
-		
+
+def global_clock(time_flies):
+	timing = 1000000
+	while True:
+		time_flies.send(timing)
+		timing -= 1
+		if timing <= 5:
+			timing = 1000000
+
+
+
 
 # pygame.draw.rect(screen, (255,255,255), [400, 500, 10, 50])
-def Main(enter, exit):
+def Main(enter, exit, time_stays):
 	
 	# Run main // (enter, exit) are not used to track exit conditions
 	pygame.init()
@@ -91,15 +101,18 @@ def Main(enter, exit):
 										g_settings.screen_height))
 	# Load the background image
 	g_settings.load_background(screen)
-	stats = Stats(g_settings)
-	ship = Ship(screen, g_settings, stats)
+	stats 	= Stats(g_settings)
+	ship 	= Ship(screen, g_settings, stats)
 	reticle = Reticle(g_settings, screen)
 	textbox = TextInput()
-	aliens = Alien(screen, g_settings)
-	scores = Score(g_settings, screen, stats, ship)
+	aliens 	= Alien(screen, g_settings)
+	scores 	= Score(g_settings, screen, stats, ship)
 	powerups = Group()
-	twits = Group()
+	twits 	= Group()
 	bullets = Group()
+	lazers 	= Group()
+	bombs 	= Group()
+	projectiles = [bombs, bullets, lazers]
 	# explode = Explosion(g_settings, screen)
 
 	clock = pygame.time.Clock()
@@ -122,10 +135,10 @@ def Main(enter, exit):
 	while True: # Main Game Loop loops
 
 		clock.tick(FPS)
-
+		
 		if gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
-												twits, powerups, bullets, stats, \
-												scores, buttons) == 'TX_QUIT':
+												twits, powerups, projectiles, stats, \
+												scores, buttons, time_stays) == 'TX_QUIT':
 			# If we receive the quit flag.
 			return True
 
@@ -133,27 +146,34 @@ def Main(enter, exit):
 			#enter.send('hello')
 			# As per the DocString
 			if gf.check_events(g_settings, screen, ship, aliens, stats, \
-									scores, twits, bullets) == 'CE_QUIT':
+									scores, twits, projectiles, time_stays) == 'CE_QUIT':
 				# if we receive the quit flag
 				return True
 			if stats._current_screen == 3:
 
 				gf.update_bullets(g_settings, screen, stats, ship, \
-								scores, bullets, powerups, enter, exit, twits=twits)
+									scores, projectiles, powerups, \
+										enter, exit, twits=twits)
+				
 				gf.update_twits(g_settings, screen, stats, ship, powerups,\
-											twits, scores, bullets)
+												twits, scores, projectiles)
 				
 
 if __name__ == "__main__":
 
 	q = Queue()
 	enter, exit = Pipe()
+	time_stays, time_flies = Pipe()
 	listener = Process(target=listening, args=(1, enter, exit))
 	listener.start()
 
-	main_program_ends = Main(enter, exit)
+	global_timing = Process(target=global_clock, args=(time_flies,))
+	global_timing.start()
+
+	main_program_ends = Main(enter, exit, time_stays)
 	
 	if main_program_ends:
 		listener.terminate()
+		global_timing.terminate()
 		sys.exit()
 

@@ -43,7 +43,8 @@ class Settings():
 
 		# Lazers
 		self.lazer_color 	= (255, 0, 0)
-		self.lazer_width 	= 3
+		self.lazer_width 	= 100
+		self.lazer_stop 	= 20 
 
 		# Bomb
 		self.bomb_color 	= (255, 190, 0)
@@ -111,7 +112,7 @@ class Settings():
 		self.bullets 	= 0
 		self.bomb 		= 0
 
-		self.lazer_stop = self.screen_height
+		
 
 	def reset_weapon_damage(self, weapon):
 
