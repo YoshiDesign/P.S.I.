@@ -47,42 +47,29 @@ class Bullet(Sprite):
 
 		elif self.power == 'bulletup' and self.level > 0:
 
-			self.rect = pygame.Rect(0,0, self.g_settings.bullet_width,\
-										 	 self.g_settings.bullet_length * 5)
-
-			if level == 1:
+			self.rect 			= pygame.Rect(0,0, self.g_settings.bullet_width,\
+										 	 	self.g_settings.bullet_length * 5)
 			
-				self.rect.centerx	= ship.rect.x + (b_offset * 32)
+			if self.level == 1:
+			
+				self.rect.centerx		= ship.rect.x + (b_offset * 32)
 				self.rect.top 			= ship.rect.top + 26
-				self.y 					= float(self.rect.y)
-				self.color 				= (255,255,255)
-				self.speed 				= self.g_settings.bullet_speed
-
-			if level == 2:
+				
+			if self.level == 2:
 				self.rect.centerx 		= ship.rect.centerx + (b_offset - 2)
 				self.rect.top 			= ship.rect.top + 26
-				self.y 					= float(self.rect.y)
-				self.x					= float(self.rect.x)
-				self.color 				= (180,255,200)
-				self.speed 				= self.g_settings.bullet_speed + 5
 
-				self.g_settings.bullet_dmg = 125
-
-			if level == 3:
-				self.rect.centerx 		= ship.rect.centerx + 2
-
-				if self.b_offset == 2 or self.b_offset == 3: 
-					self.rect.top 		= ship.rect.top
-				else:
-					self.rect.top 		= ship.rect.top + 26
-
-				self.y 					= float(self.rect.y)
-				self.x					= float(self.rect.x)
-				self.color 				= (55,255,255)
-				self.speed 				= self.g_settings.bullet_speed + 5
-
-				self.g_settings.bullet_dmg = 150
-
+			if self.level == 3:
+				self.rect.centerx 		= ship.rect.centerx + 3
+				self.rect.top 			= ship.rect.top
+				
+			self.y 				= float(self.rect.y)
+			self.x				= float(self.rect.x)
+			self.color   		= (255 - (25 * self.level),\
+									100 + (50 * self.level),\
+									175 + (25 * self.level))
+			self.speed = self.g_settings.bullet_speed + (2 * self.level)
+			self.g_settings.bullet_dmg 	= 100 + (18 * self.level)
 
 		elif self.power == 'bombup' and self.level > 0:
 
@@ -153,9 +140,10 @@ class Bullet(Sprite):
 
 	def angle_bullets(self, level):
 
+		""" Polymorphic """
+
 		total_levels = float((level * 2) + 1)
 		level = float(level)
-
 		for i in range(1, int(total_levels)):
 				
 				if self.b_offset + 1 == i:
@@ -164,12 +152,10 @@ class Bullet(Sprite):
 
 						self.x -= 2 * (total_levels - (i * 2))
 						
-
 					# Right side
 					else:
 						
 						self.x += 2 * (total_levels - ((i-2) * 2))
-
 
 					self.rect.centerx = self.x
 

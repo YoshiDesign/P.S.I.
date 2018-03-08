@@ -48,12 +48,12 @@ class Settings():
 		# Bomb
 		self.bomb_color 	= (255, 190, 0)
 		
-		# Twitter stuff. Twit = A single letter of a tweet
+		# Word stuff. Twit = A single letter of a tweet
 		self.char_width 	= 20
 		self.char_height 	= 24
 		self.char_spacing 	= 1
-		# Change in y
-		self.twit_drops 	= 40
+
+		# Static points
 		self.twit_points 	= 10
 
 		self.is_Trump = False
@@ -69,6 +69,8 @@ class Settings():
 		self.twit_direction = 1
 		# Change in x
 		self.twit_speed 	= 4
+		# Change in y
+		self.twit_drops 	= 40
 		self.twit_hp 		= 200
 		# Twit uid
 		self.twit_id 		= 0
@@ -84,6 +86,11 @@ class Settings():
 		self.bomb_dmg 		= 200
 		self.lazer_dmg 		= 50
 		self.bullet_dmg 	= 100
+
+		# Ammo
+		self.lazer_ammo = 0
+		self.bullets_ammo = 0
+		self.bomb_ammo = 0
 
 		# Pwr-up attribs
 		self.pwr_drop_rate 	= 2

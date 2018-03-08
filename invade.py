@@ -39,45 +39,56 @@ def generate_field(i, q=0):
 	"""
 	if q:
 		i = i + q
-
 	for x in range(i, 0, -1):
 		try:
 			yield x
 		except StopIteration:
-			pass
+			return False
+		else:
+			return True
+
+
 
 
 def listening(flag, enter, exit):
 
-	""" A Target of Multiprocess """
-
-	wait_time = float(0.01)
-
+	""" 
+		The Pipe Sentinel 
+		The fact that this is receiving information
+		at the present is just a virtual placeholder
+	"""
+	
+	wait_time = float(1.0)
+	odds = [0,0,0]
 	while True:
-
+		print("listening")
 		data = exit.recv()
 		# For your health
 		if data:
 
+			""" data is a dict {power : int(level)} """
 			print("FOUND DATA")
 			print(data)
 
 			if data['power'] == 'bulletup':
-
-				pygame.draw.rect()
-
+				print("1")
 			if data['power'] == 'bombup':
-				pass
+				print("2")
 			if data['power'] == 'lazerup':
-				pass
+				print("3")
 
-				
 		sleep(wait_time)
+		
 
-
-def Main(enter, exit, screen, g_settings):
+# pygame.draw.rect(screen, (255,255,255), [400, 500, 10, 50])
+def Main(enter, exit):
 	
-	
+	# Run main // (enter, exit) are not used to track exit conditions
+	pygame.init()
+	pygame.display.set_caption("Personal Space")
+	g_settings = Settings()
+	screen = pygame.display.set_mode((g_settings.screen_width, \
+										g_settings.screen_height))
 	# Load the background image
 	g_settings.load_background(screen)
 	stats = Stats(g_settings)
@@ -102,7 +113,6 @@ def Main(enter, exit, screen, g_settings):
 	passed_btn = Button(g_settings, screen, [540, 342, 122, 37], 2)
 
 	buttons = [login_btn, about_btn, attack_btn, pass_btn, passed_btn]
-
 
 	""" 
 		KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py for efficiency 
@@ -132,6 +142,7 @@ def Main(enter, exit, screen, g_settings):
 								scores, bullets, powerups, enter, exit, twits=twits)
 				gf.update_twits(g_settings, screen, stats, ship, powerups,\
 											twits, scores, bullets)
+				
 
 if __name__ == "__main__":
 
@@ -140,14 +151,8 @@ if __name__ == "__main__":
 	listener = Process(target=listening, args=(1, enter, exit))
 	listener.start()
 
-	# Run main // (enter, exit) are not used to track exit conditions
-	pygame.init()
-	pygame.display.set_caption("Personal Space")
-	g_settings = Settings()
-	screen = pygame.display.set_mode((g_settings.screen_width, \
-										g_settings.screen_height))
-	main_program_ends = Main(enter, exit, screen, g_settings)
-
+	main_program_ends = Main(enter, exit)
+	
 	if main_program_ends:
 		listener.terminate()
 		sys.exit()

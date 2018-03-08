@@ -135,23 +135,25 @@ def keydown_event(event, g_settings, screen, ship, stats, scores, \
 			fire_bullets(g_settings, screen, ship, bullets, lazerup=laz_up, \
 															bulletup=bul_up, \
 															bombup=bom_up)
-		
-	return False
 
+	return False
 
 
 def fire_bullets(g_settings, screen, ship, bullets, **kwargs):
 
 	global powers
-	# Default weapon
 	gunnin_it = 0
+
 	for pwr in kwargs:
-		# Build a dict to pass to 
+		# This loop UPDATES the global powers dict 
+		# e.g. powers = {'gun' : 0, 'lazer' : 0, 'bullet' : 2, 'bomb' : 1}
 		powers[str(pwr)] = kwargs[str(pwr)]
 		if powers[str(pwr)]:
+			print("Verifying powers")
+			print(powers)
 			gunnin_it += 1
-			print("CHECK G_SETTINGS \nlazerup : {}\nbombup : {}\nbulletup : {}".format(g_settings.lazer, g_settings.bomb, g_settings.bullets))
 
+	# Default Weapon
 	if not gunnin_it:
 		powers['gun'] = 1
 		new_bullet = Bullet(g_settings, screen, ship, power='gun', level=1)
@@ -160,30 +162,53 @@ def fire_bullets(g_settings, screen, ship, bullets, **kwargs):
 	else:
 		powers['gun'] = 0
 
-	""" may want to thread this in a separate Function somewhere somehow """
-
-	
+	""" 
+		If pwr level == 1 it won't downgrade
+	"""
 
 	for k,v in powers.items():
-		if v:
+
+		if v: # Such efficiences
 			if k == 'bulletup' and v > 0:
-	
+				if v > 1: # 5 characters, 1 futr
+
+					print("BEFORE BULLET AMMO : {}".format(g_settings.bullets_ammo))
 				for num in range(0, (v*2)):
+
 					new_bullet = Bullet(g_settings, screen, ship, power=str(k), \
 																  level=int(v), \
 																  b_offset=num)
 					bullets.add(new_bullet)
+
+					# Spend ammo & check if weapon downgrades
+					if v > 1:
+						g_settings.bullets, g_settings.bullets_ammo, = \
+						downgrade(g_settings.bullets, g_settings.bullets_ammo)
+						print("AFTER BULLET AMMO".format(g_settings.bullets))
 					if num == 1 and v == 1:
-						# or we get 3 bullets at lvl 1
+						# or we get 3 bullets at lvl 1 instead of 2 ... design choice
 						break
 			if k == 'lazerup' and v > 0:
 				pass
 			if k == 'bombup' and v > 0:
 				pass
 		
-			
-
 	return 0
+
+def downgrade(weapon, ammo):
+
+	if weapon > 1:
+		if ammo <= 0:
+			weapon -= 1
+			ammo = int(75 * weapon)
+			return (weapon, ammo)
+		else:
+			ammo -= 1
+			return (weapon, ammo)
+	else:
+		# backup : this should not occur
+		return 1, 0
+
 
 def check_play_buttons(stats, textbox, scores, buttons, cur_scrn=0, \
 												mousex=0, mousey=0):
@@ -993,7 +1018,7 @@ def check_kills(g_settings, screen, stats, bullets, twits, members, powerups, is
 
 			# Deletes from screen & Sprite Group
 			twits.remove(twit)
-			print("twit removed")
+			
 			# Update globals
 			dead_twits += 1
 			total_twits -= 1
@@ -1068,10 +1093,12 @@ def apply_power(g_settings, stats, get_power, enter):
 		Speedup is handled within Ship() class
 		We send scoreup with lvl = current multiplier
 		It will render via invade.py -> listener() << speculation
-
 	""" 
 	global powers
+
+	# level is only used to pipe info to listener() for now
 	level = 0
+
 	print("applying {}".format(get_power))
 	powers['gun'] = 0
 	# OPT map power-up to numbers and return int instead of str
@@ -1087,6 +1114,9 @@ def apply_power(g_settings, stats, get_power, enter):
 			print("at max lazer")
 			return False
 		g_settings.lazer += 1
+
+		if g_settings.lazer > 1:
+			g_settings.lazer_ammo = 10 * (g_settings.lazer)
 		level = g_settings.lazer
 		
 		
@@ -1095,6 +1125,10 @@ def apply_power(g_settings, stats, get_power, enter):
 			print("at max bullets")
 			return False
 		g_settings.bullets += 1
+
+		if g_settings.bullets > 1:
+			print("bullet is now 2 or 3")
+			g_settings.bullets_ammo = 75 * (g_settings.bullets)
 		level = g_settings.bullets
 		
 
@@ -1103,15 +1137,75 @@ def apply_power(g_settings, stats, get_power, enter):
 			print("at max bombs")
 			return False
 		g_settings.bomb += 1
+
+		if g_settings.bomb > 1:
+			g_settings.bullets_ammo = 10 * (g_settings.bomb)
 		level = g_settings.bomb
 		
-
+		### ### ### ### ### ### ### ### ### ### 
 	# Multiprocess Pipe to invade.py -> listening()
+	# Use this to collect all the money Donald Trump drops
 	if level:
 		_relay = {'power' : get_power, 'level' : level}
 		enter.send(_relay)
-
+		### ### ### ### ### ### ### ### ### ### 
 	return str(get_power)
+
+
+def update_power_chart(screen, g_settings):
+
+	# levels
+	lazer_level = g_settings.lazer
+	bullt_level = g_settings.bullets
+	bombs_level = g_settings.bomb
+
+	# ammos
+	lazer_ammo 	= g_settings.lazer_ammo
+	bullt_ammo	= g_settings.bullets_ammo
+	bombs_ammo	= g_settings.bomb_ammo
+
+	if lazer_level:
+
+		if lazer_level >= 1:
+			pygame.draw.line(screen, (255,255,255), [1100, 424], [1100, 478], 2)
+			pygame.draw.rect(screen, (255,255,255), [1093, 478, 14, 14], 3)
+		if lazer_level >= 2:
+			pygame.draw.line(screen, (255,255,255), [1100, 490], [1100, 562], 2)
+			pygame.draw.rect(screen, (255,255,255), [1093, 565, 14, 14], 3)
+		if lazer_level >= 3:
+			pygame.draw.line(screen, (255,255,255), [1100, 579], [1100, 652], 2)
+			pygame.draw.rect(screen, (255,255,255), [1093, 652, 14, 14], 3)
+
+	if bullt_level:
+
+		if bullt_level >= 1:
+			pygame.draw.line(screen, (255,255,255), [1100, 424], [1067, 478], 2)
+			pygame.draw.rect(screen, (255,255,255), [1053, 478, 14, 14], 3)
+		if bullt_level >= 2:
+			pygame.draw.line(screen, (255,255,255), [1060, 490], [1060, 565], 2)
+			pygame.draw.rect(screen, (255,255,255), [1053, 565, 14, 14], 3)
+		if bullt_level >= 3:
+			pygame.draw.line(screen, (255,255,255), [1060, 579], [1060, 652], 2)
+			pygame.draw.rect(screen, (255,255,255), [1053, 652, 14, 14], 3)
+			
+	if bombs_level:
+
+		if bombs_level >= 1:
+			pygame.draw.line(screen, (255,255,255), [1100, 424], [1133, 478], 2)
+			pygame.draw.rect(screen, (255,255,255), [1133, 478, 14, 14], 3)
+		if bombs_level >= 2:
+			pygame.draw.line(screen, (255,255,255), [1140, 490], [1140, 565], 2)
+			pygame.draw.rect(screen, (255,255,255), [1133, 565, 14, 14], 3)
+		if bombs_level >= 3:
+			pygame.draw.line(screen, (255,255,255), [1140, 579], [1140, 652], 2)
+			pygame.draw.rect(screen, (255,255,255), [1133, 652, 14, 14], 3)
+
+	return 0
+
+
+def test_draw():
+
+	pygame.draw.rect(screen, (255,255,255), [600, 600, 14, 14], 3)
 
 
 def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
@@ -1144,8 +1238,10 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 			for power in powerups.sprites():
 				power.blitme()
 
-			## MULTIPROC UPDATE POWERUPS HERE ##
+			#update_power_chart(screen, g_settings)
 
+			## MULTIPROC UPDATE POWERUPS HERE ##
+		update_power_chart(screen, g_settings)
 
 		scores.show_score()
 
@@ -1160,6 +1256,7 @@ def update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 					stats, scores, reticle, textbox, buttons, \
 								cur_scrn=stats._current_screen) == 'TX_QUIT':
 				return 'TX_QUIT'
+
 
 	pygame.display.flip()
 
