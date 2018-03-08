@@ -44,16 +44,17 @@ powers = {'gun' : 0 , 'lazerup' : 0, 'bulletup' : 0, 'bombup' : 0}
 
 
 def check_events(g_settings, screen, ship, aliens, stats, \
-						scores, twits, projectiles, time_stays):
+									scores, projectiles):
 	global get_lazer
 	global laz_lok
-	""" Tracks text input box and all player events while game_active == True """
-	# OPT REALLY IMPORTANT : This entire function might ONLY Need to run during game
+
+	""" Tracks player events while game_active == True """
+
+	# Used to ... ?
 	mousex, mousey = pygame.mouse.get_pos()
 	events = pygame.event.get()
 
 	""" Plugging in the Clock-Pipe here """
-	time_T = time_stays.recv()
 	
 	
 	# Events : This wont run at the same time -event in events- occurs in textbox.update() via get_infoz
@@ -66,15 +67,16 @@ def check_events(g_settings, screen, ship, aliens, stats, \
 			if get_lazer:
 
 				if laz_lok >= 254:
-					
+					lazer = projectiles[2]
+					laz_up = int(g_settings.lazer)
+					fire_lazer(screen, g_settings, ship, lazer, laz_up)
 					# Get_lazer will become redundant for precision
-					keydown_event(event, g_settings, screen, ship, stats, \
-									scores, projectiles, time_T, is_lazer=get_lazer)
+					
 				return 0
 			
 		elif event.type == pygame.KEYDOWN:
 			keydown_event(event, g_settings, screen, ship, \
-							stats, scores, projectiles, time_T)
+								stats, scores, projectiles)
 
 		elif event.type == pygame.KEYUP:
 			keyup_event(event, g_settings, stats)
@@ -123,25 +125,23 @@ def keyup_event(event, g_settings, stats):
 	return False
 
 def keydown_event(event, g_settings, screen, ship, stats, 
-					scores, projectiles, time_T, is_lazer=False):
+					scores, projectiles, is_lazer=False):
 	""" Keydowns """
 	# Aka more events
 	if stats.game_active:
 		# OPT Maybe these should be assigned in Check_Events() and we can instead build the dict here?
-		laz_up = int(g_settings.lazer)
+		
 		bul_up = int(g_settings.bullets)
+		bullets = projectiles[1]
 		bom_up = int(g_settings.bomb)
+		bombs = projectiles[0]
 
 		# WIll probably refactor again, but this is because lazers are handled separately
 		projecti = [projectiles[0], projectiles[1]]
 
 		# PROBLEM the placement of fire_lazer could cause issues
 
-		if is_lazer:
-			fire_lazer(screen, g_settings, ship, projectiles[2], laz_up, time_T)
-			return 0
-
-		elif event.key == pygame.K_d:
+		if event.key == pygame.K_d:
 			g_settings.move_right =  True
 		elif event.key == pygame.K_a:
 			g_settings.move_left =  True
@@ -151,9 +151,9 @@ def keydown_event(event, g_settings, screen, ship, stats,
 			g_settings.move_up = True
 		elif event.key == pygame.K_SPACE:
 			g_settings.firing = True
-			# Handles bullets and bombs
-			fire_weapon(g_settings, screen, ship, projecti[1], bulletup=bul_up, \
-																bombup=bom_up)
+			# Handles bullets atm
+			fire_weapon(g_settings, screen, ship, bullets, bulletup=bul_up, \
+															bombup=bom_up)
 
 	return 0
 
@@ -196,7 +196,7 @@ def fire_weapon(g_settings, screen, ship, bullets, **kwargs):
 		
 	return 0
 
-def fire_lazer(screen, g_settings, ship, lazers, lazer_up, time_T):
+def fire_lazer(screen, g_settings, ship, lazers, lazer_up):
 	global laz_lok
 
 	if laz_lok >= 243:
@@ -240,6 +240,10 @@ def downgrade(weapon, ammo):
 	else:
 		# backup : this should not occur
 		return 1, 0
+
+def check_clicks(event, g_settings, screen, ship, lazer):
+	pass
+	
 
 def check_play_buttons(stats, textbox, buttons, cur_scrn=0, \
 											mousex=0, mousey=0):
@@ -321,8 +325,7 @@ def check_play_buttons(stats, textbox, buttons, cur_scrn=0, \
 	return False
 
 def end_game(g_settings, screen, stats, ship, powerups, \
-											twits, scores, \
-									game_won=0, flagged=0):
+					twits, scores, game_won=False, flagged=0):
 
 	global total_twits
 	global twits_list
@@ -958,14 +961,13 @@ def update_twits(g_settings, screen, stats, ship, \
 	if len(all_tweets) <= 1 and len(twits.sprites()) == 0:
 		# REDUNDANT albeit safe
 		end_game(g_settings, screen, stats, ship, powerups,\
-					twits, projectiles, scores, flagged=flagged)
+					twits, scores, game_won=True, flagged=flagged)
 
 	elif len(twits.sprites()) <= 5 and len(all_tweets) > 1:
 		# Instantiates the next 2-tweet militia
 		create_army(g_settings, screen, twits, all_tweets)
 
 	return 0
-
 
 def ship_hit(g_settings, screen, stats, ship, powerups, \
 						twits, scores, projectiles, bottom=0):

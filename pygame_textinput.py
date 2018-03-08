@@ -69,16 +69,16 @@ class TextInput:
         for event in events:
             if event.type == pygame.QUIT:
                     return 'TX_QUIT'
+            if not stats.game_active:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    print("The game is not active, click!")
+                    # OPT  make a button group and cycle through them for readability
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
 
-                # OPT  make a button group and cycle through them for readability
-
-
-                # Returns true with a screen change // Handles all menu button clicks
-                if gf.check_play_buttons(stats, textbox, buttons, cur_scrn=cur_scrn, \
+                    # Returns true with a screen change // Handles all menu button clicks
+                    if gf.check_play_buttons(stats, textbox, buttons, cur_scrn=cur_scrn, \
                                                             mousex=mousex, mousey=mousey):
-                    return 'TX_SEARCH'
+                        return 'TX_SEARCH'
 
             if event.type == pygame.KEYDOWN:
                 self.cursor_visible = True # So the user sees where he writes

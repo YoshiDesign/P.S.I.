@@ -146,7 +146,7 @@ def Main(enter, exit, time_stays):
 			#enter.send('hello')
 			# As per the DocString
 			if gf.check_events(g_settings, screen, ship, aliens, stats, \
-									scores, twits, projectiles, time_stays) == 'CE_QUIT':
+										scores, projectiles) == 'CE_QUIT':
 				# if we receive the quit flag
 				return True
 			if stats._current_screen == 3:
@@ -154,7 +154,7 @@ def Main(enter, exit, time_stays):
 				gf.update_bullets(g_settings, screen, stats, ship, \
 									scores, projectiles, powerups, \
 										enter, exit, twits=twits)
-				
+
 				gf.update_twits(g_settings, screen, stats, ship, powerups,\
 												twits, scores, projectiles)
 				
