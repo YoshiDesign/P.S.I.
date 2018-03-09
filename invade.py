@@ -110,7 +110,7 @@ def global_clock(time_flies):
 	while True:
 		time_flies.send(timing)
 		timing -= 1
-		if timing <= 5:
+		if timing <= 5000:
 			timing = 1000000
 
 # pygame.draw.rect(screen, (255,255,255), [400, 500, 10, 50])

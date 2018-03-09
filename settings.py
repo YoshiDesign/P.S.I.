@@ -102,6 +102,7 @@ class Settings():
 		self.lazer 		= 0
 		self.bullets 	= 0
 		self.bomb 		= 0
+		self.default_gun = 1
 		# Ammo
 		self.lazer_ammo = 0
 		self.bullets_ammo = 0
