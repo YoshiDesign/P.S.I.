@@ -6,7 +6,8 @@ class Settings():
 	# 0 = reg || 1 = twitter
 	_current_game = 0
 	
-	def __init__(self):
+	# -exit- sends data to Thread_requests() in invade.py
+	def __init__(self, exit):
 		
 		self.screen_width 	= 1200
 		self.screen_height 	= 800
@@ -83,16 +84,6 @@ class Settings():
 		self.ship_limit 	= 1
 		self.ship_speedup 	= 1.2
 
-		# Damage Grades
-		self.bomb_dmg 		= 200
-		self.lazer_dmg 		= 50
-		self.bullet_dmg 	= 100
-
-		# Ammo
-		self.lazer_ammo = 0
-		self.bullets_ammo = 0
-		self.bomb_ammo = 0
-
 		# Pwr-up attribs
 		self.pwr_drop_rate 	= 2
 
@@ -107,29 +98,36 @@ class Settings():
 		# Shooting flag
 		self.firing 		= False
 
-		# weapons for upgrading
+		# Weapon Levels!
 		self.lazer 		= 0
 		self.bullets 	= 0
 		self.bomb 		= 0
+		# Ammo
+		self.lazer_ammo = 0
+		self.bullets_ammo = 0
+		self.bomb_ammo 	= 0
+
+		# Damage Grades
+		self.bomb_dmg 	= 200
+		self.lazer_dmg 	= 50
+		self.bullet_dmg = 100
 
 		
 
 	def reset_weapon_damage(self, weapon):
 
 		if weapon == 1:
-			# bullets
 			self.bullet_dmg = 100
 		if weapon == 2:
-			# lazer
 			self.lazer_dmg = 50
 		if weapon == 3:
-			# bomb
-			self.bom_dmg = 200
+			self.bomb_dmg = 200
 
 	# Special opponents
 	def reset_special(self):
 		self.is_Trump = False
 		self.is_Yoshi = False
+		self.is_ElonX = False
 
 	def clear_weapon(self, power):
 		if power == "lazerup":
@@ -160,7 +158,9 @@ class Settings():
 			screen.blit(self.background5, self.background_rect)
 
 
+	def send_datas(self):
 
+		exit.send()
 
 
 

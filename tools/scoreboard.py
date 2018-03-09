@@ -36,6 +36,8 @@ class Score():
 			ship.rect.y = 15
 			self.ships.add(ship)
 
+		return 0
+
 	def prep_score(self):
 
 		score_str = "{:,}".format(self.stats.score)
@@ -45,6 +47,8 @@ class Score():
 		self.score_rect = self.score_image.get_rect()
 		self.score_rect.right = self.screen_rect.right - 50
 		self.score_rect.top = 12
+
+		return 0
 
 	def prep_high_score(self):
 
@@ -56,6 +60,8 @@ class Score():
 		self.high_score_rect.centerx = self.screen_rect.centerx + 45
 		self.high_score_rect.top = self.screen_rect.bottom - 55
 
+		return 0
+
 	def prep_level(self, up=0):
 		""" Track Level """
 		if up:
@@ -66,12 +72,16 @@ class Score():
 		self.level_rect.left = self.screen_rect.left + 10
 		self.level_rect.top = self.score_rect.top + 38
 
+		return 0
+
 	def prep_tweeter(self, handle):
 		self.tweeter_image = self.font3.render("@"+str(handle.lstrip("@")), \
 													True, self.white, False)
 		self.tweeter_rect = self.tweeter_image.get_rect()
 		self.tweeter_rect.left = self.screen_rect.left + 39
 		self.tweeter_rect.top = self.score_rect.top + 7
+
+		return 0
 
 	def show_score(self):
 
@@ -81,6 +91,8 @@ class Score():
 		self.ships.draw(self.screen)
 		if self.stats._current_screen == 3:
 			self.screen.blit(self.tweeter_image, self.tweeter_rect)
+
+		return 0
 
 	def start_game(self, mode=0, handle=""):
 
@@ -101,5 +113,7 @@ class Score():
 			self.prep_score()
 			self.prep_high_score()
 			self.prep_level()
+
+		return 0
 
 		

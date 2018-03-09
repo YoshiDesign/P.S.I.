@@ -4,9 +4,9 @@
 
 """ 
 
-
 import sys
 import pygame
+import requests
 from time import sleep
 from pygame.locals import *
 from pygame.sprite import Group
@@ -34,8 +34,6 @@ def generate_field(i, q=0):
 
 	""" 
 		Simple reverse generator 
-		Allows for optional additions 
-		to extend prolong from StopIteration
 	"""
 	if q:
 		i = i + q
@@ -47,37 +45,65 @@ def generate_field(i, q=0):
 		else:
 			return True
 
+class Thread_requests():
 
+	def __init__(self):
+		# Hash before transit, discard otherwise
+		self.global_stats_dict = { 
 
+			"power" : {
+				"bulletup" : 0, 
+				"lazerup" :  0,
+				"bombup"  :  0,
+				"speedup" :  0,
+			},
+			"play_info" : {
+				"tw_destroy" : 0,
+				"pl_destroy" : 0,
+				"ship_loss" :  0,
+				"win_handles": []
+			},
+			"score_info" : {
+				"points" 	:  0,
+				"high_score" : 0
+			},
+			"novelty" : {
+				"dollars" : 0,
+				"booster" : 0,
+			}
+		}
 
-def listening(flag, enter, exit):
+	@classmethod
+	def listening(self, flag, enter, exit):
 
-	""" 
-		The Pipe Sentinel 
-		The fact that this is receiving information
-		at the present is just a virtual placeholder
-	"""
-	
-	wait_time = float(1.0)
-	odds = [0,0,0]
-	while True:
-		print("listening")
-		data = exit.recv()
-		# For your health
-		if data:
+		""" 
+			The Pipe Sentinel collecting from :
+			apply_power()
 
-			""" data is a dict {power : int(level)} """
-			print("FOUND DATA")
-			print(data)
+		"""
+		
+		odds = [0,0,0]
+		while True:
+			print("listening")
+			data = exit.recv()
+			# For your health
+			if data:
 
-			if data['power'] == 'bulletup':
-				print("1")
-			if data['power'] == 'bombup':
-				print("2")
-			if data['power'] == 'lazerup':
-				print("3")
+				"""	
+					Will receive a list of 3 dicts after each game ends	
+					[relay_power, relay_score, relay_other] --> globals in gf.py
 
-		sleep(wait_time)
+				"""
+				print("FOUND DATA")
+				print(data)
+
+				if data['power'] == 'bulletup':
+					self.global_stats_dict['powers']['bulletup'] += 1
+				if data['power'] == 'bombup':
+					self.global_stats_dict['powers']['bombup'] += 1
+				if data['power'] == 'lazerup':
+					self.global_stats_dict['powers']['lazerup'] += 1
+					
 
 def global_clock(time_flies):
 	timing = 1000000
@@ -87,16 +113,13 @@ def global_clock(time_flies):
 		if timing <= 5:
 			timing = 1000000
 
-
-
-
 # pygame.draw.rect(screen, (255,255,255), [400, 500, 10, 50])
 def Main(enter, exit, time_stays):
 	
 	# Run main // (enter, exit) are not used to track exit conditions
 	pygame.init()
 	pygame.display.set_caption("Personal Space")
-	g_settings = Settings()
+	g_settings = Settings(exit)
 	screen = pygame.display.set_mode((g_settings.screen_width, \
 										g_settings.screen_height))
 	# Load the background image
@@ -109,23 +132,28 @@ def Main(enter, exit, time_stays):
 	scores 	= Score(g_settings, screen, stats, ship)
 	powerups = Group()
 	twits 	= Group()
+
+	# wpns
 	bullets = Group()
 	lazers 	= Group()
 	bombs 	= Group()
+
+	# Our weapons
 	projectiles = [bombs, bullets, lazers]
-	# explode = Explosion(g_settings, screen)
+	
 
-	clock = pygame.time.Clock()
-	FPS = 22
-	switch = 0
-
+	# btns
 	attack_btn = Button(g_settings, screen, [527, 400, 159, 50], 2)
 	login_btn = Button(g_settings, screen, [130, 258, 220, 50], 2)
 	about_btn = Button(g_settings, screen, [820, 260, 245, 50], 2)
 	pass_btn = Button(g_settings, screen, [550, 342, 100, 37], 2)
 	passed_btn = Button(g_settings, screen, [540, 342, 122, 37], 2)
 
+	# Our buttons
 	buttons = [login_btn, about_btn, attack_btn, pass_btn, passed_btn]
+
+	clock = pygame.time.Clock()
+	FPS = 22
 
 	""" 
 		KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py for efficiency 
@@ -164,14 +192,19 @@ if __name__ == "__main__":
 	q = Queue()
 	enter, exit = Pipe()
 	time_stays, time_flies = Pipe()
-	listener = Process(target=listening, args=(1, enter, exit))
+
+	# SENDING DATA ONLY // see gf.get_infoz() for tweet acquisition
+	listener = Process(target=Thread_requests.listening, args=(1, enter, exit))
 	listener.start()
 
+	# A persistent clock we can pipe to where a constant loop is needed
 	global_timing = Process(target=global_clock, args=(time_flies,))
 	global_timing.start()
 
+	# Circumstantial irony for a graceful conclusion. This runs the game
 	main_program_ends = Main(enter, exit, time_stays)
 	
+	# Ritardando
 	if main_program_ends:
 		listener.terminate()
 		global_timing.terminate()
