@@ -146,8 +146,9 @@ class TextInput:
         if not hide:
             self.surface = self.font_object.render(self.input_string, self.antialias, self.text_color)
         else:
-            # Hide password
-            self.surface = self.font_object.render("...", self.antialias, self.text_color)
+            # Hidden Password Field
+            self.surface = self.font_object.render("", \
+                                                        self.antialias, self.text_color)
 
 
         # Update self.cursor_visible

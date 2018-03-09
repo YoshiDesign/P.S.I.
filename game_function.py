@@ -58,7 +58,6 @@ def check_events(g_settings, screen, ship, aliens, stats, \
 	global get_lazer
 	global laz_lok
 
-	
 	""" Tracks player events while game_active == True """
 
 	# Used to ... ?
@@ -295,7 +294,7 @@ def check_play_buttons(stats, textbox, buttons, cur_scrn=0, \
 		if login_clicked and cur_scrn == 0:
 
 			textbox.reset()
-			# Change Screens
+			# Change
 			stats.login_mode()
 			# reset state
 			login_clicked = False
@@ -303,7 +302,7 @@ def check_play_buttons(stats, textbox, buttons, cur_scrn=0, \
 
 		if to_pass_clicked and cur_scrn == 1:
 
-			# Change Screens
+			# Change
 			if not textbox.get_text():
 				return False
 			stats.pass_mode()
