@@ -29,10 +29,10 @@ class Powerup(Sprite):
 			print("TRUMP")
 			if self.x == 1:
 				print("TRUMPPUP")
-				self.fp = os.fsencode(str("media/sprites/powers/mflag.png"))
+				self.fp = os.fsencode(str("media/sprites/powers/specials/mflag.png"))
 			else:
 				print("TRUMPPUP 2")
-				self.fp = os.fsencode(str("media/sprites/powers/money.png"))
+				self.fp = os.fsencode(str("media/sprites/powers/specials/money.png"))
 
 		else:
 

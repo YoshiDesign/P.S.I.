@@ -58,8 +58,6 @@ class Settings():
 		# Static points
 		self.twit_points 	= 10
 
-		self.is_Trump = False
-
 		# Create dynamic settings
 		self.init_dynamic_settings()
 
@@ -110,7 +108,7 @@ class Settings():
 
 		# Damage Grades
 		self.bomb_dmg 	= 200
-		self.lazer_dmg 	= 50
+		self.lazer_dmg 	= 4
 		self.bullet_dmg = 100
 
 		
@@ -125,7 +123,7 @@ class Settings():
 			self.bomb_dmg = 200
 
 	# Special opponents
-	def reset_special(self):
+	def set_special(self):
 		self.is_Trump = False
 		self.is_Yoshi = False
 		self.is_ElonX = False

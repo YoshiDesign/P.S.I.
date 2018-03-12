@@ -47,7 +47,10 @@ def generate_field(i, q=0):
 
 class Thread_requests():
 
+	""" Game Data to be sent to the webserver """
+
 	def __init__(self):
+
 		# Hash before transit, discard otherwise
 		self.global_stats_dict = { 
 
@@ -103,18 +106,27 @@ class Thread_requests():
 					self.global_stats_dict['powers']['bombup'] += 1
 				if data['power'] == 'lazerup':
 					self.global_stats_dict['powers']['lazerup'] += 1
-					
+
 
 def global_clock(time_flies):
-	timing = 1000000
+	timing = 1000
+	count = 0
 	while True:
-		time_flies.send(timing)
-		timing -= 1
-		if timing <= 5000:
-			timing = 1000000
+
+		if time_flies.recv():
+
+			if timing % 12:
+				count += 1
+				timing -= 1
+				print("time ", end="")
+				print(timing)
+				time_flies.send(count)
+				if timing <= 100:
+					timing = 1000
+					count = 0
 
 # pygame.draw.rect(screen, (255,255,255), [400, 500, 10, 50])
-def Main(enter, exit, time_stays):
+def Main(enter, exit, time_stay):
 	
 	# Run main // (enter, exit) are not used to track exit conditions
 	pygame.init()
@@ -166,7 +178,7 @@ def Main(enter, exit, time_stays):
 		
 		if gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
 												twits, powerups, projectiles, stats, \
-												scores, buttons, time_stays) == 'TX_QUIT':
+														scores, buttons) == 'TX_QUIT':
 			# If we receive the quit flag.
 			return True
 
@@ -181,7 +193,7 @@ def Main(enter, exit, time_stays):
 
 				gf.update_bullets(g_settings, screen, stats, ship, \
 									scores, projectiles, powerups, \
-										enter, exit, twits=twits)
+											enter, exit, twits=twits)
 
 				gf.update_twits(g_settings, screen, stats, ship, powerups,\
 												twits, scores, projectiles)
@@ -189,9 +201,10 @@ def Main(enter, exit, time_stays):
 
 if __name__ == "__main__":
 
+	# P's & Q
 	q = Queue()
 	enter, exit = Pipe()
-	time_stays, time_flies = Pipe()
+	time_stay, time_flies = Pipe()
 
 	# SENDING DATA ONLY // see gf.get_infoz() for tweet acquisition
 	listener = Process(target=Thread_requests.listening, args=(1, enter, exit))
@@ -202,7 +215,7 @@ if __name__ == "__main__":
 	global_timing.start()
 
 	# Circumstantial irony for a graceful conclusion. This runs the game
-	main_program_ends = Main(enter, exit, time_stays)
+	main_program_ends = Main(enter, exit, time_stay)
 	
 	# Ritardando
 	if main_program_ends:

@@ -1,4 +1,10 @@
 """017, Silas Gyger, silasgyger@gmail.com, All rights reserved.
+    
+    Modifications by Anthony Lyristis (YoshiDesign)
+    - Added password-field mode ::156 "--------------" as arbitrary placeholder.
+    - Added reset()
+    - Important! : call TextInput.reset() before creating an instance or otherwise rendering.
+        ~ This was to fix frozen character placement and BS tracking issues after calls to clear_text()
 """
 import sys
 import pygame
@@ -147,8 +153,7 @@ class TextInput:
             self.surface = self.font_object.render(self.input_string, self.antialias, self.text_color)
         else:
             # Hidden Password Field
-            self.surface = self.font_object.render("", \
-                                                        self.antialias, self.text_color)
+            self.surface = self.font_object.render("--------------", self.antialias, self.text_color)
 
 
         # Update self.cursor_visible

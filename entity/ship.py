@@ -13,7 +13,7 @@ class Ship(Sprite):
 
 		super(Ship, self).__init__()
 
-
+		self.g_settings = g_settings
 		# Get screen & Screen Object
 		self.screen = screen
 		self.stats = stats
@@ -23,7 +23,6 @@ class Ship(Sprite):
 		self.sheet = Spritesheet(self.fp, 4, 1)
 		# Used for life counter
 		self.index = 0
-		self.g_settings = g_settings
 		
 		# Since we blit the boat based on a spritesheet, we need initial static allocation to start
 		# Note : The ship image follows a manually instantiated pygame.Rect its rect, not vice versa
@@ -48,7 +47,7 @@ class Ship(Sprite):
 			self.index += 1
 		else:
 			self.index = 0
-		
+
 		# Blit the ship on the screen, iterating through its spritesheet indices
 		self.sheet.blitme(self.screen, self.index % self.sheet.totalCells, \
 												self.ship_x, self.ship_y)
@@ -116,18 +115,4 @@ class Ship(Sprite):
 
 		return True
 
-
-		
-
-
-	# def moar_bulletz(self):
-
-	# 	going, beside = Pipe()
-
-	# def set_us_bomb(self):
-
-	# 	alice, bob = Pipe()
-	
-		
-		
 		
