@@ -8,28 +8,38 @@ from tools.spritesheet import Spritesheet
 class Bullet(Sprite):
 	
 	def __init__(self, g_settings, screen, ship, power='', \
-												level=0, b_offset=0, \
-												mousex=0, mousey=0):
+										level=0, b_offset=0):
 		super(Bullet, self).__init__()
 		
-		# Otherwise we are stuck relative to the ship's X at instantiation
-		self.position_x = ship.ship_x - 400
-		self.speed = float(3.0)
-		self.step = 0
-		self.index = 0
 		self.screen = screen
 		self.ship = ship
 		self.g_settings = g_settings
+
+		# Constant for keeping relative to the ship
+		self.position_x = ship.ship_x - 400
+		# Relative speed constant
+		self.speed = float(3.0)
+
+		# Increment spritesheets
+		self.step 	= 0
+		self.index 	= 0
+
+		# For Lazer vector
+		self.delta_x = 0
+		self.delta_y = 0
+
 		# Properties
 		self.power = str(power)
 		self.level = int(level)
-		# Used to angle bullet upgrade - specifically
+
+		# Bullet vector constant
 		self.b_offset = b_offset
 
 		if self.power == 'gun' and self.level > 0:
 
 			self.rect = pygame.Rect(0,0, self.g_settings.gun_width,\
-										 	self.g_settings.bullet_length)
+									self.g_settings.bullet_length)
+
 			self.rect.centerx 		= self.ship.rect.centerx
 			self.rect.top 			= self.ship.rect.top
 			self.y 					= float(self.rect.y)
@@ -39,34 +49,43 @@ class Bullet(Sprite):
 		# Ima Lazer
 		elif self.power == 'lazerup' and self.level > 0:
 			
-			self.mousex = mousex
-			self.mousey = mousey
+			# AIM
+			self.mousex, self.mousey = pygame.mouse.get_pos()
 			
-
 			self.frequency = 3
 			self.amplitude = 20
 
-			# OPT Rect of a circle?
-			self.fp = os.fsencode("media/spritesheets/splodesheet.png")
+			if level == 1:
+				self.fp = os.fsencode("media/spritesheets/splodesheet.png")
+			elif level == 2:
+				self.fp = os.fsencode("media/spritesheets/splodesheetL2.png")
+			elif level == 3:
+				self.fp = os.fsencode("media/spritesheets/splodesheetL3.png")
+			else:
+				self.fp = os.fsencode("media/spritesheets/splodesheet.png")
+
 			self.sheet = Spritesheet(self.fp, 5, 4)
 			self.rect = pygame.Rect(0,0, 32, 32)
 			self.rect.x = self.ship.rect.x
 			self.rect.y = self.ship.rect.y
-			
-			if level == 1:
-				pass
-			if level == 2:
-				pass
-			if level == 3:
-				pass
 
 			self.speed 			= 2
-			self.x				= float(self.ship.rect.x)
+			self.x				= float(self.ship.ship_x)
 			self.y			 	= float(self.rect.y)
-			self.color   		= (175 + (25 * self.level),\
-									0,\
-									175 + (25 * self.level))
-			self.g_settings.lazer_dmg += (5 * self.level)
+
+			# self.color   		= (175 + (25 * self.level), 0, 175 + (25 * self.level))
+			self.g_settings.lazer_dmg += (4 * self.level)
+
+
+
+			self.delta_y = float(self.ship.rect.y - self.mousey) * -1
+			self.delta_x = float(self.x - self.mousex)
+
+			self.zero_y = self.mousey - self.mousey
+
+			self.slope = float(self.delta_y / self.delta_x)
+
+			print("SLOPE = {}".format(self.slope))
 
 		# Ima Bullet
 		elif self.power == 'bulletup' and self.level > 0:
@@ -129,14 +148,11 @@ class Bullet(Sprite):
 			self.rect.centerx 	= self.ship.rect.x + self.offset_value
 			self.y 				= float(self.rect.y)
 			self.speed 			= self.speed + 8
+			self.g_settings.bomb_dmg += (3 * self.level)
 
 	def update(self, *args):
-		""" powers[] = Power levels of [bullets, lazer, bomb], oh my """
 
-		# # Tracking weapon levels
-		# lazer 		= self.g_settings.lazer
-		# bullets 		= self.g_settings.bullets
-		# bomb 			= self.g_settings.bomb
+		""" Incremental changes in location """
 
 		# Update Bullets
 		if self.power == 'bulletup' and self.level >= 2:
@@ -144,22 +160,36 @@ class Bullet(Sprite):
 		
 		# Update Lazer
 		if self.power == 'lazerup' and self.level > 0:
+
 			self.index += 1
 			if self.index % 12:
 				self.step += 1
-			self.bomb_lazer(lazer=True, step=self.step)
 			
+			self.y -= self.speed
+
+
+			self.rect.y = self.y
+			self.rect.x = self.x
+
+			# print("SLOPE??? ", self.slope)
+			self.sheet.blitme(self.screen, self.step % self.sheet.totalCells, \
+														self.rect.x, self.rect.y)
+
 		# Update Bombs
 		if self.power == 'bombup' and self.level > 0:
-			self.bomb_lazer(bomb=True)
+			self.bomb_vector()
 
 		# Update Default
 		else:
 			self.y -= self.speed
 			self.rect.y = self.y
 
-	def draw_projectile(self):
+		pygame.display.flip()
 
+
+
+	def draw_projectile(self):
+		"""  Cannons  """
 		if self.power == 'bulletup' or self.power == 'gun':
 		
 			pygame.draw.rect(self.screen, self.color, self.rect)
@@ -168,10 +198,13 @@ class Bullet(Sprite):
 
 	def angle_bullets(self, level):
 
-		""" Creates constant (level) based angles """
-
+		""" 
+			Fan out the bullets based upon a constant.
+			Is polymorphic
+		"""
 		total_levels = float((level * 2) + 1)
 		level = float(level)
+
 		for i in range(1, int(total_levels)):
 				
 				if self.b_offset + 1 == i:
@@ -182,17 +215,11 @@ class Bullet(Sprite):
 						
 					# Right side
 					else:
-						
 						self.x += 2 * (total_levels - ((i-2) * 2))
 
 					self.rect.centerx = self.x
 
-
-	def aim_lazer(self, mousex, mousey):
-		pass
-
-
-	def bomb_lazer(self, bomb=False, lazer=False, step=0):
+	def bomb_vector(self):
 
 		""" Messy Maths, attempting to organize """
 
@@ -201,23 +228,15 @@ class Bullet(Sprite):
 		else:
 			op = cos
 
+		self.y -= self.speed
+		self.rect.y = self.y
+		# MMMMMMMMMMMMMMMMMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATHS
 		self.x = int((self.g_settings.screen_height/2) + self.amplitude*op(self.frequency*((float(self.y)/self.g_settings.screen_width)*(2*pi) + (self.speed*time()))))
-		self.y-= self.speed
-		self.rect.y=self.y
+		if self.b_offset == 0:
+			self.rect.x = self.x + self.position_x - 16
+		elif self.b_offset == 1:
+			self.rect.x = self.x + self.position_x + 16
+		self.screen.blit(self.image, self.rect)
 
-		if bomb:
-			if self.b_offset == 0:
-				self.rect.x = self.x + self.position_x - 16
-			elif self.b_offset == 1:
-				self.rect.x = self.x + self.position_x + 16
-			self.screen.blit(self.image, self.rect)
-
-
-		if lazer:
-			step = step
-			self.sheet.blitme(self.screen, step % self.sheet.totalCells, \
-													self.rect.x, self.rect.y)
-
-		pygame.display.flip()
 
 		

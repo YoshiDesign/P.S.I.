@@ -17,10 +17,14 @@ class Ship(Sprite):
 		# Get screen & Screen Object
 		self.screen = screen
 		self.stats = stats
-		self.screen_rect = screen.get_rect()
 
+		# Increment Spritesheets
+		self.index = 0
+		self.step = 0
+
+		self.screen_rect = screen.get_rect()
 		self.fp = os.fsencode("media/spritesheets/shipsheet.png")
-		self.sheet = Spritesheet(self.fp, 4, 1)
+		self.sheet = Spritesheet(self.fp, 4, 3)
 		# Used for life counter
 		self.index = 0
 		
@@ -43,13 +47,12 @@ class Ship(Sprite):
 
 	def update(self):
 
-		if self.index < 100:
-			self.index += 1
-		else:
-			self.index = 0
+		self.index += 1
+		if self.index % 12:
+			self.step += 1
 
 		# Blit the ship on the screen, iterating through its spritesheet indices
-		self.sheet.blitme(self.screen, self.index % self.sheet.totalCells, \
+		self.sheet.blitme(self.screen, self.step % self.sheet.totalCells, \
 												self.ship_x, self.ship_y)
 		
 		# Movement Sensors

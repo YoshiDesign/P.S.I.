@@ -97,7 +97,7 @@ class Thread_requests():
 					[relay_power, relay_score, relay_other] --> globals in gf.py
 
 				"""
-				print("FOUND DATA")
+				print("Collecting ... ")
 				print(data)
 
 				if data['power'] == 'bulletup':
@@ -108,25 +108,24 @@ class Thread_requests():
 					self.global_stats_dict['powers']['lazerup'] += 1
 
 
-def global_clock(time_flies):
-	timing = 1000
-	count = 0
-	while True:
+# def global_clock(time_fly):
+# 	timing = 1000
+# 	count = 0
+# 	while True:
 
-		if time_flies.recv():
+# 		if time_fly.recv():
 
-			if timing % 12:
-				count += 1
-				timing -= 1
-				print("time ", end="")
-				print(timing)
-				time_flies.send(count)
-				if timing <= 100:
-					timing = 1000
-					count = 0
+# 			if timing % 12:
+# 				count += 1
+# 				timing -= 1
+# 				print("time ", end="")
+# 				print(timing)
+# 				time_fly.send(count)
+# 				if timing <= 100:
+# 					timing = 1000
+# 					count = 0
 
-# pygame.draw.rect(screen, (255,255,255), [400, 500, 10, 50])
-def Main(enter, exit, time_stay):
+def Main(enter, exit):
 	
 	# Run main // (enter, exit) are not used to track exit conditions
 	pygame.init()
@@ -134,6 +133,7 @@ def Main(enter, exit, time_stay):
 	g_settings = Settings(exit)
 	screen = pygame.display.set_mode((g_settings.screen_width, \
 										g_settings.screen_height))
+	font = pygame.font.SysFont(None, 48)
 	# Load the background image
 	g_settings.load_background(screen)
 	stats 	= Stats(g_settings)
@@ -168,15 +168,15 @@ def Main(enter, exit, time_stay):
 	FPS = 22
 
 	""" 
-		KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py for efficiency 
-		When gameplay is active, textbox.update() ceases, and check_events takes over
+		KEYDOWNS occurring outside of gameplay compute within pygame_textinput.py 
+		When game is active, textbox.update() ceases, and gf.check_events takes over.
 	"""
 
 	while True: # Main Game Loop loops
 
 		clock.tick(FPS)
 		
-		if gf.update_screen(g_settings, screen, ship, textbox, aliens, reticle, \
+		if gf.update_screen(g_settings, screen, font, ship, textbox, aliens, reticle, \
 												twits, powerups, projectiles, stats, \
 														scores, buttons) == 'TX_QUIT':
 			# If we receive the quit flag.
@@ -201,25 +201,22 @@ def Main(enter, exit, time_stay):
 
 if __name__ == "__main__":
 
-	# P's & Q
-	q = Queue()
+	# P's & Queue
 	enter, exit = Pipe()
-	time_stay, time_flies = Pipe()
+	q = Queue()
+
+	# Auxiliary timing pipe
+	# time_stay, time_fly = Pipe()
 
 	# SENDING DATA ONLY // see gf.get_infoz() for tweet acquisition
 	listener = Process(target=Thread_requests.listening, args=(1, enter, exit))
 	listener.start()
 
-	# A persistent clock we can pipe to where a constant loop is needed
-	global_timing = Process(target=global_clock, args=(time_flies,))
-	global_timing.start()
-
-	# Circumstantial irony for a graceful conclusion. This runs the game
-	main_program_ends = Main(enter, exit, time_stay)
+	# This runs the game, all parts tied together
+	main_program_ends = Main(enter, exit)
 	
 	# Ritardando
 	if main_program_ends:
 		listener.terminate()
-		global_timing.terminate()
 		sys.exit()
 

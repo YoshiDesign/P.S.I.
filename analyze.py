@@ -89,20 +89,12 @@ class Analyzer():
             for word in n:
                 cls._neg_words.append(word)
 
-    # @staticmethod <-- Just in case I add prams to this class and begin to wonder
-    def get_difficulty():
-        """ Asshead meter """ 
-        x = Analyzer._pos_words_n
-        y = Analyzer._neg_words_n
+    @classmethod
+    def get_difficulty(c):
+        """ Otherwise, asshat meter """ 
+        x = c._pos_words_n
+        y = c._neg_words_n
         z = x + y
         return round(100 * (y / z))
 
-
-
-
-
-
-
-
-            
 
