@@ -675,13 +675,13 @@ def send_data_TEST(name, q, url=0, hash='', u_name='', flag=0):
 	"""
 	if not flag: # We are getting tweets
 		resp = []
-		url = "https://psigames.herokuapp.com/twit?h=" + name
+		url = "https://alyrist.herokuapp.com/twit?h=" + name
 		resp = requests.get(url)
 		return q.put(resp.json())
 
 	######## LOGIN #########
 	elif flag: # We are logging the user in from menu
-		ok = requests.post("https://psigames.herokuapp.com/servauth", \
+		ok = requests.post("https://alyrist.herokuapp.com/servauth", \
 								data={'hash':hash, 'u_name': u_name})
 		if ok:
 			return 1
@@ -689,7 +689,6 @@ def send_data_TEST(name, q, url=0, hash='', u_name='', flag=0):
 			print("BADNESS == {} - {}".\
 			format(ok.status_code, ok.reason))
 			return 12
-
 
 def get_infoz(g_settings, screen, twits, stats, scores, reticle, \
 							textbox, buttons, cur_scrn=0, hide=0):
@@ -726,10 +725,10 @@ def get_infoz(g_settings, screen, twits, stats, scores, reticle, \
 			handle = textbox.get_text()
 
 			if handle.lower() == "realdonaldtrump" or handle.lower() == "@realdonaldtrump":
-				print("TRUUUUUUUMP")
+				# Acquire Trump
 				g_settings.is_Trump = True
 			if handle.lower() == "yoshiyoshums" or handle.lower() == "@yoshiyoshums":
-				print("YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOSHI")
+				# Acquire the Poobah
 				g_settings.is_Yoshi = True
 
 			if not handle or handle == "":
@@ -765,10 +764,9 @@ def get_infoz(g_settings, screen, twits, stats, scores, reticle, \
 				user_tweets = q.get()
 
 			except: # Requests.exceptions or TimeoutError
-				# Trace server exception to stderr
+				# Trace server-side exception to stderr
 				print("Something went wrong : " \
 				"{}".format(sys.exc_info()[:-1]))
-				# ErrID
 				return 11
 
 ### ### ### ### ### ### ### ### Tweet Tweet ### ### ### ### ### ### ### ### ###
