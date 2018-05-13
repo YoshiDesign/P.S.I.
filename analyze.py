@@ -95,6 +95,10 @@ class Analyzer():
         x = c._pos_words_n
         y = c._neg_words_n
         z = x + y
-        return round(100 * (y / z))
+        try:
+            return round(100 * (y / z))
+        except ZeroDivisionError:
+            return 1
+
 
 
