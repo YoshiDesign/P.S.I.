@@ -28,7 +28,7 @@ Due to formatting requirements and intellectual property rights this game is in 
 ## Sentiment Analyzer
 All tweets are scored using the Natural Language ToolKit (nltk). A score is presented based upon the nice : mean words ratio. This score could be used to adjust difficulty, however, at this time all scenarios are the same difficulty (and non biased!). 
 
-## APIP
+## API
 Tweets(R) are collected over encrypted TLS1.2; the service making the Twython calls is not (directly) baked into this client. The game supports a currently disabled login fsystem and Twitter OAuth. All communications are encrypted. Passwords are transmitted as MD5 digests.
 
 ## Other Features
