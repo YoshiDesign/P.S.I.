@@ -1,10 +1,10 @@
 """017, Silas Gyger, silasgyger@gmail.com, All rights reserved.
     
     Modifications by Anthony Lyristis (YoshiDesign)
-    - Added password-field mode ::156 "--------------" as arbitrary placeholder.
-    - Added reset()
-    - Important! : call TextInput.reset() before creating an instance or otherwise rendering.
-        ~ This was to fix frozen character placement and BS tracking issues after calls to clear_text()
+    - Added a hidden password-field ln:156
+    - Added reset() 
+    - Call TextInput.reset() before creating an instance or otherwise rendering any text field.
+        ~ This was to fix frozen character placement and backspace/cursor tracking issues after calls to clear_text()
 """
 import sys
 import pygame

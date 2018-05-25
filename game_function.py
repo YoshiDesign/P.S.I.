@@ -33,6 +33,7 @@ get_bomb = False
 # Timing constraints
 laz_lok = 255
 bom_lok = 255
+bul_lok = 255
 # List of literal indices i.e. [1,3] means we destroyed 0 and 2 ...
 twits_list = []
 # List of full tweets
@@ -81,6 +82,12 @@ def check_events(g_settings, screen, ship, aliens, stats, \
 			keydown_event(event, g_settings, screen, ship, \
 								stats, scores, projectiles)
 			
+			if event.key == pygame.K_SPACE:
+				g_settings.firing = True
+				# Handles bullets and bombs
+				fire_weapon(g_settings, screen, ship, projectiles[1], projectiles[0])
+
+
 			# if event.type == pygame.KEYUP:
 			# keyup_event(event, g_settings, stats)
 
@@ -88,6 +95,7 @@ def check_events(g_settings, screen, ship, aliens, stats, \
 			keyup_event(event, g_settings, stats)
 			
 
+		# Fire lazer is separate because it does not use keyboard event
 		elif laz_lok >= 254 and event.type == pygame.MOUSEBUTTONDOWN:
 			
 			if get_lazer:
@@ -145,10 +153,10 @@ def keyup_event(event, g_settings, stats):
 def keydown_event(event, g_settings, screen, ship, stats, 
 					scores, projectiles, is_lazer=False):
 	""" Keydowns """
-	# Aka more events
+
 	if stats.game_active:
 		
-		# Extra Boolean Falsey values included. Most recent key takes precedence in a pair
+		# Extra Boolean Falsey values will ease the transaction of multi keystrokeage
 
 		if event.key == pygame.K_d:
 			g_settings.move_left = False
@@ -166,28 +174,27 @@ def keydown_event(event, g_settings, screen, ship, stats,
 			g_settings.move_down = False
 			g_settings.move_up = True
 
-		elif event.key == pygame.K_SPACE:
-			g_settings.firing = True
-			# Handles bullets and bombs
-			fire_weapon(g_settings, screen, ship, projectiles[1], projectiles[0])
-
 	return 0
 
 def fire_weapon(g_settings, screen, ship, bullets, bombs):
 
+	# Tracks weapon levels
 	global powers
+	# Global restraints
 	global bom_lok
 	global get_bomb
 
+	# Update from dynamic settings
 	k_boom = 	powers['bombup'] 	= g_settings.bomb
 	k_bull = 	powers['bulletup'] 	= g_settings.bullets
 
 	# Fire upgraded bullets
 	if powers['bulletup']:
-		# Shuts off the main gun
+		# Shuts off the starting gun
 		g_settings.default_gun = 0
 		powers['gun'] = 0
-		fire_bullets(screen, g_settings, ship, bullets, k_bull, v='bulletup')
+		if len(bullets.sprites()) <= 15:
+			fire_bullets(screen, g_settings, ship, bullets, k_bull, v='bulletup')
 
 	# Fire bombs (also k_SPACE)
 	if powers['bombup'] and bom_lok >= 250:
@@ -201,7 +208,8 @@ def fire_weapon(g_settings, screen, ship, bullets, bombs):
 	elif g_settings.default_gun:
 		# We have the gun until we touch any bulletup
 		powers['gun'] = 1
-		if len(bullets.sprites()) <= 2:
+		# Shoot if there are <= 16 bullets drawn to screen
+		if len(bullets.sprites()) <= 16:
 			new_bullet = Bullet(g_settings, screen, ship, power='gun', level=1)
 			bullets.add(new_bullet)
 
@@ -224,6 +232,7 @@ def fire_lazer(screen, g_settings, ship, lazers, lazer_up):
 		return 0
 
 def fire_bullets(screen, g_settings, ship, bullets, k, v=''):
+	global bul_lok
 
 	for num in range(0, (k*2)):
 		# k == 'bulletup' // v == v
@@ -531,7 +540,7 @@ def create_army(g_settings, screen, twits, all_tweets, \
 		x = all_tweets.pop(0)
 		x = ""
 
-	# Pop the last tweet if uneven tweets
+	# Pop the last tweet if uneven total tweets were acquired
 	elif len(all_tweets):
 		print("THERE ARE STILL TWEETS")
 		x = all_tweets.pop(0)
@@ -559,7 +568,7 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 	powers = {
 				'1' : 'bulletup', '2' : 'bombup', \
 				'3' : 'lazerup', '4' : 'speedup', \
-				'5' : 'bulletup', '6' : 'scoreup'
+				'5' : 'scoreup', '6' : 'scoreup'
 			}
 
 	text_data = {}
@@ -579,21 +588,10 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 		character = Tweeter(g_settings, screen, \
 							text_data=text_data)
 		# Determine if carrying powerup
-		x = randint(2,27)
-		if not (x % 6):
-			# Pick powerup
-			x = randint(1,20)
-			if x >= 6 and x < 11:
-				# EASY DROP
-				character.power = powers['6']
-			elif x >= 18:
-				character.power = powers['5']
-			elif x < 18 and x > 11:
-				character.power = powers['1']
-			else:
-				if not x == 2:
-					x = randint(3,6)
-				character.power = powers[str(x)]
+		x = randint(1,6)
+		y = randint(1,12)
+		if y == 3:
+			character.power = powers[str(x)]
 		else:
 			# twit does not have a power
 			character.power = 0
@@ -637,14 +635,14 @@ def assign_twit(g_settings, screen, twits, letter, sentiment, \
 ### ### ### ### ### ### ### ### Twit Placement ### ### ### ### ### ### ### ### 
 
 def give_twit_dimension(character, x_pos, row):
-	""" Tells each character where to appear on screen """
+	""" Positional awareness for each letter """
 	width = character.rect.width
 	character.x = width * x_pos
 	character.rect.x = character.x
 	character.rect.y = character.rect.height + (2 * (character.rect.height * row))
 
-# Generator from 0 to total COLS
 def make_space(columns):
+	""" Generator from 0 to total COLS """
 	for space in range(columns):
 		yield space
 
@@ -669,8 +667,8 @@ def get_high_score(stats, scores):
 
 def send_data_TEST(name, q, url=0, hash='', u_name='', flag=0):
 	""" 
-		flag = 0 = Activate the web server's view function to access the Twitter API 
-		flag = 1 = Authenticate user from client login
+		flag = 0 = Access the Twitter API 
+		flag = 1 = Authenticate user from client login (DISABLED)
 
 	"""
 	if not flag: # We are getting tweets
@@ -680,21 +678,21 @@ def send_data_TEST(name, q, url=0, hash='', u_name='', flag=0):
 		return q.put(resp.json())
 
 	######## LOGIN #########
-	elif flag: # We are logging the user in from menu
-		ok = requests.post("https://alyrist.herokuapp.com/servauth", \
-								data={'hash':hash, 'u_name': u_name})
-		if ok:
-			return 1
-		else:
-			print("BADNESS == {} - {}".\
-			format(ok.status_code, ok.reason))
-			return 12
+	# elif flag: # We are logging the user in from menu
+	# 	ok = requests.post("https://alyrist.herokuapp.com/servauth", \
+	# 							data={'hash':hash, 'u_name': u_name})
+	# 	if ok:
+	# 		return 1
+	# 	else:
+	# 		print("BADNESS == {} - {}".\
+	# 		format(ok.status_code, ok.reason))
+	# 		return 12
 
 def get_infoz(g_settings, screen, twits, stats, scores, reticle, \
 							textbox, buttons, cur_scrn=0, hide=0):
 	""" 
-		Check user input, get tweets from server, analyze them and begin game.
-		textbox.update() returns True if use presses Enter 
+		Get user input // Call to Twitter // Conduct Sent. Analysis // Start Game
+		textbox.update() returns True if user presses Enter
 	"""
 	mousex, mousey = pygame.mouse.get_pos()
 	pygame.mouse.set_visible(False)
@@ -753,7 +751,6 @@ def get_infoz(g_settings, screen, twits, stats, scores, reticle, \
 								((255 - (i % 200)), (0), (255 - (i % 200)))]
 
 					loading_wheel(screen, i, reticle, colors)
-
 					if i == 400:
 						i = 0
 
@@ -1406,9 +1403,10 @@ def weapon_locks(screen, mousex, mousey, get_lazer, get_bomb):
 		if not bom_lok < 245:
 			bom_lok = 255
 		else:
-			bom_lok += 200
+			bom_lok += 10
 
 	if not laz_lok == 255:
+		# Charging
 		pygame.draw.aalines(screen, (5 * (laz_lok % 50), 0, 0), False, \
 					[[mousex + 11,mousey],[mousex, mousey - 11], \
 					[mousex, mousey - 11],[mousex - 11, mousey], \
@@ -1416,6 +1414,7 @@ def weapon_locks(screen, mousex, mousey, get_lazer, get_bomb):
 					[mousex, mousey + 11],[mousex + 11, mousey]], False)
 
 	else:
+		# Ready
 		pygame.draw.aalines(screen, (255, 10, 255), False,\
 					[[mousex + 11, mousey],[mousex,mousey - 11], \
 					[mousex, mousey - 11],[mousex - 11, mousey], \
@@ -1424,10 +1423,9 @@ def weapon_locks(screen, mousex, mousey, get_lazer, get_bomb):
 
 	if not bom_lok == 255:
 		pygame.draw.aalines(screen, (255, 0, 0), False, \
-					[[mousex + 11, mousey],[mousex - 11, mousey], \
-					[mousex + 8, mousey - 3],[mousex - 8, mousey - 3], \
-					[mousex + 5, mousey - 5],[mousex - 5, mousey - 5], \
-					[mousex + 3, mousey - 8],[mousex - 3, mousey - 8]], False)
+					[[mousex + 11, mousey + 11],[mousex - 11, mousey - 11], \
+					[mousex + 11, mousey - 11],[mousex - 11, mousey + 11],\
+					[mousex + 11, mousey + 11]], False)
 
 	return 0
 

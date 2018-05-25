@@ -2,9 +2,8 @@ import pygame
 import os
 from pygame.locals import *
 
-
 class Spritesheet:
-
+	""" Render individual sprites from a spritesheet """
 	def __init__(self, fp, cols, rows, index=0):
 		
 		self.sheet = pygame.image.load(os.fsdecode(fp)).convert_alpha()

@@ -40,7 +40,7 @@ class Settings():
 		
 		# Bullets
 		self.bullet_speed 	= 25
-		self.bullet_length 	= 2
+		self.bullet_length 	= 1
 		self.bullet_width 	= 1
 		self.bullet_color 	= (255,255,190)
 		self.gun_width 		= 3
@@ -114,9 +114,9 @@ class Settings():
 		self.bullets_ammo = 0
 		self.bomb_ammo 	= 0
 		# Damages
-		self.bullet_dmg = 200
-		self.lazer_dmg 	= 10
-		self.bomb_dmg 	= 5
+		self.bullet_dmg = 100
+		self.lazer_dmg 	= 15
+		self.bomb_dmg 	= 100
 		
 	def reset_weapon_damage(self, weapon):
 

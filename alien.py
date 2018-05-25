@@ -1,6 +1,7 @@
 import pygame, os
 from pygame.sprite import Sprite
 
+# Currently Unused - Just another sprite entity
 
 class Alien(Sprite):
 

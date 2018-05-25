@@ -8,6 +8,7 @@ from nltk.tokenize import TweetTokenizer
 class Analyzer():
     """Implements tokenizer and sentiment analysis."""
 
+    # Tracking Datum
     _pos_words_n = 0
     _neg_words_n = 0
     _pos_words = []
