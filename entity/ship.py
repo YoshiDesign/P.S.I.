@@ -16,17 +16,17 @@ class Ship(Sprite):
 		self.g_settings = g_settings
 		# Get screen & Screen Object
 		self.screen = screen
-		self.stats = stats
+		self.stats 	= stats
 
 		# Increment Spritesheets
-		self.index = 0
-		self.step = 0
+		self.index 	= 0
+		self.step 	= 0
 
 		self.screen_rect = screen.get_rect()
-		self.fp = os.fsencode("media/spritesheets/shipsheet.png")
-		self.sheet = Spritesheet(self.fp, 4, 3)
-		# Used for life counter
-		self.index = 0
+		self.fp 	= os.fsencode("media/spritesheets/shipsheet.png")
+		self.sheet 	= Spritesheet(self.fp, 4, 3)
+		# Used to slow down rapid animation
+		self.index 	= 0
 		
 		# Since we blit the boat based on a spritesheet, we need initial static allocation to start
 		# Note : The ship image follows a manually instantiated pygame.Rect its rect, not vice versa
@@ -98,8 +98,8 @@ class Ship(Sprite):
 
 	def power_up(self, pwr=''):
 		""" 
-			Must be called to fully initialize the ship
-			when pwr=False, g_settings.(pwr) is 3/3
+			Must be called when initializing the ship
+			returns false when g_settings.(pwr) is 3/3
 		"""
 
 		if pwr == False:
