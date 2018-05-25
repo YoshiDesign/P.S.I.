@@ -1,26 +1,45 @@
-# P.S.I.
-A data driven game.
+# Personal Space Invaders
+A socially data-driven game.
 
-## Sentiment Analysis
-Difficulty and pace are functions of the niceness of a user's timeline.
+# Controls
+
+WASD - Movement
+
+Space - Fire
+
+LeftClick - Lazer Cloud
+
+There is no pause menu...
+
+### Usage
+python invade.py
+
+(Install requirements.txt first ya dingus)
+
+(vrt) user@User:~/P.S.I.$ pip install -r requirements.txt
+
+## Disclaimer
+This game was created as a personal learning exercise. I hope others will use it to a similar degree.
+
+Due to formatting requirements and intellectual property rights this game is in violation of the Twitter(R) Developer ToS. This software must not be distributed and must not be sold as is presented in this repository (YoshiDesign). It is a proof of concept and an educational tool. I hope you will find the amalgamation of the ideas presented to be inspiring. I hope to also promote the use of realtime data in video game development.
+
+# Features
+
+## Sentiment Analyzer
+All tweets are scored using the Natural Language ToolKit (nltk). A score is presented based upon the nice : mean words ratio. This score could be used to adjust difficulty, however, at this time all scenarios are the same difficulty (and non biased!). 
 
 ## API
-I make remote calls to my personal API, built with Flask into a Heroku app, for all of my functional needs. This keeps my projects lightweight and promotes a more streamlined use of multiprocessing/async. One of those needs is a call to the Twython for Python library to collect the tweets of anyone whom you might consider your peer (enemy) and/or friend (bantha-fodder).
-
-## Data Collate
-Thanks to the wonders of multithreading, as you play the game you are also scanning the sentiments of the users whom you attack for multiple data points. You can see why I am unable to freely distribute this game. Defamation is not a studying programmers concern. *gulp*
+Tweets(R) are collected over encrypted TLS1.2; the service making the Twython calls is not (directly) baked into this client. The game supports a currently disabled login fsystem and Twitter OAuth. All communications are encrypted. Passwords are transmitted as MD5 digests.
 
 ## Other Features
-If you play against Donald Trump, all of the power ups become american flags and dollar bills.
-If you play agains me (@YoshiYoshums), the theme is slightly Nintendo.
+If you play against the current U.S. president, all of the power ups become american flags and dollar bills.
+If you play agains me (@YoshiYoshums), the theme is slightly more retro.
 
 ## Plans for future development (?)
-- I would like to add an Elon Musk condition that turns the power ups into rocket boosters that land sit the bottom of the screen instead of disappearing.
-- Fix the purple power up's line measure.
+Probably not. I hope a fellow programmer will tweak this project to their liking. But seeing how many restrictions are placed on intellectual property rights, I think I will move on to my next project
 
-## Things I removed
-- Ability to log-in. Again, this game is not for distrobution nor data mining (kinda) personal data.
-- Stat tracking. For similar reasons.
+## Bugs
+None?
 
-## Things I would like changed
-- Rethink the description of difficulty. Using the ratio of positive/negative words means 1 negative and 2 positive words makes the "playee" 50% unkind. This is surely not a fair representation. I would simply count total negative and total positive, and use each as game-state variables in their own terms.
+## Optimization
+The bullets and bombs do not play well together. Needs some friendly optimizations from the maths and threads department.

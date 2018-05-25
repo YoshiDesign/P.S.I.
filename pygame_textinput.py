@@ -77,7 +77,6 @@ class TextInput:
                     return 'TX_QUIT'
             if not stats.game_active:
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    print("The game is not active, click!")
                     # OPT  make a button group and cycle through them for readability
 
 

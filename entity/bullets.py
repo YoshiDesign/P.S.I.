@@ -85,7 +85,7 @@ class Bullet(Sprite):
 
 			self.slope = float(self.delta_y / self.delta_x)
 
-			print("SLOPE = {}".format(self.slope))
+			# print("SLOPE = {}".format(self.slope))
 
 		# Ima Bullet
 		elif self.power == 'bulletup' and self.level > 0:
