@@ -14,11 +14,11 @@ class Settings():
 		self.screen_height 	= 800
 
 		# Load Image / sprites. 
-		self.f1 = os.fsencode("media/BackMain.jpg")
-		self.f2 = os.fsencode("media/BackUsr.jpg")
-		self.f3 = os.fsencode("media/BackPwd.jpg")
+		self.f1 = os.fsencode("media/g_backS.jpg")
+		self.f2 = os.fsencode("media/back_user.jpg")
+		self.f3 = os.fsencode("media/back_pass.jpg")
 		self.f4 = os.fsencode("media/GameBack.jpg")
-		self.f5 = os.fsencode("media/BackMain2.jpg")
+		self.f5 = os.fsencode("media/g_backL.jpg")
 		self.fY = os.fsencode("media/GameBackY.jpg")
 		# self.f5 = os.fsencode("media")
 
