@@ -1,5 +1,5 @@
-# P.S.I.
-A data driven anti-social game.
+# Personal Space Invaders
+A socially data-driven game.
 
 # Controls
 
@@ -11,10 +11,17 @@ LeftClick - Lazer Cloud
 
 There is no pause menu...
 
-This game was created as a personal learning exercise. I hope others will use it to a similar degree.
+### Usage
+python invade.py
+
+(Install requirements.txt first ya dingus)
+
+(vrt) user@User:~/P.S.I.$ pip install -r requirements.txt
 
 ## Disclaimer
-Due to formatting requirements and intellectual property rights this game is in violation of the Twitter(R) Developer ToS. This software is non distributable and may not be sold. It is a proof of concept and an educational tool. I hope you will find the amalgamation of the ideas presented to be inspiring.
+This game was created as a personal learning exercise. I hope others will use it to a similar degree.
+
+Due to formatting requirements and intellectual property rights this game is in violation of the Twitter(R) Developer ToS. This software is non distributable and may not be sold. It is a proof of concept and an educational tool. I hope you will find the amalgamation of the ideas presented to be inspiring. I hope to also promote the use of realtime data in video game development.
 
 # Features
 
@@ -22,7 +29,7 @@ Due to formatting requirements and intellectual property rights this game is in 
 All tweets are scored using the Natural Language ToolKit (nltk). A score is presented based upon the nice : mean words ratio. This score could be used to adjust difficulty, however, at this time all scenarios are the same difficulty (and non biased!)
 
 ## API
-Tweets are collected over encrypted TLS1.2, the service making the Twython calls is not (directly) baked into this client. The game supports a currently disabled login feature and Twitter OAuth. All communications are encrypted. The password feature is transmitted in MD5.
+Tweets(R) are collected over encrypted TLS1.2, the service making the Twython calls is not (directly) baked into this client. The game supports a currently disabled login feature and Twitter OAuth. All communications are encrypted. The password feature is transmitted in MD5.
 
 ## Other Features
 If you play against the current U.S. president, all of the power ups become american flags and dollar bills.
