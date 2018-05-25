@@ -10,7 +10,7 @@ import requests
 from time import sleep
 from pygame.locals import *
 from pygame.sprite import Group
-from multiprocessing import Process, Pipe, Queue, set_start_method
+from multiprocessing import Process, Pipe, Queue
 
 import game_function as gf
 from tools.scoreboard import Score
