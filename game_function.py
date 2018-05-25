@@ -372,6 +372,8 @@ def end_game(g_settings, screen, stats, ship, powerups, projectiles, \
 	global all_tweets
 	global twit_id
 	global powers
+	global get_lazer
+	global get_bomb
 	
 	# Maybe I could reset globals at game start they could be used for score tracking
 	total_twits = 0
@@ -379,6 +381,8 @@ def end_game(g_settings, screen, stats, ship, powerups, projectiles, \
 	all_tweets 	= []
 	twit_id 	= 0
 	default_gun	= 1
+	get_lazer 	= False
+	get_bomb	= False
 
 	# SHould reset at the beginning, not the end
 	powers = {'gun' : 0, 'lazerup' : 0, 'bulletup' : 0, 'bombup' : 0}
