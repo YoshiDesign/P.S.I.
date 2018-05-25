@@ -30,21 +30,6 @@ from entity.tweeter import Tweeter
 				  .set_icon
 """
 
-def generate_field(i, q=0):
-
-	""" 
-		Simple reverse generator 
-	"""
-	if q:
-		i = i + q
-	for x in range(i, 0, -1):
-		try:
-			yield x
-		except StopIteration:
-			return False
-		else:
-			return True
-
 class Thread_requests():
 
 	""" Game Data to be sent to the webserver """
