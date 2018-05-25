@@ -28,8 +28,8 @@ Due to formatting requirements and intellectual property rights this game is in 
 ## Sentiment Analyzer
 All tweets are scored using the Natural Language ToolKit (nltk). A score is presented based upon the nice : mean words ratio. This score could be used to adjust difficulty, however, at this time all scenarios are the same difficulty (and non biased!). 
 
-## API
-Tweets(R) are collected over encrypted TLS1.2; the service making the Twython calls is not (directly) baked into this client. The game supports a currently disabled login feature and Twitter OAuth. All communications are encrypted. The password feature is transmitted in MD5.
+## APIP
+Tweets(R) are collected over encrypted TLS1.2; the service making the Twython calls is not (directly) baked into this client. The game supports a currently disabled login fsystem and Twitter OAuth. All communications are encrypted. Passwords are transmitted as MD5 digests.
 
 ## Other Features
 If you play against the current U.S. president, all of the power ups become american flags and dollar bills.
@@ -39,7 +39,7 @@ If you play agains me (@YoshiYoshums), the theme is slightly more retro.
 Probably not. I hope a fellow programmer will tweak this project to their liking. But seeing how many restrictions are placed on intellectual property rights, I think I will move on to my next project
 
 ## Bugs
-None
+None?
 
 ## Optimization
 The bullets and bombs do not play well together. Needs some friendly optimizations from the maths department.
