@@ -42,4 +42,4 @@ Probably not. I hope a fellow programmer will tweak this project to their liking
 None?
 
 ## Optimization
-The bullets and bombs do not play well together. Needs some friendly optimizations from the maths department.
+The bullets and bombs do not play well together. Needs some friendly optimizations from the maths and threads department.
