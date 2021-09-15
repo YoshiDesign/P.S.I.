@@ -21,7 +21,7 @@ python invade.py
 ## Disclaimer
 This game was created as a personal learning exercise. I hope others will use it to a similar degree.
 
-Due to formatting requirements and intellectual property rights this game is in violation of the Twitter(R) Developer ToS. This software must not be distributed and must not be sold as is presented in this repository (YoshiDesign). It is a proof of concept and an educational tool. I hope you will find the amalgamation of the ideas presented to be inspiring. I hope to also promote the use of realtime data in video game development.
+Due to formatting requirements and intellectual property rights this game is in violation of Twitter's Developer ToS. This software must not be distributed and must not be sold as is presented in this repository (YoshiDesign). It is a proof of concept and an educational tool. I hope you will find the amalgamation of the ideas presented to be inspiring. I hope to also promote the use of realtime data in video game development.
 
 # Features
 
